@@ -1,0 +1,55 @@
+name: Deploy changed stacks to AWS
+
+on:
+  push:
+    branches:
+      - release/backend
+
+
+env:
+  AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  STAGING_CERTIFICATE_ARN: ${{ secrets.STAGING_CERT_ARN }}
+  STAGING_CLOUDFRONT_SSL_CERTIFICATE_ARN: ${{ secrets.STAGING_CLOUDFRONT_ARN }}
+  AWS_REGION: eu-west-1
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{env.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{env.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{env.AWS_REGION}}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Install packages
+        id: install-packages
+        run: npm install
+
+      - name: Run cdk bootstrap
+        id: Run-cdk
+        run: |
+          npx nx run infra:bootstrap
+
+      - name: Find the difference between the current state and the target state
+        id: get-diff
+        run: |
+          npx nx run infra:synth
+          npx nx run infra:diff
+
+      - name: Deploy the stack to AWS
+        id: deploy-image
+        env:
+          LOCAL: true
+        run: |
+          npx nx run infra:deploy

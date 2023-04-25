@@ -1,0 +1,43 @@
+{
+  "name": "razzle-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/razzle-sdk/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/razzle-sdk/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/razzle-sdk/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/razzle-sdk",
+        "tsConfig": "libs/razzle-sdk/tsconfig.lib.json",
+        "packageJson": "libs/razzle-sdk/package.json",
+        "main": "libs/razzle-sdk/src/index.ts",
+        "assets": ["libs/razzle-sdk/*.md"]
+      }
+    },
+    "doc": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "cwd": "libs/razzle-sdk",
+        "command": "npx typedoc --options typedoc.json"
+      }
+    }
+  },
+  "tags": []
+}

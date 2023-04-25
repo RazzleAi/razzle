@@ -1,0 +1,44 @@
+from node:16.18.1 as build_stage
+
+
+# Set the working directory
+WORKDIR /build
+
+# Copy in the project files
+COPY dist/apps/backend/* ./
+COPY apps/backend/prisma ./prisma
+# Install the dependencies
+RUN npm install
+RUN npm install @razzledotai/sdk
+
+# Copy the build files to the production image
+FROM node:16.17.1-alpine AS run_stage
+
+WORKDIR /app
+COPY --from=build_stage /build/* ./
+
+ENV DATABASE_URL="mongodb://razzle:razzle@host.docker.internal:27017/razzle_database?authSource=admin&directConnection=true"
+
+# redis
+ENV REDIS_HOST='localhost'
+ENV REDIS_PORT=6379
+ENV REDIS_PASSWORD=razzle
+
+# secret key for generating the default app api key
+ENV DEFAULT_APP_KEY_SECRET=e89dab8f927eb77ea24b5b62369c09184c0330d515dea5ba92b407bea9dbe24d
+ENV DEFAULT_USER_EMAIL=default-user@razzle.com
+
+ENV OPENAI_KEY=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
+
+ENV EMAIL_CRON="0 0/5 * 1/1 * *"
+
+# Expose the port
+EXPOSE 3333
+
+# Start the server
+CMD npx prisma db push && npx prisma generate && node ./main.js
+
+
+
+
+

@@ -1,0 +1,197 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String                   @id @default(auto()) @map("_id") @db.ObjectId
+  authUid                String                   @unique
+  email                  String                   @unique
+  username               String                   @unique
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  loginType              String
+  profilePictureUrl      String?
+  WorkspaceUser          WorkspaceUser[]
+  AccountUser            AccountUser[]
+  UserAppAuthentication  UserAppAuthentication[]
+  AccountUserInviteToken AccountUserInviteToken[]
+}
+
+model Account {
+  id                     String                   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  name                   String                   @unique
+  matchDomain            String?
+  enableDomainMatching   Boolean                  @default(false)
+  workspaces             Workspace[]
+  apps                   App[]
+  AccountUser            AccountUser[]
+  AccountUserInviteToken AccountUserInviteToken[]
+}
+
+model AccountUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.ObjectId
+  isOwner   Boolean  @default(false)
+
+  @@unique([accountId, userId, isOwner])
+}
+
+model App {
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String
+  appId                 String                  @unique
+  apiKey                String                  @unique
+  iconUrl               String?
+  description           String
+  creatorId             String                  @db.ObjectId
+  creator               Account                 @relation(fields: [creatorId], references: [id])
+  data                  Json?
+  isDefault             Boolean                 @default(false)
+  handle                String?
+  isPublic              Boolean                 @default(false)
+  infoUrl               String?
+  deleted               Boolean                 @default(false)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  workspaceApps         WorkspaceApp[]
+  UserAppAuthentication UserAppAuthentication[]
+}
+
+model Workspace {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String?
+  deleted       Boolean         @default(false)
+  isDefault     Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  workspaceApps WorkspaceApp[]
+  accountId     String          @db.ObjectId
+  account       Account         @relation(fields: [accountId], references: [id])
+  workspaceUser WorkspaceUser[]
+}
+
+model WorkspaceApp {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String    @db.ObjectId
+  app         App       @relation(fields: [appId], references: [id])
+  appId       String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, appId])
+}
+
+model WorkspaceUser {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id])
+  workspaceId String              @db.ObjectId
+  user        User                @relation(fields: [userId], references: [id])
+  userId      String              @db.ObjectId
+  role        WorkspaceUserRole[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([workspaceId, userId])
+}
+
+enum WorkspaceUserRole {
+  ADMIN
+  MEMBER
+}
+
+model ClientHistoryItem {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientId        String
+  workspaceId     String
+  hash            String
+  isFramed        Boolean? @default(false)
+  message         Json
+  timestampMillis Int
+}
+
+model UserAppAuthentication {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String   @db.ObjectId
+  app           App      @relation(fields: [appId], references: [id])
+  appId         String   @db.ObjectId
+  authenticated Boolean
+  createdAt     DateTime @default(now())
+}
+
+model AccountUserInviteToken {
+  id                     String                   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  account                Account                  @relation(fields: [accountId], references: [id])
+  accountId              String                   @db.ObjectId
+  user                   User                     @relation(fields: [userId], references: [id])
+  userId                 String                   @db.ObjectId
+  token                  String                   @unique
+  emailInvitee           String
+  expiresOn              DateTime
+  valid                  Boolean                  @default(false)
+  accountUserInviteEmail AccountUserInviteEmail[]
+}
+
+model AccountUserInviteEmail {
+  id                       String                 @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  accountUserInviteToken   AccountUserInviteToken @relation(fields: [accountUserInviteTokenId], references: [id])
+  accountUserInviteTokenId String                 @db.ObjectId
+  emailReference           String
+}
+
+model Email {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  reference   String      @unique
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  to          String
+  from        String?
+  subject     String
+  body        String
+  sentOn      DateTime?
+  sent        Boolean     @default(false)
+  emailType   EmailType
+  contentType ContentType
+}
+
+enum EmailType {
+  ACCOUNT_USER_INVITE
+}
+
+enum ContentType {
+  TEXT
+  HTML
+}
+
+model Onboarding {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  accountId            String   @db.ObjectId
+  userId               String   @db.ObjectId
+  appCreated           Boolean  @default(false)
+  appSynced            Boolean  @default(false)
+  firstActionTriggered Boolean  @default(false)
+  promptTriggered      Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}

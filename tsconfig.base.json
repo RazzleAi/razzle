@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": ".",
+    "paths": {
+      "@razzle/dto": ["libs/dto/src/index.ts"],
+      "@razzle/razzle-widgets": ["libs/razzle-widgets/src/index.ts"],
+      "@razzle/sdk": ["libs/razzle-sdk/src/index.ts"],
+      "@razzle/services": ["libs/services/src/index.ts"],
+      "@razzle/widgets": ["libs/widgets/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

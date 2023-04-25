@@ -1,0 +1,19 @@
+@tailwind components;
+@tailwind base;
+@tailwind utilities;
+
+/* You can add global styles to this file, and also import other style files */
+
+@font-face {
+  font-family: "Mona Sans";
+  src: url('assets/fonts/Mona-Sans.ttf');
+  src: url('assets/fonts/Mona-Sans.woff2') format('woff2'),
+       url('assets/fonts/Mona-Sans.woff') format('woff'),
+       url('assets/fonts/Mona-Sans.ttf') format('truetype');
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}

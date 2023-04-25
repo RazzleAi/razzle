@@ -1,0 +1,42 @@
+{
+  "name": "widgets",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/widgets/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/widgets",
+        "main": "libs/widgets/src/index.ts",
+        "tsConfig": "libs/widgets/tsconfig.lib.json",
+        "assets": ["libs/widgets/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/widgets/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/widgets/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "doc": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "cwd": "libs/widgets",
+        "command": "npx typedoc --options typedoc.json"
+      }
+    }
+  },
+  "tags": []
+}
