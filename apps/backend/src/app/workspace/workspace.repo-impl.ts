@@ -3,6 +3,7 @@ import { Workspace, WorkspaceUserRole } from '@prisma/client'
 import { PageParams, Page } from '@razzle/dto'
 import {
   App,
+  WorkspaceApp,
   WorkspaceRepo,
   WorkspaceWithUser,
   appFromPrisma,
@@ -50,13 +51,22 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
     return apps
   }
 
-  async addAppToWorkspace(workspaceId: string, appId: string): Promise<void> {
-    await this.prismaService.workspaceApp.create({
+  async addAppToWorkspace(workspaceId: string, appId: string): Promise<WorkspaceApp> {
+    const res = await this.prismaService.workspaceApp.create({
       data: {
         workspaceId,
         appId,
       },
+      include: {
+        app: true,
+        workspace: true,
+      }
     })
+
+    return {
+      ...res,
+      app: await appFromPrisma(res.app),
+    }
   }
 
   async removeAppFromWorkspace(
@@ -82,6 +92,29 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
     })
     return !!result
   }
+
+  async getWorkspaceApp(workspaceId: string, appId: string): Promise<WorkspaceApp | null> {
+    const result = await this.prismaService.workspaceApp.findFirst({
+      where: {
+        workspaceId,
+        appId,
+      },
+      include: {
+        app: true,
+        workspace: true,
+      },
+    })
+
+    if (!result) {
+      return null
+    }
+
+    return {
+      ...result,
+      app: await appFromPrisma(result.app),
+    }
+  }
+
 
   findWorkspacesByAccountId(accountId: string): Promise<Workspace[]> {
     return this.workspace.findMany({

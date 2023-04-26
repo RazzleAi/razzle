@@ -13,6 +13,7 @@ import {
 } from '../ml'
 import {
   UpdateWorkspaceInput,
+  WorkspaceApp,
   WorkspaceRepo,
   WorkspaceWithUser,
 } from './workspace.repo'
@@ -261,11 +262,17 @@ export class WorkspaceService {
     }
   }
 
-  async addAppToWorkspace(appId: string, workspaceId: string): Promise<void> {
-    if (await this.workspaceRepo.isAppInWorkspace(workspaceId, appId)) {
-      return
-    }
+  async addAppToWorkspace(appId: string, workspaceId: string): Promise<WorkspaceApp> {
+    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(workspaceId, appId)
+    if (workspaceApp) {
+      return workspaceApp
+    }    
     return this.workspaceRepo.addAppToWorkspace(workspaceId, appId)
+  }
+
+  async isAppInWorkspace(workspaceId: string, appId: string): Promise<boolean> {
+    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(workspaceId, appId)
+    return !!workspaceApp
   }
 
   async removeAppFromWorkspace(

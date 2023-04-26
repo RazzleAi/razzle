@@ -1,10 +1,13 @@
-import { Workspace, WorkspaceUser } from '@prisma/client'
+import { Workspace, WorkspaceUser, WorkspaceApp as PrismaWorkspaceApp } from '@prisma/client'
 import { Page, PageParams } from '@razzle/dto'
 import { User } from '../user'
 import { App } from '../apps'
 
+
 export type WorkspaceWithUser = WorkspaceUser & {workspace: Workspace, user: User}
 export type UpdateWorkspaceInput = Partial<Omit<Workspace, 'id' | 'accountId' | 'deleted' | 'createdAt' | 'updatedAt'>>
+export type WorkspaceApp = PrismaWorkspaceApp & {app: App; workspace: Workspace}
+
 export interface WorkspaceRepo {
   findById(id: string): Promise<Workspace | null>
   getAppsInWorkspace(workspaceId: string): Promise<App[]>  
@@ -23,9 +26,10 @@ export interface WorkspaceRepo {
     pageParams: PageParams,
   ): Promise<Page<WorkspaceWithUser>>
   removeUserFromWorkspace(workspaceId: string, userId: string): Promise<void>
-  addAppToWorkspace(workspaceId: string, appId: string): Promise<void>
+  addAppToWorkspace(workspaceId: string, appId: string): Promise<WorkspaceApp>
   removeAppFromWorkspace(workspaceId: string, appId: string): Promise<void>
   isAppInWorkspace(workspaceId: string, appId: string): Promise<boolean>  
+  getWorkspaceApp(workspaceId: string, appId: string): Promise<WorkspaceApp | null>
   findWorkspacesByUserIdAndAccountId(userId: string, accountId: string): Promise<Workspace[]>
   updateWorkspace(id: string, data: Partial<Workspace>): Promise<Workspace>
 }

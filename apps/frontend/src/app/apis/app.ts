@@ -27,9 +27,7 @@ export function getActionArgs(
   appId: string,
   actionId: string
 ): Promise<AxiosResponse<{ data: ActionAndArgsDto }>> {
-  return get<{ data: ActionAndArgsDto }>(
-    `/apps/${appId}/${actionId}/args`
-  )
+  return get<{ data: ActionAndArgsDto }>(`/apps/${appId}/${actionId}/args`)
 }
 
 export async function getAppSyncStatus(
@@ -39,6 +37,44 @@ export async function getAppSyncStatus(
   try {
     const response = await get(`/apps/${appId}/status`)
     return response
+  } catch (error) {
+    handleAxiosErrors(error)
+  }
+}
+
+export async function addAppToAccount(
+  { post }: AxiosInstance,
+  accountId: string,
+  appId: string
+): Promise<AxiosResponse<{ data: AppDto; error?: string }>> {
+  try {
+    return await post<{ data: AppDto }>(`/account/${accountId}/apps/${appId}`)
+  } catch (error) {
+    handleAxiosErrors(error)
+  }
+}
+
+export async function isAppInAccount(
+  { get }: AxiosInstance,
+  accountId: string,
+  appId: string
+): Promise<AxiosResponse<{ data: boolean; error?: string }>> {
+  try {
+    return await get<{ data: boolean }>(
+      `/account/${accountId}/apps/${appId}/exists`
+    )
+  } catch (error) {
+    handleAxiosErrors(error)
+  }
+}
+
+export async function removeAppFromAccount(
+  { delete: del }: AxiosInstance,
+  accountId: string,
+  appId: string
+): Promise<AxiosResponse<{ data: boolean; error?: string }>> {
+  try {
+    return await del<{data: boolean}>(`/account/${accountId}/apps/${appId}`)
   } catch (error) {
     handleAxiosErrors(error)
   }

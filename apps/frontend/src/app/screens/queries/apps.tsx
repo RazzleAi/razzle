@@ -6,6 +6,7 @@ import {
 } from '@razzle/dto'
 import { useMutation, useQuery } from 'react-query'
 import {
+  addAppToAccount,
   createApp,
   deleteAppById,
   generateNewAPIKey,
@@ -13,9 +14,12 @@ import {
   getAppSyncStatus,
   getPublicApps,
   getUnsyncedAppsInAccount,
+  isAppInAccount,
+  removeAppFromAccount,
   updateApp,
 } from '../../apis'
 import { useHttpClient } from '../../http-client'
+import { QueryConfig } from './types'
 
 export function useGetAppsInAccount(
   accountId: string,
@@ -61,11 +65,7 @@ export function useDeleteApp(config?: { onSuccess: (resp: boolean) => void }) {
 
 export function useGetUnsyncedAppsInAccount(
   accountId: string,
-  props?: {
-    enabled?: boolean
-    refetchInterval?: number | false
-    refetchOnWindowFocus?: boolean
-  }
+  props?: QueryConfig
 ) {
   const httpClient = useHttpClient()
   return useQuery(
@@ -79,6 +79,55 @@ export function useGetUnsyncedAppsInAccount(
       enabled: props?.enabled ?? false,
       refetchInterval: props?.refetchInterval ?? 5000,
       refetchOnWindowFocus: props?.refetchOnWindowFocus ?? false,
+    }
+  )
+}
+
+export function useIsAppInAccount(
+  accountId: string,
+  appId: string,
+  config?: QueryConfig
+) {
+  const httpClient = useHttpClient()
+  return useQuery(
+    ['is-app-in-account', accountId, appId],
+    async ({ queryKey }) => {
+      const [_, accountId, appId] = queryKey
+      const res = await isAppInAccount(httpClient, accountId, appId)
+      return res.data.data
+    },
+    { enabled: config?.enabled ?? false }
+  )
+}
+
+export function useAddAppToAccount(config?: {
+  onSuccess: (resp: AppDto) => void
+}) {
+  const httpClient = useHttpClient()
+  return useMutation(
+    async (data: { accountId: string; appId: string }) => {
+      return await addAppToAccount(httpClient, data.accountId, data.appId)
+    },
+    {
+      onSuccess: (resp) => {
+        config?.onSuccess(resp.data.data)
+      },
+    }
+  )
+}
+
+export function useRemoveAppFromAccount(config?: {
+  onSuccess: (resp: boolean) => void
+}) {
+  const httpClient = useHttpClient()
+  return useMutation(
+    async (data: { accountId: string; appId: string }) => {
+      return await removeAppFromAccount(httpClient, data.accountId, data.appId)
+    },
+    {
+      onSuccess: (resp) => {
+        config?.onSuccess(resp.data.data)
+      },
     }
   )
 }
@@ -113,10 +162,7 @@ export function useUpdateApp(config?: { onSuccess: (data: AppDto) => void }) {
   )
 }
 
-export function useGetAppSyncStatus(
-  appId: string,
-  config?: { enabled?: boolean; refetchInterval?: number }
-) {
+export function useGetAppSyncStatus(appId: string, config?: QueryConfig) {
   const httpClient = useHttpClient()
   return useQuery(
     ['get-app-sync-status', appId],
@@ -128,6 +174,7 @@ export function useGetAppSyncStatus(
     {
       enabled: config?.enabled ?? true,
       refetchInterval: config?.refetchInterval ?? 5000,
+      refetchOnWindowFocus: config?.refetchOnWindowFocus ?? false,
     }
   )
 }

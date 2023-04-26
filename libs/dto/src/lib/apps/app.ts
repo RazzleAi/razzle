@@ -7,6 +7,7 @@ export interface AppDto {
   isDefault: boolean
   isPublic: boolean
   handle: string | null
+  creatorId: string
 }
 
 export interface AppDtoWithApiKey extends AppDto {
