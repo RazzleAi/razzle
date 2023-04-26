@@ -91,7 +91,7 @@ export function getUnsyncedAppsInAccount(
 ): Promise<AxiosResponse<{ data: AppDtoWithApiKey[]; error?: string }>> {
   try {
     return get<{ data: AppDtoWithApiKey[] }>(
-      `/account/${accountId}/unsynced-apps`
+      `/account/${accountId}/apps/unsynced`
     )
   } catch (error) {
     if (error.response) {

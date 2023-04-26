@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -24,6 +25,7 @@ import {
 } from '@razzle/dto'
 import {
   AccountWithUser,
+  AppNotFoundException,
   DuplicateMatchDomainException,
 } from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
@@ -111,11 +113,45 @@ export class AccountController {
     return await this.accountService.getAppsInAccount(accountId)
   }
 
-  @Get('/:accountId/unsynced-apps')
+  @Get('/:accountId/apps/unsynced')
   async getUnsyncedAppsInAccount(
     @Param('accountId') accountId: string
   ): Promise<AppDtoWithApiKey[]> {
     return await this.accountService.getUnsyncedAppsInAccount(accountId)
+  }
+
+  @ExceptionResponse({
+    types: [AppNotFoundException],
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: 'This app does not exist',
+  })
+  @Post('/:accountId/apps/:appId')
+  async addAppToAccount(
+    @Param('accountId') accountId: string,
+    @Param('appId') appId: string
+  ): Promise<AppDto> {
+    return await this.accountService.addAppToAccount(accountId, appId)
+  }
+
+  @Get('/:accountId/apps/:appId/exists')
+  async isAppInAccount(
+    @Param('accountId') accountId: string,
+    @Param('appId') appId: string
+  ): Promise<boolean> {
+    return await this.accountService.isAppInAccount(accountId, appId)
+  }
+
+  @ExceptionResponse({
+    types: [AppNotFoundException],
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: 'This app does not exist',
+  })
+  @Delete('/:accountId/apps/:appId')
+  async removeAppFromAccount(
+    @Param('accountId') accountId: string,
+    @Param('appId') appId: string
+  ): Promise<boolean> {
+    return await this.accountService.removeAppFromAccount(accountId, appId)
   }
 
   @Get('/:accountId/onboarding')

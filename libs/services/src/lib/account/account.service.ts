@@ -7,14 +7,20 @@ import {
 } from '@razzle/dto'
 import { WorkspaceService } from '../workspace'
 import { AccountUserInviteTokenRepo } from './account-user-invite-token-repo'
-import { AccountRepo} from './account.repo'
+import { AccountRepo } from './account.repo'
 import { DuplicateMatchDomainException } from './exceptions'
 import { AccountUserInviteTokenGenerator } from './account-invite-token-generator'
 import { EmailDispatchGateway } from '../email/email-dispatch-gateway.service'
 import { User, UserService } from '../user'
-import { App, AppsService } from '../apps'
+import { App, AppNotFoundException, AppsService } from '../apps'
 import { ACCOUNT_CREATED_EVENT, EventBus } from '../event'
-import { Account, AccountUser, AccountWithOwner, AccountWithUser } from './types'
+import {
+  Account,
+  AccountUser,
+  AccountWithOwner,
+  AccountWithUser,
+} from './types'
+import { IllegalArgumentException } from '../exceptions/illegal-argument.exception'
 
 export class AccountService {
   constructor(
@@ -205,7 +211,7 @@ export class AccountService {
       accountId
     )
 
-    // dedupe by is
+    // dedupe by id
     const appIds = new Set<string>()
     const dedupedApps = [...apps, ...createdApps].filter((app) => {
       if (appIds.has(app.id)) {
@@ -220,5 +226,66 @@ export class AccountService {
   async getUnsyncedAppsInAccount(accountId: string): Promise<App[]> {
     const apps = await this.getAppsInAccount(accountId)
     return apps.filter((app) => !app.isDefault && !!app.data == false)
+  }
+
+  async addAppToAccount(accountId: string, appId: string): Promise<App | null> {
+    const app = await this.appsService.getById(appId)
+    if (!app) {
+      throw new AppNotFoundException(`App ${appId} not found`)
+    }
+
+    const workspaces = await this.workspaceService.getWorkspacesForAccount(
+      accountId
+    )
+
+    for (const workspace of workspaces) {
+      await this.workspaceService.addAppToWorkspace(appId, workspace.id)
+    }
+    return app
+  }
+
+  async isAppInAccount(accountId: string, appId: string): Promise<boolean> {
+    const workspaces = await this.workspaceService.getWorkspacesForAccount(
+      accountId
+    )
+    const app = await this.appsService.getById(appId)
+    if (!app) {
+      throw new AppNotFoundException(`App ${appId} not found`)
+    }
+
+    if (app.creatorId === accountId) {
+      return true
+    }
+
+    for (const workspace of workspaces) {
+      if (await this.workspaceService.isAppInWorkspace(workspace.id, appId)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  async removeAppFromAccount(
+    accountId: string,
+    appId: string
+  ): Promise<boolean> {
+    const app = await this.appsService.getById(appId)
+    if (!app) {
+      throw new AppNotFoundException(`App ${appId} not found`)
+    }
+
+    // can't remove an app if it's the default app or if it's owned by the account
+    if (app.isDefault || app.creatorId === accountId) {
+      throw new IllegalArgumentException(`Can't remove app ${appId}`)
+    }
+
+    const workspaces = await this.workspaceService.getWorkspacesForAccount(
+      accountId
+    )
+    for (const workspace of workspaces) {
+      await this.workspaceService.removeAppFromWorkspace(appId, workspace.id)
+    }
+    return true
   }
 }
