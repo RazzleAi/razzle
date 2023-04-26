@@ -1,12 +1,12 @@
 {
   "name": "@razzledotai/sdk",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "scripts": {
     "doc": "esdoc -c esdoc.json"
   },
   "dependencies": {
     "@loopback/metadata": "^5.0.4",
-    "@razzledotai/widgets": "^0.0.16",
+    "@razzledotai/widgets": "^0.0.17",
     "@types/ws": "^8.5.3",
     "reflect-metadata": "^0.1.13",
     "ws": "^8.11.0"
