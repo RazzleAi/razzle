@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsOptional, IsString } from 'class-validator'
 
 export class UpdateAppDto {
   @IsOptional()
@@ -8,4 +8,8 @@ export class UpdateAppDto {
   @IsOptional()
   @IsString()
   description?: string
+
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean
 }
