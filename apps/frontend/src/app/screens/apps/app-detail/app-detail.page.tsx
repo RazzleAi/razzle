@@ -35,6 +35,7 @@ import { AppCardIcon } from '../components/app-card-icon'
 import { useAppStore } from '../../../stores/app-store'
 import { AppPrivacyBadge } from '../components/app-privacy-badge'
 import { DeleteAppButton } from './delete-app-button'
+import { PrimarySwitch } from '../../../components/switches'
 
 export default function AppDetailPage() {
   const { appId } = useParams()
@@ -215,6 +216,7 @@ function EditAppForm({
   cancelClicked: () => void
   onComplete?: (app: AppDto) => void
 }) {
+  const [makeAppPublic, setMakeAppPublic] = useState(app?.isPublic ?? false)
   const {
     register,
     handleSubmit,
@@ -234,6 +236,7 @@ function EditAppForm({
       data: {
         name: data.appName,
         description: data.description,
+        isPublic: makeAppPublic,
       },
     })
   }
@@ -258,6 +261,14 @@ function EditAppForm({
           rows={2}
           placeholder="Edit app description"
           className="p-1 border-none bg-transparent ring-0 focus:outline-none focus:ring-0 text-sm "
+        />
+      </div>
+      <div className="mt-2 mb-2">
+        <PrimarySwitch
+          defaultValue={makeAppPublic}
+          onChange={setMakeAppPublic}
+          short={true}          
+          label="Make this app available to everyone"
         />
       </div>
       <div className="mt-2 space-x-2">
