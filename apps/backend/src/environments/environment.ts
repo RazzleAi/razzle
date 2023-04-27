@@ -1,9 +1,8 @@
 export const environment = {
   production: false,
   firebaseConfig: {
-    projectId: 'raazzle-dev',
-    clientEmail: 'firebase-adminsdk-u0exn@raazzle-dev.iam.gserviceaccount.com',
-    privateKey:
-      '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCvkQF+YUhT2vKr\nq8zlii952wzuaKdDLhR/fbKHSp+y3dVRJGHBdDx4ahfipIbz9qm/z6LDmTyq2YQF\n0OfDP39F9bpsLP7lk5jUvJwUtG+/pqwmQYHHkfP4Fj9YeIJM6Mp5nrT7VQFCyvP6\ndX1llS5pU0lwGGYessGjiV2WV0Q8Qj7iQ5Z1Ydr6GiDpe3EvR/kFOKZ4S7ho01yI\nC8whiDNcvuRLdVyz+yBOrOyHtRclX7BXI6d3ka3f+Bmj9slUx3i2VrzKBPRVmGuN\neKPpLclj1TuC7CV44hyUiZ3LqPWWxhLGXpX7uB3lZEPCum9AzvAX/C1JcxNdSH76\ni0OBrj0zAgMBAAECggEADSUWD7XN71qtylUEdCKKrRzNqjios/rKaxnorit+qyrj\nx/2phLf6DRP4ci4vsoAYiTV3x3L83AKJhCag1k617fGDgd+ZPWwgcxEkvddypHlL\nW1k9PnQlkutrgRQTbBm5Ndjq+QRjd0ebHnisfli95Fc+4NyFd4Kab+70KbJNTWuS\nRX9ddaOJHtFEQfrXeuktP/zd2Ro/XMV8akawattyBROoICVLaE/2bTX6x4pb3tRH\nXnrhptpfzLs9h9yjvgY1Ok3NNmV1W3VqiuQrYy58iI8o9un3UKigtxHaTu19Bchn\ndedYiv5tpxevDfTaU47foAxOHEbMrdzUXeSEz/rWwQKBgQDz9DpJ0opGgmBDNNDE\nMmtNM7fOxw6RA8W4VhiKbi+7pncWxyiAkfRK8gu9KuqBsc9MJVo4Jtak5BTYzvBT\npFJU9m+iD2gjSjWqQKirtZG7PuqkYm684lqlLov0M3DjeoelpR4HywAmNisrGGOp\nWZvIV03+zRIHPz5WDYus2S4OcwKBgQC4PE4Hmnxyog1fUIaZzSI5wvDxZb2logh1\nOfzsqo/Nduh/9LEfj1EUTqKPM57Mcsy8SoDdfZ1bywJO3qsOsWP86mDHFjEcgdHU\nWllDbJjKvn4LgqoA97Yh3E4XmjHdZv4yyQ57TbyND5fwCIpkLj9zHFd/fM9S/Bex\n/N+WbGqmQQKBgHT7wdPSvXIwZP71XcMntmLQES18MRUDLRZHWv9O9V7T5bmriVWW\nKAKkbVKqOMg2vwRxyQCyRy3NHd4V5hMF8mFBx6h8IOEDXhalaPzmVdrnwddQSHAV\nT4h0eLKC1HiRMmkRdAQiqZCpWywQRwJXsSdyDjnIlwOYpUjYuAkMIFTXAoGAA0iP\n23LVZPWeZ2R4AaW2RnFC+gpmJt2MaQpvh4hCp9bGrgEeZwGW4FXGb+brnZkuLOzm\n/wuOEmS71cwCIHDo50kGEIZEuc1WgAJcNOdqkbJzbKEXhozjohbbDXCiEuATB7St\nnWT1R05P1udQEBkC6HpI1OzUhRYZFgL7uSKVhAECgYEA7kzu+qZUafniqqtzirrf\nEAi0eGzTLcia0Pz7GjUPhx/5YEaZg2zbzN7jKMXM38738xJnJBAJTyl6cht4SvFO\n6IkB5oVb1o286dKgsMgDmZ2BT39w5eSx9hu+cufXBi1Z3qfn2HDGFgpmvBL6E4EI\nFFZ5MSSAmMrA3VQF6PBI2OY=\n-----END PRIVATE KEY-----\n',
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,    
   },
 }
