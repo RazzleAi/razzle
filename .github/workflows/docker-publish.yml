@@ -35,6 +35,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Get the commit hashes
+        id: vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
@@ -85,22 +92,20 @@ jobs:
           IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
         run: |
           # Build a docker container and push it to Docker hub
-          npx nx run backend:build-image
-          docker tag razzleai/razzle ${{ steps.meta.outputs.tags }}
+          npx nx run backend:build-image          
           echo "Pushing image to Docker Hub..."
-          docker push razzleai/razzle:latest
-          echo "::set-output name=image::docker.io/razzleai/razzle:${{ steps.meta.outputs.tags }}"
+          docker push razzleai/razzle:${{ env.IMAGE_TAG }}
+          echo "::set-output name=image::docker.io/razzleai/razzle:${{ env.IMAGE_TAG }}"
       
-
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+      # # Sign the resulting Docker image digest except on PRs.
+      # # This will only write to the public Rekor transparency log when the Docker
+      # # repository is public to avoid leaking data.  If you would like to publish
+      # # transparency data even for private images, pass --force to cosign below.
+      # # https://github.com/sigstore/cosign
+      # - name: Sign the published Docker image
+      #   if: ${{ github.event_name != 'pull_request' }}
+      #   env:
+      #     COSIGN_EXPERIMENTAL: "true"
+      #   # This step uses the identity token to provision an ephemeral certificate
+      #   # against the sigstore community Fulcio instance.
+      #   run: echo "${{ steps.vars.outputs.sha_short }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
