@@ -27,7 +27,7 @@ export class BootstrapService {
       await this.bootstrapDefaultAccount()
       await this.cleanupUsernames()
       this.cleanupAppHandles()
-    }, 10000)
+    }, 60000)
   }
 
   get isBootstrapped() {
