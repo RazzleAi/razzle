@@ -8,7 +8,7 @@ import { DefaultAppsServiceImpl } from '../default-apps.service-impl'
 import { AccountManager } from './account-manager'
 
 @Injectable()
-export class AccountManagerService implements OnModuleInit {
+export class AccountManagerService {
   private logger = new Logger(AccountManagerService.name)
 
   constructor(
@@ -18,15 +18,6 @@ export class AccountManagerService implements OnModuleInit {
     private readonly appsService: AppsServiceImpl,
     private readonly defaultApps: DefaultAppsServiceImpl
   ) {}
-
-  async onModuleInit() {
-    while (!this.bootstrapService.isBootstrapped) {
-      console.log('Waiting for bootstrap to complete')
-      await this.sleep()
-    }
-    console.log('Bootstrap complete. Initializing Account Manager App')
-    this.initializeAccountManagerApp()
-  }
 
   private async sleep(): Promise<any> {
     return new Promise((resolve) => {

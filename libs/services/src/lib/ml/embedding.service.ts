@@ -12,10 +12,6 @@ export class EmbeddingService {
     })
   )
 
-  constructor() {
-    console.log(`Key: ${process.env.OPENAI_KEY}`)
-  }
-
   async getEmbeddings(sentences: string[]): Promise<EmbeddingResult[]> {
     const sendtenceAndEmbeddings = await Promise.all(
       sentences.map(async (sentence) => {
