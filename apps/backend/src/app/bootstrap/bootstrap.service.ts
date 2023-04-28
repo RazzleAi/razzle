@@ -9,7 +9,6 @@ import { AuthServiceImpl } from '../auth/auth.service-impl'
 @Injectable()
 export class BootstrapService {
   private logger = new Logger(BootstrapService.name)
-  private _isBootstrapped = false
 
   constructor(
     private readonly userService: UserServiceImpl,
@@ -23,14 +22,6 @@ export class BootstrapService {
     if (process.env.NODE_ENV === 'test') {
       return
     }
-  }
-
-  get isBootstrapped() {
-    return this._isBootstrapped
-  }
-
-  set isBootstrapped(val: boolean) {
-    this._isBootstrapped = val
   }
 
   // TODO: DELETE AFTER CLEANUP IN PROD
@@ -125,7 +116,6 @@ export class BootstrapService {
     for (const appData of defaultApps) {
       await this.createDefaultApp(accountId, appData)
     }
-    this.isBootstrapped = true
   }
 
   private async createDefaultApp(
