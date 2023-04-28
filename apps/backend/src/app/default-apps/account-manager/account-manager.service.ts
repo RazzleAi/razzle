@@ -21,8 +21,10 @@ export class AccountManagerService implements OnModuleInit {
 
   async onModuleInit() {
     while (!this.bootstrapService.isBootstrapped) {
+      console.log('Waiting for bootstrap to complete')
       await this.sleep()
     }
+    console.log('Bootstrap complete. Initializing Account Manager App')
     this.initializeAccountManagerApp()
   }
 
