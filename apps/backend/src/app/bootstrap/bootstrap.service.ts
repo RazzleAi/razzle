@@ -23,11 +23,6 @@ export class BootstrapService {
     if (process.env.NODE_ENV === 'test') {
       return
     }
-    // setTimeout(async () => {
-    //   await this.bootstrapDefaultAccount()
-    //   await this.cleanupUsernames()
-    //   this.cleanupAppHandles()
-    // }, 58000)
   }
 
   get isBootstrapped() {
