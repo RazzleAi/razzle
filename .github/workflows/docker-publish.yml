@@ -86,7 +86,7 @@ jobs:
         run: |
           # Build a docker container and push it to Docker hub
           npx nx run backend:build-image
-          docker tag razzle/backend ${{ steps.meta.outputs.tags }}
+          docker tag razzleai/razzle ${{ steps.meta.outputs.tags }}
           echo "Pushing image to Docker Hub..."
           docker push razzleai/razzle:latest
           echo "::set-output name=image::docker.io/razzleai/razzle:${{ steps.meta.outputs.tags }}"
