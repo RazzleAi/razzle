@@ -199,7 +199,7 @@ export class AppsService {
   }
 
   async updateAppData(id: string, data: { [key: string]: any }): Promise<App> {
-    return this.appsRepo.updateAppData(id, { data })
+    return this.appsRepo.updateAppData(id, { ...data })
   }
 
   async syncApp(appId: string, data: AgentSyncDto): Promise<void> {
