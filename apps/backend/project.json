@@ -103,7 +103,7 @@
     "build-image": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker build -t razzle/backend -f apps/backend/dockerfile ."
+        "command": "docker build -t razzleai/razzle -f apps/backend/dockerfile ."
       },
       "dependsOn": ["^build:production"]
     },
