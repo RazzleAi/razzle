@@ -138,6 +138,10 @@ export class AppsService {
       name: app.name,
       description: app.description,
     }
+    if (app.isPublic !== undefined) {
+      data.isPublic = app.isPublic
+    }
+    
     return this.appsRepo.updateApp(id, data)
   }
 
@@ -195,7 +199,7 @@ export class AppsService {
   }
 
   async updateAppData(id: string, data: { [key: string]: any }): Promise<App> {
-    return this.appsRepo.updateAppData(id, { data })
+    return this.appsRepo.updateAppData(id, { ...data })
   }
 
   async syncApp(appId: string, data: AgentSyncDto): Promise<void> {

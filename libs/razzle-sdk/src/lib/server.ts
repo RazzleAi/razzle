@@ -6,9 +6,7 @@ import Logger from './util/logger'
 export class RazzleServer {
   private wsClient: WebSocket
   private onConnect: () => void
-  private retryCount = 0
   private backoffTime = 2000
-  static MAX_RETRY_COUNT = 50
   private pingInterval: NodeJS.Timeout
   private logger: Logger
 
@@ -113,16 +111,10 @@ export class RazzleServer {
   }
 
   private async retryConnect() {
-    if (this.retryCount < RazzleServer.MAX_RETRY_COUNT) {
-      await this.sleep()
-      this.logger.log('Razzle Server: Retrying...')
-      this.backoffTime *= 1.2
-      this.retryCount += 1
-      this.connect()
-    } else {
-      clearInterval(this.pingInterval)
-      throw new Error('Failed to connect to razzle server.')
-    }
+    await this.sleep()
+    this.logger.log('Razzle Server: Retrying...')
+    this.backoffTime *= 1.2
+    this.connect()
   }
 
   private async sleep() {

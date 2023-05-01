@@ -12,7 +12,7 @@ import { PrimaryOutlineButton } from '../../components/buttons'
 import { CREATE_APP_LINK_CLICKED } from '../../events'
 import { useEventTracker } from '../../mixpanel'
 import { TitleBar } from '../layout/title-bar'
-import AppDetailPage from './app-detail.page'
+import AppDetailPage from './app-detail/app-detail.page'
 import CreateAppPage from './create-app.page'
 import { AppsListPage } from './apps.list.page'
 

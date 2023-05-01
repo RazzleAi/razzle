@@ -1,54 +1,117 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import { AiFillCheckCircle } from 'react-icons/ai'
-import { useGetAppById } from '../workspaces/center-pane/queries'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Spinner } from '../../components/spinners'
+import { useGetAppById } from '../../workspaces/center-pane/queries'
+import { useParams } from 'react-router-dom'
+import { Spinner } from '../../../components/spinners'
 import { AppDto } from '@razzle/dto'
 import {
-  useDeleteApp,
+  useAddAppToAccount,
   useGenerateNewAPIKey,
   useGetAppSyncStatus,
+  useIsAppInAccount,
+  useRemoveAppFromAccount,
   useUpdateApp,
-} from '../queries'
+} from '../../queries'
 import { useEffect, useState } from 'react'
-import { WarningDisplay } from '../../components/warning-display'
-import CopyBytton from '../../components/copy-button'
-import { useEventTracker } from '../../mixpanel'
+import { WarningDisplay } from '../../../components/warning-display'
+import CopyBytton from '../../../components/copy-button'
+import { useEventTracker } from '../../../mixpanel'
 import {
   COPY_API_KEY_CLICKED,
   COPY_APP_ID_CLICKED,
-  DELETE_APP_CLICKED,
   GENERATE_API_KEY_CLICKED,
-} from '../../events'
-import { useAppPagesStore } from './apps-store'
-import razzle_icon_black from '../../../assets/images/razzle_icon_black.svg'
-import ConfirmDeleteModal from './confirm-delete-modal'
+} from '../../../events'
+import { useAppPagesStore } from '../apps-store'
+import razzle_icon_black from '../../../../assets/images/razzle_icon_black.svg'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
-import { PrimaryButton, PrimaryOutlineButton } from '../../components/buttons'
+import {
+  DangerOutlineButton,
+  PrimaryButton,
+  PrimaryOutlineButton,
+} from '../../../components/buttons'
 import { useForm } from 'react-hook-form'
+import { AppCardIcon } from '../components/app-card-icon'
+import { useAppStore } from '../../../stores/app-store'
+import { AppPrivacyBadge } from '../components/app-privacy-badge'
+import { DeleteAppButton } from './delete-app-button'
+import { PrimarySwitch } from '../../../components/switches'
 
 export default function AppDetailPage() {
   const { appId } = useParams()
   const { data: app, isLoading } = useGetAppById(appId)
-  return isLoading ? (
+  const { me, account } = useAppStore()
+
+  const isAppCreator =
+    !isLoading &&
+    app?.creatorId === account?.id &&
+    account?.owner.id === me?.user.id
+
+  return isLoading || !account || !app ? (
     <div className="w-full h-full flex flex-row items-center justify-center">
       <Spinner size="medium" thumbColorClass="fill-electricIndigo-500" />
     </div>
   ) : (
-    <div className="flex flex-col w-full h-full bg-gray-50 px-10 py-10">
-      <AppDetailsHeader app={app} isLoading={isLoading} />
-      <AppSyncStatus app={app} />
-      <AppCredentials app={app} />
-      <DeleteApp app={app} />
+    <div className="flex flex-row w-full h-full justify-center">
+      <div className="flex flex-col w-3/5 h-full bg-gray-50 px-10 py-10">
+        <AppDetailsHeader
+          app={app}
+          isAppCreator={isAppCreator}
+          isLoading={isLoading}
+          accountId={account.id}
+        />
+        {isAppCreator && <AppSyncStatus app={app} />}
+        {isAppCreator && <AppCredentials app={app} />}
+        {isAppCreator && <DeleteAppButton app={app} />}
+      </div>
     </div>
   )
 }
 
-function AppDetailsHeader(props: { isLoading: boolean; app?: AppDto }) {
-  const { isLoading } = props
-  const [isEditing, setIsEditing] = useState(false)
+function AppDetailsHeader(props: {
+  isLoading: boolean
+  app?: AppDto
+  accountId: string
+  isAppCreator: boolean
+}) {
   const [app, setApp] = useState<AppDto>(props.app)
+  const [isEditing, setIsEditing] = useState(false)
+  const { isLoading, isAppCreator, accountId } = props
+
+  const { account } = useAppStore()
+
+  const {
+    data: isAppInAccount,
+    error: isAppInAccountError,
+    refetch: refreshIsAppInAccount,
+  } = useIsAppInAccount(account?.id, app?.id, { enabled: !!account && !!app })
+
+  const { mutate: addAppToAccount, isLoading: isAddingAppToAccount } =
+    useAddAppToAccount({
+      onSuccess: onAppAddedToAccount,
+    })
+
+  const { mutate: removeAppFromAccount, isLoading: isRemovingApp } =
+    useRemoveAppFromAccount({ onSuccess: onAppRemovedFromAccount })
+
+  const canAddAppToAccount = !isAppInAccount && !isAppCreator
+  const canRemoveAppFromAccount = isAppInAccount && !isAppCreator
+
+  function onAddAppToAccountClicked() {
+    addAppToAccount({ appId: app.id, accountId })
+  }
+
+  function onAppAddedToAccount() {
+    refreshIsAppInAccount()
+  }
+
+  function onRemoveAppFromAccountClicked() {
+    removeAppFromAccount({ appId: app.id, accountId })
+  }
+
+  function onAppRemovedFromAccount(success: boolean) {
+    refreshIsAppInAccount()
+  }
 
   return isLoading ? (
     <div className="h-[104px] overflow-hidden rounded-lg bg-white shadow flex flex-col items-center justify-center">
@@ -62,27 +125,55 @@ function AppDetailsHeader(props: { isLoading: boolean; app?: AppDto }) {
       <div className="bg-white p-6">
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex sm:space-x-5">
-            <div className="flex-shrink-0 h-16 w-16 flex flex-row justify-center p-4 items-center rounded-full bg-lavenderBlue">
-              <img
-                className="mx-auto w-full h-full"
-                src={razzle_icon_black}
-                alt=""
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="group flex flex-row  mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+            {app.isDefault ? (
+              <div className="flex-shrink-0 h-16 w-16 flex flex-row justify-center p-4 items-center rounded-full bg-lavenderBlue">
+                <img
+                  className="mx-auto w-full h-full"
+                  src={razzle_icon_black}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            ) : (
+              <AppCardIcon app={props.app} />
+            )}
+            <div className="group flex flex-row  mt-4 text-center sm:mt-0 sm:text-left">
               <div className="h-full flex flex-col items-start">
                 {!isEditing ? (
                   <>
-                    <p className="text-xl font-bold text-gray-900 sm:text-2xl">
-                      {app?.name ?? ''}
-                    </p>
+                    <div className="flex flex-row gap-2 items-center">
+                      <p className="text-xl font-bold text-gray-900 sm:text-2xl">
+                        {app?.name ?? ''}
+                      </p>
+                      <AppPrivacyBadge isPublic={app.isPublic} />
+                    </div>
+
                     <p className="text-sm font-medium text-gray-600">
                       @{app?.handle ?? ''}
                     </p>
-                    <p className="text-sm mt-2 font-medium text-gray-600">
+                    <p className="text-sm mt-1 font-medium text-gray-600">
                       {app?.description ?? ''}
                     </p>
+                    <div className="mt-2">
+                      {canAddAppToAccount && (
+                        <PrimaryOutlineButton
+                          text="Add to account"
+                          short={true}
+                          staticColor={true}
+                          isLoading={isAddingAppToAccount}
+                          onClick={onAddAppToAccountClicked}
+                        />
+                      )}
+                      {canRemoveAppFromAccount && (
+                        <DangerOutlineButton
+                          text="Remove from account"
+                          short={true}
+                          staticColor={true}
+                          isLoading={isRemovingApp}
+                          onClick={onRemoveAppFromAccountClicked}
+                        />
+                      )}
+                    </div>
                   </>
                 ) : (
                   <EditAppForm
@@ -95,7 +186,7 @@ function AppDetailsHeader(props: { isLoading: boolean; app?: AppDto }) {
                   />
                 )}
               </div>
-              {isEditing ? undefined : (
+              {isEditing || !isAppCreator ? undefined : (
                 <div className="flex flex-col opacity-0 items-center h-full group-hover:opacity-100 transition-opacity duration-300 ml-3">
                   <button
                     type="button"
@@ -125,6 +216,7 @@ function EditAppForm({
   cancelClicked: () => void
   onComplete?: (app: AppDto) => void
 }) {
+  const [makeAppPublic, setMakeAppPublic] = useState(app?.isPublic ?? false)
   const {
     register,
     handleSubmit,
@@ -144,6 +236,7 @@ function EditAppForm({
       data: {
         name: data.appName,
         description: data.description,
+        isPublic: makeAppPublic,
       },
     })
   }
@@ -168,6 +261,14 @@ function EditAppForm({
           rows={2}
           placeholder="Edit app description"
           className="p-1 border-none bg-transparent ring-0 focus:outline-none focus:ring-0 text-sm "
+        />
+      </div>
+      <div className="mt-2 mb-2">
+        <PrimarySwitch
+          defaultValue={makeAppPublic}
+          onChange={setMakeAppPublic}
+          short={true}          
+          label="Make this app available to everyone"
         />
       </div>
       <div className="mt-2 space-x-2">
@@ -343,42 +444,5 @@ function AppSyncStatus({ app }: { app?: AppDto }) {
         </div>
       </div>
     </div>
-  )
-}
-
-function DeleteApp({ app }: { app?: AppDto }) {
-  const { accountId } = useParams()
-  const { trackEvent } = useEventTracker()
-  const navigate = useNavigate()
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-  const { mutateAsync: deleteApp } = useDeleteApp()
-
-  function deleteAppClicked(e: React.MouseEvent<HTMLButtonElement>) {
-    setConfirmDeleteOpen(true)
-    trackEvent(DELETE_APP_CLICKED, { ...app })
-  }
-
-  return (
-    <>
-      {confirmDeleteOpen && (
-        <ConfirmDeleteModal
-          app={app}
-          open={confirmDeleteOpen}
-          setOpen={setConfirmDeleteOpen}
-          deleteClicked={async () => {
-            await deleteApp(app.id)
-            navigate(`/accounts/${accountId}/apps`)
-          }}
-        />
-      )}
-      <button
-        className="mt-5 bg-white shadow sm:rounded-lg"
-        onClick={deleteAppClicked}
-      >
-        <div className="px-4 py-5 sm:p-6 font-semibold text-red-700">
-          Delete {app.name}
-        </div>
-      </button>
-    </>
   )
 }
