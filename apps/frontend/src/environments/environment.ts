@@ -3,8 +3,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:3333',
-  wsBaseUrl: 'ws://localhost:3333/client',
+  baseUrl: 'http://localhost:8080',
+  wsBaseUrl: 'ws://localhost:8080/client',
   firebaseConfig: {
     apiKey: 'AIzaSyD76bjb2D9zmE-Y4B2FurzRUPzgPoJ50c0',
     authDomain: 'raazzle-dev.firebaseapp.com',

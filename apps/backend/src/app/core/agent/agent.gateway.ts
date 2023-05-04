@@ -32,6 +32,7 @@ export class AgentGateway implements OnGatewayConnection, AgentLifecycle {
     const agent = new Agent(
       socket,
       app.id,
+      app.appId,
       this.agentHeaderValidator,
       this.agentSyncService,
       this.agentToEngineMessenger,

@@ -50,6 +50,19 @@ export class AppsRepoImpl implements AppsRepo {
     )
   }
 
+  async findNonDeletedByHandle(props: { handle: string }): Promise<App | null> {
+    const { handle } = props
+
+    return appFromPrisma(
+      this.prismaService.app.findFirst({
+        where: {
+          handle,
+          deleted: false,
+        },
+      })
+    )
+  }
+
   async findPublicApps(): Promise<App[]> {
     const res = await this.prismaService.app.findMany({
       where: {

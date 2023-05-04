@@ -16,7 +16,16 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const skipAuthFor = [
+      'account/internal/*',
+    ]
     const request = context.switchToHttp().getRequest()
+    const skipAuthForURL = skipAuthFor.some((pattern) =>
+      new RegExp(pattern).test(request.originalUrl),
+    );
+    if (skipAuthForURL) {
+      return true
+    }    
 
     try {
       const shouldSkipAuth = this.reflector.getAllAndOverride<boolean>(SKIP_AUTH_KEY, [

@@ -253,4 +253,21 @@ export class AccountRepoImpl implements AccountRepo {
       },
     })
   }
+
+  async findAccountUserWithOwner(accountId: string, userId: string): Promise<AccountWithOwner> {
+    const res = await this.prismaService.accountUser.findFirst({
+      where: {
+        accountId,
+        userId,
+      },
+      include: {
+        account: true,
+        user: true,
+      },
+    })
+    return {
+      ...res.account,
+      owner: res.user,
+    }
+  }
 }
