@@ -86,7 +86,7 @@ export class AppsService {
   }
 
   private async validateHandle(app: CreateAppDto, user: User) {
-    const existingAppWithHandle = await this.appsRepo.findByHandle({
+    const existingAppWithHandle = await this.appsRepo.findNonDeletedByHandle({
       handle: app.handle,
     })
     if (existingAppWithHandle) {

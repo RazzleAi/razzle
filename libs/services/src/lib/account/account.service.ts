@@ -194,6 +194,13 @@ export class AccountService {
     return this.accountRepo.findAccountUser(accountId, userId)
   }
 
+  public async findAccountUserWithOwner(
+    accountId: string,
+    userId: string
+  ): Promise<AccountWithOwner> {
+    return this.accountRepo.findAccountUserWithOwner(accountId, userId)
+  }
+
   async getAppsInAccount(accountId: string): Promise<App[]> {
     // also get apps installed in the workspaces
     const workspaces = await this.workspaceService.getWorkspacesForAccount(
