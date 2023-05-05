@@ -203,4 +203,15 @@ export class AppsRepoImpl implements AppsRepo {
     })
     return appFromPrisma(res)
   }
+
+  async deleteWorkspaceAppsForAppByID(appId: string): Promise<void> {
+    await this.prismaService.workspaceApp.deleteMany({
+      where: {
+        app: {
+          id: appId,
+        },
+      },
+    })
+    
+  }
 }
