@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { AccountServiceImpl } from '../account/account.service-impl'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
 import { UserRepoImpl } from '../user/user.repo.impl'
+import { AppsRepoImpl } from '../apps/apps.repo.impl'
 
 @Injectable()
 export class BootstrapService {
@@ -11,6 +12,7 @@ export class BootstrapService {
     private readonly accountService: AccountServiceImpl,
     private readonly usersRepo: UserRepoImpl,
     private readonly appsService: AppsServiceImpl,
+    private readonly appsRepo: AppsRepoImpl,
   ) {}
 
   onModuleInit() {
@@ -53,6 +55,14 @@ export class BootstrapService {
     }
 
     await this.cleanupAppHandles()
+
+    const accountManager = await this.appsRepo.findByAppId({appId: 'razzle-account-manager'})
+    if (!accountManager) {
+      return
+    }
+
+    const accountManagerId = accountManager.id    
+    await this.appsRepo.deleteWorkspaceAppsForAppByID(accountManagerId)
   }
 
   private async cleanupAppHandles() {
