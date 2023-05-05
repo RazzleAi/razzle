@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { AccountServiceImpl } from '../account/account.service-impl'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
+import { UserRepoImpl } from '../user/user.repo.impl'
 
 @Injectable()
 export class BootstrapService {
@@ -8,6 +9,7 @@ export class BootstrapService {
 
   constructor(
     private readonly accountService: AccountServiceImpl,
+    private readonly usersRepo: UserRepoImpl,
     private readonly appsService: AppsServiceImpl,
   ) {}
 
@@ -16,7 +18,7 @@ export class BootstrapService {
       return
     }
 
-    this.cleanupAppHandles()
+    this.cleanupUsernames()
   }
 
   // TODO: DELETE AFTER CLEANUP IN PROD
@@ -24,13 +26,38 @@ export class BootstrapService {
    * This function is used to clean up old usernames which were just a copy of emails. new usernames areextracted from the users emails
    */
 
+  private async cleanupUsernames() {
+    const allUsers = await this.usersRepo.getAllUsers()
+    const usersToUpdate = allUsers.filter(
+      (user) => user.username === user.email
+    )
+    for (const user of usersToUpdate) {
+      const parts = user.email.split('@')
+      if (parts.length < 1) {
+        continue
+      }
+      let username = parts[0]
+      const existingWithUsername = await this.usersRepo.findByUsername(
+        username
+      )
+      if (existingWithUsername && existingWithUsername.id !== user.id) {
+        // generate a random username
+        username = `${username}-${Math.floor(Math.random() * 100000)}`
+      }
+
+      try {
+        await this.usersRepo.upsertUser(user.authUid, {...user, username})
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    await this.cleanupAppHandles()
+  }
+
   private async cleanupAppHandles() {
     const allApps = await this.appsService.getAllApps()
-    const appsWithoutHandles = allApps.filter(
-      (app) => !app.handle || app.handle.trim() === ''
-    )
-
-    for (const app of appsWithoutHandles) {
+    for (const app of allApps) {
       const handleName = app.name.toLowerCase().replace(/ /g, '-')
       const creatorAccountId = app.creatorId
       const acct = await this.accountService.getById(creatorAccountId)
@@ -43,4 +70,6 @@ export class BootstrapService {
       }
     }
   }
+
+  
 }
