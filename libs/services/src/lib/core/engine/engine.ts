@@ -115,7 +115,6 @@ export class RazzleEngine {
     promptSteps: PromptAndSteps,
     headers: Record<string, unknown> = {}
   ): Promise<[StepDto, RazzleResponse] | null> {
-    // TODO: revisit this return type. Figure out the type of Step.output, we want to minimize the use of any
     const apps = (await this.accountService.getAppsInAccount(accountId)).filter(
       (a) => a.data != null
     )

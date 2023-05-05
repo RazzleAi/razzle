@@ -145,19 +145,6 @@ export class AppsService {
     return this.appsRepo.updateApp(id, data)
   }
 
-  // TODO: DELETE THIS AFTER MIGRATING APP HANDLES IN PROD
-  async updateAppHandle(id: string, handle: string): Promise<App | null> {
-    const existingApp = await this.appsRepo.findById(id)
-    if (!existingApp) {
-      throw new AppNotFoundException(`App with id ${id} not found`)
-    }
-
-    const data: UpdateAppInput = {
-      handle,
-    }
-    return this.appsRepo.updateApp(id, data)
-  }
-
   async getAppSyncStatus(id: string): Promise<AppSyncStatusDto | null> {
     const app = await this.getById(id)
     if (!app) {
@@ -316,5 +303,18 @@ export class AppsService {
 
     const res = await this.appsRepo.forceDeleteById(id)
     return !!res
+  }
+
+  // TODO: DELETE THIS AFTER MIGRATING APP HANDLES IN PROD
+  async updateAppHandle(id: string, handle: string): Promise<App | null> {
+    const existingApp = await this.appsRepo.findById(id)
+    if (!existingApp) {
+      throw new AppNotFoundException(`App with id ${id} not found`)
+    }
+
+    const data: UpdateAppInput = {
+      handle,
+    }
+    return this.appsRepo.updateApp(id, data)
   }
 }

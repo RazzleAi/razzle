@@ -25,12 +25,4 @@ export interface AccountRepo {
   ): Promise<AccountWithOwner>
   isUserInAccount(userId: string, accountId: string): Promise<boolean>
   removeUserFromAccount(userId: string, accountId: string): Promise<boolean>
-
-  //TOD: DELETE THESE TWO AFTER DEPLOYMENT
-  getByName(name: string): Promise<Account | null>
-  deleteAccount(id: string): Promise<void>
-  forceRemoveUserFromAccount(
-    userId: string,
-    accountId: string
-  ): Promise<boolean>
 }

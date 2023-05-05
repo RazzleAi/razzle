@@ -64,11 +64,6 @@ export class AccountService {
     return account
   }
 
-  // TODO: DELETE THIS AFTER DEPLOYMENT TO PROD
-  async getByName(name: string): Promise<Account | null> {
-    return this.accountRepo.getByName(name)
-  }
-
   async getById(accountId: string): Promise<AccountWithOwner | null> {
     return this.accountRepo.findById(accountId)
   }
@@ -299,30 +294,5 @@ export class AccountService {
       await this.workspaceService.removeAppFromWorkspace(appId, workspace.id)
     }
     return true
-  }
-
-  // TODO: DELETE THESE
-  async deleteAccountByName(accountName: string): Promise<void> {
-    const account = await this.getByName(accountName)
-    if (!account) {
-      throw new Error(`Account ${accountName} not found`)
-    }
-
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      account.id
-    )
-    for (const workspace of workspaces) {
-      await this.workspaceService.forceDeleteWorkspace(workspace.id)
-    }
-
-    await this.accountRepo.deleteAccount(account.id)
-  }
-
-  async forceRemoveUserFromAccount(
-    userId: string,
-    accountId: string
-  ): Promise<boolean> {
-    
-    return await this.accountRepo.forceRemoveUserFromAccount(userId, accountId)
   }
 }
