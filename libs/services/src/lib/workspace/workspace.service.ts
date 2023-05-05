@@ -4,7 +4,6 @@ import {
   Page,
   PageParams,
   WorkspaceActionDto,
-  WorkspaceDto,
 } from '@razzle/dto'
 import {
   PromptResolverService,
@@ -18,7 +17,6 @@ import {
   WorkspaceRepo,
   WorkspaceWithUser,
 } from './workspace.repo'
-import { DefaultAppsService } from '../default-apps'
 import { App, AppsService } from '../apps'
 import { Logger } from '@nestjs/common'
 import {
@@ -36,7 +34,6 @@ export class WorkspaceService {
     private readonly embeddingSearchService: EmbeddingSearchService,
     private readonly promptResolverService: PromptResolverService,
     private readonly appsService: AppsService,
-    private readonly defaultAppsService: DefaultAppsService,
     eventBus: EventBus
   ) {
     this.handleEvents(eventBus)
@@ -73,7 +70,6 @@ export class WorkspaceService {
       },
       userId
     )
-    await this.addDefaultAppsToWorkspace(result.workspaceId)
     return result
   }
 
@@ -144,6 +140,7 @@ export class WorkspaceService {
     return this.workspaceRepo.getAppsInWorkspace(workspaceId)
   }
 
+  // TODO: revisit this
   async getActionsInWorkspace(
     workspaceId: string
   ): Promise<WorkspaceActionDto[]> {
@@ -247,22 +244,6 @@ export class WorkspaceService {
     return this.embeddingSearchService.search(searchSpace, searchQuery)
   }
 
-  async addDefaultAppsToWorkspace(workspaceId: string): Promise<void> {
-    const defaultApps = this.defaultAppsService.getDefaultApps()
-    for (const appData of defaultApps) {
-      const app = await this.appsService.getByAppId(appData.appId!)
-      if (!app) {
-        this.logger.log(
-          `Cannot add App - ${appData.name} to workspace ${workspaceId} because this app was not found`
-        )
-        continue
-      }
-
-      await this.addAppToWorkspace(app.id, workspaceId)
-      this.logger.log(`Added - ${appData.name} to workspace ${workspaceId}`)
-    }
-  }
-
   async addAppToWorkspace(appId: string, workspaceId: string): Promise<WorkspaceApp> {
     const workspaceApp = await this.workspaceRepo.getWorkspaceApp(workspaceId, appId)
     if (workspaceApp) {
@@ -326,18 +307,5 @@ export class WorkspaceService {
         payload.id
       )
     })
-  }
-
-  // TODO: DELETE
-  async getAllWorkspaces(): Promise<WorkspaceDto[]> {
-    return this.workspaceRepo.getAllWorkspaces()
-  }
-
-  getAllWorkspacesForAccount(accountId: string): Promise<WorkspaceDto[]> {
-    return this.workspaceRepo.findAllWorkspacesByAccountId(accountId)
-  }
-
-  async forceDeleteWorkspace(workspaceId: string): Promise<void> {
-    return this.workspaceRepo.forceDeleteWorkspace(workspaceId)
   }
 }

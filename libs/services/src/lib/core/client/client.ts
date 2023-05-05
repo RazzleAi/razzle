@@ -115,7 +115,6 @@ export class Client {
 
   onPing() {
     if (!this.isIdentified) return
-    // TODO: Determine whether to send history or not
     this.sendHistory()
   }
 

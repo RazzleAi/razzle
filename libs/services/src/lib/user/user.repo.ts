@@ -13,7 +13,4 @@ export interface UserRepo {
     authUid: string,
     user: UpsertUserData
   ) => Promise<{ userId: string; authUid: string }>
-  // TODO: MAKE THIS PRIVATE AFTER USERNAME CLEANUP IN PROD
-  getAllUsers: () => Promise<User[]>
-  deleteUser: (userId: string) => Promise<void>
 }

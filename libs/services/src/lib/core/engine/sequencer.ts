@@ -128,7 +128,7 @@ export class Sequencer {
 
     return {
       id: step.id,
-      thought: step.thought!, // TODO: revisit this type
+      thought: step.thought!,
       action: step.actionName,
       actionInput: args,
       output: response,

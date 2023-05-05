@@ -186,11 +186,7 @@ export class AppsRepoImpl implements AppsRepo {
 
   // TODO: DELETE THIS AFTER CLEANUP APP HANDLES IS RUN IN PROD
   async getAllApps(): Promise<App[]> {
-    const res = await this.prisma.findMany({
-      where: {
-        deleted: false,
-      },
-    })
+    const res = await this.prisma.findMany({})
 
     const apps: App[] = []
     for (const r of res) {

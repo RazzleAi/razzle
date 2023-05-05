@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { WorkspaceService } from '@razzle/services'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
-import { DefaultAppsServiceImpl } from '../default-apps/default-apps.service-impl'
 import { EventBusImpl } from '../event/event-bus-impl'
 import { PromptResolverServiceImpl } from '../ml/args-extractor.service.impl'
 import { EmbeddingSearchServiceImpl } from '../ml/embedding-search.service'
@@ -14,7 +13,6 @@ export class WorkspaceServiceImpl extends WorkspaceService {
     embeddingSearchService: EmbeddingSearchServiceImpl,
     argsExtractorService: PromptResolverServiceImpl,
     appsService: AppsServiceImpl,
-    defaultAppsService: DefaultAppsServiceImpl,
     eventBus: EventBusImpl
   ) {
     super(
@@ -22,7 +20,6 @@ export class WorkspaceServiceImpl extends WorkspaceService {
       embeddingSearchService,
       argsExtractorService,
       appsService,
-      defaultAppsService,
       eventBus
     )
   }

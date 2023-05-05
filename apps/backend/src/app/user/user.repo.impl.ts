@@ -100,17 +100,4 @@ export class UserRepoImpl implements UserRepo {
   findByAuthUid(authUid: string): Promise<User | null> {
     return this.prismaService.user.findUnique({ where: { authUid: authUid } })
   }
-
-  // TODO: MAKE THIS PRIVATE AFTER USERNAME CLEANUP IN PROD
-  async getAllUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany()
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    await this.prismaService.user.delete({
-      where: {
-        id: userId,
-      },
-    })
-  }
 }

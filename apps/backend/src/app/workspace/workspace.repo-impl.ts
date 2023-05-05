@@ -291,28 +291,4 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
     })
     return res
   }
-
-  // TODO: remove this
-  findAllWorkspacesByAccountId(accountId: string): Promise<Workspace[]> {
-    return this.workspace.findMany({
-      where: {
-        account: {
-          id: accountId,
-        },
-      },
-    })
-  }
-
-  async getAllWorkspaces(): Promise<Workspace[]> {
-    const res = await this.workspace.findMany({})
-    return res
-  }
-
-  async forceDeleteWorkspace(id: string): Promise<void> {
-    await this.workspace.delete({
-      where: {
-        id,
-      },
-    })
-  }
 }
