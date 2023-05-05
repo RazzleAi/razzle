@@ -13,6 +13,4 @@ export interface UserRepo {
     authUid: string,
     user: UpsertUserData
   ) => Promise<{ userId: string; authUid: string }>
-  // TODO: DELETE THIS
-  getAllUsers: () => Promise<User[]>
 }

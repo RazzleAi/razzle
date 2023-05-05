@@ -289,32 +289,4 @@ export class AppsService {
     const res = await this.appsRepo.deleteById(id)
     return !!res
   }
-
-  // TODO: DELETE THIS AFTER CLEANING UP APP HANDLES IN PROD
-  async getAllApps(): Promise<App[]> {
-    return this.appsRepo.getAllApps()
-  }
-
-  async forceDeleteApp(id: string): Promise<boolean> {
-    const app = await this.appsRepo.findById(id)
-    if (!app) {
-      return false
-    }
-
-    const res = await this.appsRepo.forceDeleteById(id)
-    return !!res
-  }
-
-  // TODO: DELETE THIS AFTER MIGRATING APP HANDLES IN PROD
-  async updateAppHandle(id: string, handle: string): Promise<App | null> {
-    const existingApp = await this.appsRepo.findById(id)
-    if (!existingApp) {
-      throw new AppNotFoundException(`App with id ${id} not found`)
-    }
-
-    const data: UpdateAppInput = {
-      handle,
-    }
-    return this.appsRepo.updateApp(id, data)
-  }
 }

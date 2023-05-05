@@ -11,7 +11,6 @@ import configuration from './config/configuration'
 import { MlModule } from './ml/ml.module'
 import { AccountModule } from './account/account.module'
 import { WorkspaceModule } from './workspace/workspace.module'
-import { BootstrapModule } from './bootstrap/bootstrap.module'
 import { ConstantsModule } from './constants.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { KafkaModule } from './kafka/kafka.module'
@@ -34,7 +33,6 @@ import { CoreModule } from './core/core.module'
     RedisModule,
     PrismaModule,
     AuthModule,
-    BootstrapModule,
     UserModule,
     AppsModule,
     WorkspaceModule,
