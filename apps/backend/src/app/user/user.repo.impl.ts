@@ -100,9 +100,4 @@ export class UserRepoImpl implements UserRepo {
   findByAuthUid(authUid: string): Promise<User | null> {
     return this.prismaService.user.findUnique({ where: { authUid: authUid } })
   }
-
-  // TODO: DELETE THIS
-  getAllUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany()
-  }
 }
