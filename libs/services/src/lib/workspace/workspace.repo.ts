@@ -32,4 +32,8 @@ export interface WorkspaceRepo {
   getWorkspaceApp(workspaceId: string, appId: string): Promise<WorkspaceApp | null>
   findWorkspacesByUserIdAndAccountId(userId: string, accountId: string): Promise<Workspace[]>
   updateWorkspace(id: string, data: Partial<Workspace>): Promise<Workspace>
+  // TODO: DELETE THIS AFTER DEPLOYMENT
+  getAllWorkspaces(): Promise<Workspace[]>
+  forceDeleteWorkspace(id: string): Promise<void>
+  findAllWorkspacesByAccountId(accountId: string): Promise<Workspace[]>
 }

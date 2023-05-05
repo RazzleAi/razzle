@@ -15,4 +15,5 @@ export interface AppsRepo {
   deleteById(id: string): Promise<App | null>
   // TODO: DELETE THIS AFTER CLEANUP APP HANDLES IS RUN IN PROD
   getAllApps(): Promise<App[]>
+  forceDeleteById(id: string): Promise<App | null>
 }

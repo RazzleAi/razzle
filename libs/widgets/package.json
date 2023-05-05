@@ -1,6 +1,6 @@
 {
   "name": "@razzledotai/widgets",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "type": "commonjs",
   "devDependencies": {
     "typedoc": "^0.23.28"

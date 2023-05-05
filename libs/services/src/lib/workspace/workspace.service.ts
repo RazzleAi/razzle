@@ -4,6 +4,7 @@ import {
   Page,
   PageParams,
   WorkspaceActionDto,
+  WorkspaceDto,
 } from '@razzle/dto'
 import {
   PromptResolverService,
@@ -325,5 +326,18 @@ export class WorkspaceService {
         payload.id
       )
     })
+  }
+
+  // TODO: DELETE
+  async getAllWorkspaces(): Promise<WorkspaceDto[]> {
+    return this.workspaceRepo.getAllWorkspaces()
+  }
+
+  getAllWorkspacesForAccount(accountId: string): Promise<WorkspaceDto[]> {
+    return this.workspaceRepo.findAllWorkspacesByAccountId(accountId)
+  }
+
+  async forceDeleteWorkspace(workspaceId: string): Promise<void> {
+    return this.workspaceRepo.forceDeleteWorkspace(workspaceId)
   }
 }

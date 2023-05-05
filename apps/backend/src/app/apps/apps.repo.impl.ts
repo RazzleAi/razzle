@@ -198,4 +198,13 @@ export class AppsRepoImpl implements AppsRepo {
     }
     return apps
   }
+
+  async forceDeleteById(id: string): Promise<App> {
+    const res = await this.prismaService.app.delete({
+      where: {
+        id,
+      },
+    })
+    return appFromPrisma(res)
+  }
 }

@@ -5,9 +5,10 @@ import { DefaultAppsHelperModule } from "../default-apps/default-apps-helpers.mo
 import { UserModule } from "../user/user.module";
 import { BootstrapService } from "./bootstrap.service";
 import { AuthModule } from "../auth/auth.module";
+import { WorkspaceModule } from "../workspace/workspace.module";
 
 @Module({
-    imports: [UserModule, AccountModule, AppsModule, DefaultAppsHelperModule, AuthModule],
+    imports: [UserModule, AccountModule, AppsModule, WorkspaceModule, DefaultAppsHelperModule, AuthModule],
     providers: [BootstrapService],
     exports: [BootstrapService],
 })

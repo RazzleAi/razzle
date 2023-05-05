@@ -69,4 +69,8 @@ export class UserService {
   getAllUsers(): Promise<User[]> {
     return this.userRepo.getAllUsers()
   }
+
+  deleteUser(userId: string): Promise<void> {
+    return this.userRepo.deleteUser(userId)
+  }
 }

@@ -51,7 +51,10 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
     return apps
   }
 
-  async addAppToWorkspace(workspaceId: string, appId: string): Promise<WorkspaceApp> {
+  async addAppToWorkspace(
+    workspaceId: string,
+    appId: string
+  ): Promise<WorkspaceApp> {
     const res = await this.prismaService.workspaceApp.create({
       data: {
         workspaceId,
@@ -60,7 +63,7 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
       include: {
         app: true,
         workspace: true,
-      }
+      },
     })
 
     return {
@@ -93,7 +96,10 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
     return !!result
   }
 
-  async getWorkspaceApp(workspaceId: string, appId: string): Promise<WorkspaceApp | null> {
+  async getWorkspaceApp(
+    workspaceId: string,
+    appId: string
+  ): Promise<WorkspaceApp | null> {
     const result = await this.prismaService.workspaceApp.findFirst({
       where: {
         workspaceId,
@@ -114,7 +120,6 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
       app: await appFromPrisma(result.app),
     }
   }
-
 
   findWorkspacesByAccountId(accountId: string): Promise<Workspace[]> {
     return this.workspace.findMany({
@@ -285,5 +290,29 @@ export class WorkspaceRepoImpl implements WorkspaceRepo {
       data,
     })
     return res
+  }
+
+  // TODO: remove this
+  findAllWorkspacesByAccountId(accountId: string): Promise<Workspace[]> {
+    return this.workspace.findMany({
+      where: {
+        account: {
+          id: accountId,
+        },
+      },
+    })
+  }
+
+  async getAllWorkspaces(): Promise<Workspace[]> {
+    const res = await this.workspace.findMany({})
+    return res
+  }
+
+  async forceDeleteWorkspace(id: string): Promise<void> {
+    await this.workspace.delete({
+      where: {
+        id,
+      },
+    })
   }
 }
