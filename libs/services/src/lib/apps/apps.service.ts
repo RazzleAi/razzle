@@ -307,4 +307,14 @@ export class AppsService {
   async getAllApps(): Promise<App[]> {
     return this.appsRepo.getAllApps()
   }
+
+  async forceDeleteApp(id: string): Promise<boolean> {
+    const app = await this.appsRepo.findById(id)
+    if (!app) {
+      return false
+    }
+
+    const res = await this.appsRepo.forceDeleteById(id)
+    return !!res
+  }
 }

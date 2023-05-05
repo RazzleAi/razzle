@@ -105,4 +105,12 @@ export class UserRepoImpl implements UserRepo {
   async getAllUsers(): Promise<User[]> {
     return this.prismaService.user.findMany()
   }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.prismaService.user.delete({
+      where: {
+        id: userId,
+      },
+    })
+  }
 }
