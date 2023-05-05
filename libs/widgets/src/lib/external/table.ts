@@ -24,7 +24,7 @@ export class RazzleTable extends RazzleWidget {
   constructor(props: RazzleTableProps) {
     super()
 
-    if (props.columns.length !== props.data[0].length) {
+    if (props.data.length > 0 && props.columns.length !== props.data[0].length) {
       throw new Error('"data" must have the same number of columns "columns"')
     }
 

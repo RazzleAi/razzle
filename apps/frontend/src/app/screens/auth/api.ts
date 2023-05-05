@@ -129,6 +129,7 @@ function handleError(err) {
       case 'auth/user-disabled':
         throw new Error('Your account has been disabled')
       default:
+        console.error('FIREBASE_ERROR: ', err)
         throw new Error('An unknown error occurred')
     }
   } else {

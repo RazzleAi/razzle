@@ -13,7 +13,7 @@ export class ConnectedAgents {
 
   removeAgent(agent: Agent) {
     const agentId = agent.id
-    const appId = agent.appId
+    const appId = agent.razzleAppId
 
     this.agentsById.delete(agentId)
     const newAgentIds = (this.agentsPerAppID.get(appId) || []).filter(
@@ -26,8 +26,8 @@ export class ConnectedAgents {
     }
   }
 
-  public getAgentForAppId(appId: string): Agent | undefined {
-    const agentsForAppId = this.agentsPerAppID.get(appId) || []
+  public getAgentForAppId(razzleAppId: string): Agent | undefined {
+    const agentsForAppId = this.agentsPerAppID.get(razzleAppId) || []
     if (agentsForAppId.length === 0) {
       return undefined
     }

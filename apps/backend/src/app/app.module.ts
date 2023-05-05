@@ -11,9 +11,6 @@ import configuration from './config/configuration'
 import { MlModule } from './ml/ml.module'
 import { AccountModule } from './account/account.module'
 import { WorkspaceModule } from './workspace/workspace.module'
-import { DefaultAppsModule } from './default-apps/default-apps.module'
-import { BootstrapModule } from './bootstrap/bootstrap.module'
-import { DefaultAppsHelperModule } from './default-apps/default-apps-helpers.module'
 import { ConstantsModule } from './constants.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { KafkaModule } from './kafka/kafka.module'
@@ -36,15 +33,12 @@ import { CoreModule } from './core/core.module'
     RedisModule,
     PrismaModule,
     AuthModule,
-    BootstrapModule,
     UserModule,
     AppsModule,
     WorkspaceModule,
     CoreModule,
     MlModule,
     AccountModule,
-    DefaultAppsModule,
-    DefaultAppsHelperModule,
   ],
   providers: [
     {

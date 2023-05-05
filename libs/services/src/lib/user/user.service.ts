@@ -2,7 +2,6 @@ import { User } from '@prisma/client'
 import { UserRepo } from './user.repo'
 import { Logger } from '@nestjs/common'
 import { WorkspaceService } from '../workspace'
-import { v4 as uuidv4 } from 'uuid'
 import { UserDto } from '@razzle/dto'
 import { CreateUserData, UpsertUserData } from './types'
 
@@ -22,7 +21,10 @@ export class UserService {
     return this.userRepo.findByUsername(username)
   }
 
-  async searchInAccountByEmailOrUsername(accountId: string, query: string): Promise<UserDto[]> {
+  async searchInAccountByEmailOrUsername(
+    accountId: string,
+    query: string
+  ): Promise<UserDto[]> {
     return this.userRepo.searchInAccountByEmailOrUsername(query)
   }
 
@@ -45,28 +47,5 @@ export class UserService {
 
   getUserByAuthUid(authId: string): Promise<User | null> {
     return this.userRepo.findByAuthUid(authId)
-  }
-
-  getDefaultUser(): Promise<User | null> {
-    const defaultUserEmail =
-      process.env.DEFAULT_USER_EMAIL || 'default-user@razzle.com'
-    return this.userRepo.findByEmail(defaultUserEmail)
-  }
-
-  createDefaultUser(): Promise<{ authUid: string; userId: string }> {
-    const defaultUserEmail =
-      process.env.DEFAULT_USER_EMAIL || 'default-user@razzle.com'
-    return this.userRepo.createUser({
-      authUid: uuidv4(),
-      email: defaultUserEmail,
-      loginType: 'default',
-      username: 'default-user',
-      profilePictureUrl: null,
-    })
-  }
-
-  // TODO: MAKE THIS PRIVATE AFTER USERNAME CLEANUP IN PROD
-  getAllUsers(): Promise<User[]> {
-    return this.userRepo.getAllUsers()
   }
 }

@@ -18,6 +18,7 @@ export class Agent {
   constructor(
     private readonly ws: WebSocket,
     readonly appId: string,
+    readonly razzleAppId: string,
     private readonly headerValidator: AgentHeaderValidator,
     private readonly syncService: AgentSyncService,
     private readonly agentToEgineMessenger: AgentToEngineMessenger,

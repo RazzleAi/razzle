@@ -75,8 +75,7 @@ export class AuthService {
     return usr
   }
 
-  // TODO: MAKE THIS PRIVATE AFTER USERNAME CLEANUP IN PROD
-  async generateUniqueUsernameFromEmail(
+  private async generateUniqueUsernameFromEmail(
     email: string
   ): Promise<string> {
     const emailParts = email.split('@')

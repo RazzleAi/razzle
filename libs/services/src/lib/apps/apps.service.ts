@@ -86,7 +86,7 @@ export class AppsService {
   }
 
   private async validateHandle(app: CreateAppDto, user: User) {
-    const existingAppWithHandle = await this.appsRepo.findByHandle({
+    const existingAppWithHandle = await this.appsRepo.findNonDeletedByHandle({
       handle: app.handle,
     })
     if (existingAppWithHandle) {
@@ -142,19 +142,6 @@ export class AppsService {
       data.isPublic = app.isPublic
     }
     
-    return this.appsRepo.updateApp(id, data)
-  }
-
-  // TODO: DELETE THIS AFTER MIGRATING APP HANDLES IN PROD
-  async updateAppHandle(id: string, handle: string): Promise<App | null> {
-    const existingApp = await this.appsRepo.findById(id)
-    if (!existingApp) {
-      throw new AppNotFoundException(`App with id ${id} not found`)
-    }
-
-    const data: UpdateAppInput = {
-      handle,
-    }
     return this.appsRepo.updateApp(id, data)
   }
 
@@ -301,10 +288,5 @@ export class AppsService {
 
     const res = await this.appsRepo.deleteById(id)
     return !!res
-  }
-
-  // TODO: DELETE THIS AFTER CLEANING UP APP HANDLES IN PROD
-  async getAllApps(): Promise<App[]> {
-    return this.appsRepo.getAllApps()
   }
 }

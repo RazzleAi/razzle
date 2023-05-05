@@ -19,6 +19,10 @@ export interface AccountRepo {
     pageParams: PageParams
   ): Promise<Page<AccountWithUser>>
   findAccountUser(accountId: string, userId: string): Promise<AccountUser>
+  findAccountUserWithOwner(
+    accountId: string,
+    userId: string
+  ): Promise<AccountWithOwner>
   isUserInAccount(userId: string, accountId: string): Promise<boolean>
-  removeUserFromAccount(userId: string, accountId: string): Promise<boolean>  
+  removeUserFromAccount(userId: string, accountId: string): Promise<boolean>
 }

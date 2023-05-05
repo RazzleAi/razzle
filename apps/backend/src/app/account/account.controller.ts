@@ -24,9 +24,11 @@ import {
   WorkspaceDto,
 } from '@razzle/dto'
 import {
+  AccountUser,
   AccountWithUser,
   AppNotFoundException,
   DuplicateMatchDomainException,
+  User,
 } from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
@@ -74,6 +76,49 @@ export class AccountController {
     return this.accountService.addUserToAccount(userId, accountId)
   }
 
+  @Delete('/internal/:accountId/users/:userId')
+  async removeUserFromAccount(
+    @Param('accountId') accountId: string,
+    @Param('userId') userId: string
+  ): Promise<boolean> {
+    const res = await this.accountService.removeUserFromAccount(
+      userId,
+      accountId
+    )
+    return res
+  }
+
+  @Get('/internal/user-accounts/:accountId/:userId')
+  async getUserAccount(
+    @Param('accountId') accountId: string,
+    @Param('userId') userId: string
+  ): Promise<AccountWithOwnerDto> {
+    const res = await this.accountService.findAccountUserWithOwner(accountId, userId)    
+    return res
+  }
+
+  @Post('/internal/:accountId/users/:userId/invitations')
+  async inviteUserToAccount(
+    @Param('accountId') accountId: string,
+    @Param('userId') userId: string,
+    @Query('email') email: string
+  ): Promise<void> {
+    const accountUser = await this.accountService.findAccountUser(
+      accountId,
+      userId
+    )
+    if (!accountUser) {
+      throw new HttpException(
+        `Account User not found, Account ID: ` +
+          accountId +
+          `, User ID: ` +
+          userId,
+        HttpStatus.NOT_FOUND
+      )
+    }
+    return this.accountService.inviteUserToAccount(accountUser, email)
+  }
+
   @Get(':id/users')
   async getAccountMembers(
     @Param('id') id: string,
@@ -84,6 +129,12 @@ export class AccountController {
       cursor: cursor,
       limit: count || 10,
     })
+  }
+
+  @Get('/internal/:id/all-users')
+  async getAllAccountMembers(@Param('id') id: string): Promise<User[]> {
+    const res = await this.accountService.getAllUsersInAccount(id)
+    return res
   }
 
   @Get('user')
