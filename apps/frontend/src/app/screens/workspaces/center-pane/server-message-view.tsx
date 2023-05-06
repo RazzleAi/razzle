@@ -130,12 +130,6 @@ function PaginationControls(props: {
   const [currPageNum, setCurrPageNum] = useState<number>(pagination.pageNumber)
   const { pageSize, totalCount } = pagination
   const totalPages = Math.ceil(totalCount / pageSize)
-
-  const pageOptions = []
-  for (let i = 1; i <= totalPages; i++) {
-    pageOptions.push(i)
-  }
-
   return (
     totalCount > pageSize && (
       <div className="flex flex-row items-center justify-center gap-1 text-sm text-gray-500 font-medium">
