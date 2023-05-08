@@ -12,4 +12,5 @@ export interface IRazzleLink extends IRazzleWidget {
   readonly textSize?: RazzleTextSize
   readonly textWeight?: RazzleTextWeight
   readonly textColor?: string
+  readonly textAlignment?: 'left' | 'center' | 'right'
 }

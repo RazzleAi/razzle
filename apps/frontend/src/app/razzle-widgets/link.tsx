@@ -30,7 +30,7 @@ export function Link(props: LinkProps) {
     onSuccess: onActionArgsLoaded,
   })
 
-  const { action, padding, textColor, textSize, textWeight } = props.link
+  const { action, padding, textColor, textSize, textWeight, textAlignment } = props.link
 
   function onClicked() {
     const actionType = action.type
