@@ -14,6 +14,7 @@ interface LinkProps {
   textSize?: RazzleTextSize
   textColor?: string
   textWeight?: RazzleTextWeight
+  textAlignment?: 'left' | 'center' | 'right'
 }
 
 /**
@@ -60,6 +61,8 @@ export class RazzleLink extends RazzleWidget {
    */
   readonly textWeight?: RazzleTextWeight
 
+  readonly textAlignment?: 'left' | 'center' | 'right'
+
   constructor(props: LinkProps) {
     super()
     this.action = props.action
@@ -67,6 +70,8 @@ export class RazzleLink extends RazzleWidget {
     this.textSize = props.textSize || 'medium'
     this.textColor = props.textColor
     this.textWeight = props.textWeight || 'normal'
+    this.textAlignment = props.textAlignment
+    
   }
 
   getType(): RazzleWidgetType {
@@ -81,6 +86,7 @@ export class RazzleLink extends RazzleWidget {
       textColor: this.textColor,
       textWeight: this.textWeight,
       padding: this.padding?.toJSON(),
+      textAlignment: this.textAlignment,
     }
   }
 }
