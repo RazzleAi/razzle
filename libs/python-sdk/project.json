@@ -1,0 +1,42 @@
+{
+  "name": "python-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/razzle-sdk/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "cwd": "libs/python-sdk",
+        "command": "python3 setup.py sdist bdist_wheel"
+      }
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "cwd": "libs/python-sdk",
+        "command": "python3 -m pip install --no-cache-dir dist/razzlesdk-{args.version}-py3-none-any.whl"
+      }
+    },
+    "run-example": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        },
+        {
+          "target": "install",
+          "projects": "self"
+        }
+      ],
+      "options": {
+        "cwd": "libs/python-sdk/example",
+        "command": "python example.py"
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ export interface props {
   ui?: RazzleWidget
   data?: any
   error?: RazzleError
+  agentError?: RazzleError
   pagination?: {
     frameId?: string
     totalCount: number
@@ -27,6 +28,7 @@ export class RazzleResponse {
   ui?: RazzleWidget
   data?: any
   error?: RazzleError
+  agentError?: RazzleError
   /**
    * Pagination information for the response.
    */
@@ -42,6 +44,7 @@ export class RazzleResponse {
     this.pagination = props.pagination
     this.data = props.data
     this.error = props.error
+    this.agentError = props.agentError
   }
 }
 

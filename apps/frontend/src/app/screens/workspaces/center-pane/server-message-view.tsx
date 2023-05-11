@@ -6,7 +6,13 @@ import { BiChevronLeft, BiChevronRight } from 'react-icons/bi'
 import { renderReponse } from '../../../utils/render-reponse'
 import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFirebaseServices } from '../../../firebase'
-import { MessageType, Pagination, ServerMessage, ServerMessageV2, StepDto } from '@razzle/dto'
+import {
+  MessageType,
+  Pagination,
+  ServerMessage,
+  ServerMessageV2,
+  StepDto,
+} from '@razzle/dto'
 import { useMessageDetails } from './history-item-view'
 import { useAppStore } from '../../../stores/app-store'
 
@@ -18,7 +24,10 @@ export interface ServerMessageViewProps {
 }
 
 export function ServerMessageView(props: ServerMessageViewProps) {
-  const msgData = props.messageType === 'ServerMessageV2' ? (props.message as ServerMessageV2).data.payload :  (props.message as ServerMessage).data.message
+  const msgData =
+    props.messageType === 'ServerMessageV2'
+      ? (props.message as ServerMessageV2).data.payload
+      : (props.message as ServerMessage).data.message
 
   const message = props.isFramed
     ? (msgData as RazzleResponseWithActionArgs)
@@ -33,14 +42,17 @@ export function ServerMessageView(props: ServerMessageViewProps) {
   const { appName, applicationId, appId } = useMessageDetails()
   const { currentUser } = useFirebaseServices()
   const { triggerPaginationAction } = useWSClientStore()
-  
+
   function onPageChanged(newPage: number) {
     if (!actionArgs) {
       console.debug('onPageChanged', newPage, 'no action args')
       return
     }
 
-    const prompt  = props.messageType === 'ServerMessageV2' ? (props.message as ServerMessageV2).data.payload.requestPrompt :  actionArgs.actionDescription
+    const prompt =
+      props.messageType === 'ServerMessageV2'
+        ? (props.message as ServerMessageV2).data.payload.requestPrompt
+        : actionArgs.actionDescription
     const steps: StepDto[] = []
     steps.push({
       id: 1,
@@ -74,7 +86,13 @@ export function ServerMessageView(props: ServerMessageViewProps) {
     })
   }
 
-  return (
+  return message.agentError ? (
+    <div className="w-2/3 overflow-auto">
+      <div className="bg-red-300 text-red-900 rounded overflow-auto w-fit min-w-fit max-w-full border border-red-900 p-2">
+        An unexpected error occurred on the agent
+      </div>
+    </div>
+  ) : (
     <div className="w-2/3 overflow-auto">
       <div className="bg-white rounded overflow-auto w-fit min-w-fit max-w-full border border-[#E8EBED]">
         {renderReponse(responseWidget)}

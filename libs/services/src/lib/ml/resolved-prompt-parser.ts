@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common'
 import { ActionInput, StepDto } from '@razzle/dto'
+import { RazzleResponse } from '@razzledotai/sdk'
 
 export class ResolvedPromptParser {
   parse(resolvedPrompt: string): ActionPlan[] {
@@ -200,7 +201,7 @@ export interface Step {
   thought: string
   action: string
   actionInput?: (string | null)[]
-  output?: any
+  output?: RazzleResponse
   containsOutputHallucination?: boolean
 }
 
@@ -210,7 +211,7 @@ export class StepImpl implements Step {
     public thought: string,
     public action: string,
     public actionInput?: (string | null)[],
-    public output?: any
+    public output?: RazzleResponse
   ) {}
 
   public static of(step: Step): StepImpl {

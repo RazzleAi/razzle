@@ -35,7 +35,9 @@ export class MessageHandler {
       const msgStr = message.toString()
       const json = JSON.parse(msgStr) as ServerMessage
       console.log('MessageHandler.handleMessage: Received message. ' + msgStr)
-      this.logger.log('MessageHandler.handleMessage: Received message. ' + msgStr)
+      this.logger.log(
+        'MessageHandler.handleMessage: Received message. ' + msgStr
+      )
 
       const type = json.event as MessageType
       const data = json.data
@@ -188,12 +190,22 @@ export class MessageHandler {
     callArgs.push(callDetails)
 
     let result: any
-    if (instance[method]) {
-      if (handler.isPromise) {
-        result = await instance[method].call(instance, ...callArgs)
-      } else {
-        result = instance[method].call(instance, ...callArgs)
+    try {
+      if (instance[method]) {
+        if (handler.isPromise) {
+          result = await instance[method].call(instance, ...callArgs)
+        } else {
+          result = instance[method].call(instance, ...callArgs)
+        }
       }
+    } catch (err) {
+      this.logger.error(
+        `MessageHandler.handleActionTrigger: Error occurred calling handler for action ${actionName}`,
+        err
+      )
+      return new RazzleResponse({
+        agentError: err.message ? err.message : err,
+      })
     }
 
     if (result && handler.paged) {
