@@ -78,11 +78,19 @@ export class Sequencer {
 
       stepResult.push(stepResponse)
 
+      if (stepResponse.output?.agentError ) {
+        return {
+          resolved: true,
+          steps: stepResult,
+          agentError: stepResponse.output?.agentError?.message
+        }
+      }
+
       const isErrorResponse = stepResponse.output?.error ? true : false
 
       if (isErrorResponse || step.containsOutputHallucination) {
         return this.buildSequencerOutput(stepResult)
-      }
+      }      
     }
 
     return Promise.resolve({

@@ -137,6 +137,10 @@ export class RazzleEngine {
       apps
     )
 
+    if (!step.output) {
+      return null
+    }
+
     return [dto, step.output]
   }
 }

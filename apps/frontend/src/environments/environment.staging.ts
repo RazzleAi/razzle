@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   baseUrl: 'https://staging-api-gw.razzle.network',
-  wsBaseUrl: 'wss://staging-api-gw.razzle.network',
+  wsBaseUrl: 'wss://staging-api-gw.razzle.network/client',
   firebaseConfig: {
     apiKey: 'AIzaSyD76bjb2D9zmE-Y4B2FurzRUPzgPoJ50c0',
     authDomain: 'raazzle-dev.firebaseapp.com',

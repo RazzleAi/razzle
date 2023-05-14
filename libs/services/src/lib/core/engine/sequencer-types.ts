@@ -16,6 +16,6 @@ export interface SequencerInput {
   
   export interface SequencerOutput {
     resolved: boolean
-  
+    agentError?: string
     steps: Step[]
   }
