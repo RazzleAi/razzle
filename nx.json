@@ -3,14 +3,9 @@
   "npmScope": "razzle",
   "tasksRunnerOptions": {
     "default": {
-      "runner": "@nrwl/nx-cloud",
+      "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ],
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
         "accessToken": "ZGExZDdhMGEtNzU4Zi00ZGVkLWFmYWMtMDAyOTYwNGIxOWEwfHJlYWQtd3JpdGU="
       }
     }
@@ -43,7 +38,7 @@
   },
   "defaultProject": "backend",
   "generators": {
-    "@nrwl/react": {
+    "@nx/react": {
       "application": {
         "style": "css",
         "linter": "eslint",
