@@ -1,11 +1,11 @@
 import { Configuration, OpenAIApi } from 'openai'
 import { PROMPT_PREFIX } from './prompt-prefix'
-import { Prisma } from '@prisma/client'
 import { times } from 'lodash'
 import { ResolvedPromptParser, Step } from './resolved-prompt-parser'
 import { StepDto } from '@razzle/dto'
 import { Logger } from '@nestjs/common'
 import { App, AppAction, AppActionParameter } from '../apps'
+import { Gpt3 } from '../core/enginev2/llm/gpt3'
 
 export class PromptResolverService {
   private readonly resolvedPromptParser = new ResolvedPromptParser()
@@ -17,19 +17,17 @@ export class PromptResolverService {
     })
   )
 
+  private gpt3 = new Gpt3(this.openai)
+
   async resolve(prompt: string, actionTable: string): Promise<string> {
     const promptToSend = `${PROMPT_PREFIX}${actionTable}\nInstruction:${prompt}\nDo your work below and do not include "Output:" in your response and do not include more inputs than specified in the action table\n`
-    const response = await this.openai.createCompletion({
+    const response = await this.gpt3.accept(promptToSend, {
       model: 'text-davinci-003',
-      prompt: promptToSend,
       temperature: 0,
-      max_tokens: 256,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
+      stop: [],
     })
 
-    const result = response?.data?.choices[0].text
+    const result = response.message
 
     return result ? result : ''
   }

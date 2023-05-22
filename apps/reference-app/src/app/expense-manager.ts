@@ -41,6 +41,7 @@ export class ExpenseManagerModule {
       '',
       '',
     ])
+
     return new RazzleResponse({
       data: companies,
       pagination: {
