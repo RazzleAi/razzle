@@ -1,4 +1,4 @@
-from razzlesdk import Razzle, RazzleProps, Action, ActionParam
+from razzlesdk.sdk import Razzle, RazzleProps
 import os
 
 class HelloApp(object):
