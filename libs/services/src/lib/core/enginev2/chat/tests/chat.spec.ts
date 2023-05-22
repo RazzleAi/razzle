@@ -26,6 +26,11 @@ describe('Chat', () => {
     sandbox.restore()
   })
 
+  it('created a chatid on creation', () => {
+    expect(chat.chatId).toBeDefined()
+    expect(chat.chatId.length)
+  })
+
   describe('accept', () => {
     it('calls the llm when a message is received', () => {
       sandbox

@@ -1,10 +1,10 @@
 import { RazzleResponse } from '@razzle/sdk'
-import { Agent, NlpProxyAgentAcceptParams } from './agent'
+import { IAgent, NlpProxyAgentAcceptParams } from './agent'
 import { PromptResolverService } from '../../../ml'
 import { App } from '../../../apps'
 import { Sequencer } from '../../engine/sequencer'
 
-export class NlpProxyAgent implements Agent {
+export class NlpProxyAgent implements IAgent {
   constructor(
     private readonly app: App,
     private readonly promptResolverService: PromptResolverService,

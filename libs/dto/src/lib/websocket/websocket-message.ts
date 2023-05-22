@@ -1,7 +1,26 @@
-export type ClientToServerEvent = 'Ping' | 'Identify' | 'Message' | 'CallAction'
-export type AgentToServerEvent = 'SyncApp' | 'FuncResponse' | 'AuthenticateResponse' | 'UserAppAuthentication'
-export type ServerToAgentEvent = 'CallFunction' | 'SyncAppResponse' | 'Authenticate'
-export type ServerToClientEvent = 'History' | 'AuthenticationResponse' | 'UserAppAuthentication' | 'ActivateWorkspace' | 'CreateWorkspace' | 'DeleteWorkspace'
+export type ClientToServerEvent =
+  | 'Ping'
+  | 'Identify'
+  | 'Message'
+  | 'CallAction'
+  | 'CreateNewChat'
+  | 'NewChatSelected'
+export type AgentToServerEvent =
+  | 'SyncApp'
+  | 'FuncResponse'
+  | 'AuthenticateResponse'
+  | 'UserAppAuthentication'
+export type ServerToAgentEvent =
+  | 'CallFunction'
+  | 'SyncAppResponse'
+  | 'Authenticate'
+export type ServerToClientEvent =
+  | 'History'
+  | 'AuthenticationResponse'
+  | 'UserAppAuthentication'
+  | 'ActivateWorkspace'
+  | 'CreateWorkspace'
+  | 'DeleteWorkspace'
 
 export interface ClientToServerMessage<T> {
   event: ClientToServerEvent

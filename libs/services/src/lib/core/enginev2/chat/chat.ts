@@ -1,11 +1,11 @@
-import { Agent } from '../agent/agent'
+import { IAgent } from '../agent/agent'
 import { ChatTunedLlm } from '../llm'
 import { ChatHistoryItem } from './chathistoryitem'
 import { v1 as uuidV1 } from 'uuid'
 
 interface ChatInitializationProps {
   llm: ChatTunedLlm
-  agents: Agent[]
+  agents: IAgent[]
   accountId: string
   workspaceId: string
   userId: string
@@ -14,6 +14,7 @@ interface ChatInitializationProps {
 
 export default class Chat {
   history: ChatHistoryItem[] = []
+  chatId: string = uuidV1().toString()
 
   constructor(private readonly initializationProps: ChatInitializationProps) {}
 

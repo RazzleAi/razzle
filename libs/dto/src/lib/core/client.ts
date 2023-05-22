@@ -6,7 +6,12 @@ import { StepDto } from '../workspace'
 export interface ClientRequest {
   accountId: string
   workspaceId: string
-  payload: { steps?: StepDto[]; prompt?: string; pagination?: Pagination }
+  payload: {
+    steps?: StepDto[]
+    prompt?: string
+    pagination?: Pagination
+    chatId?: string
+  }
   headers?: NodeJS.Dict<string | any>
 }
 

@@ -12,9 +12,10 @@ import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFetchOnboardingStatus } from '../../queries'
 import { HistoryItemView } from './history-item-view'
 import { OnboardingView } from './onboarding-view'
+import { ChatHistoryItem } from '@razzle/services'
 
 export function MessagePane() {
-  const [messages, setMessages] = useState<ClientHistoryItemDto[]>([])
+  const [messages, setMessages] = useState<ChatHistoryItem[]>([])
   const { setOnMessageReceived, removeOnMessageReceived } = useWSClientStore()
 
   const { accountId } = useParams()
@@ -47,7 +48,7 @@ export function MessagePane() {
     const response = JSON.parse(message) as ServerToClientMessage<unknown>
     switch (response.event) {
       case 'History': {
-        const historyItems = response.data as ClientHistoryItemDto[]
+        const historyItems = response.data as ChatHistoryItem[]
         setMessages(historyItems)
         break
       }
@@ -88,7 +89,7 @@ function isOnboardingComplete(onboarding: OnboardingDto) {
   )
 }
 
-function MessagesView(props: { messages: ClientHistoryItemDto[] }) {
+function MessagesView(props: { messages: ChatHistoryItem[] }) {
   const { messages } = props
   // force everyone to have a frame ID
   const messagesWithFrameIDs = messages.map((m, idx) => ({

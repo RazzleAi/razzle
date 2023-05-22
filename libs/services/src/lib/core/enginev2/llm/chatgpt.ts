@@ -1,12 +1,12 @@
-import { ChatCompletionRequestMessage, OpenAIApi } from 'openai'
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
 import { ChatTunedLlm, LlmResponse } from './llm'
-import { Agent } from '../agent/agent'
+import { IAgent } from '../agent/agent'
 import { Prompt } from '../prompt'
 
 export class ChatGpt implements ChatTunedLlm {
   constructor(
     private readonly openAiApi: OpenAIApi,
-    private readonly agents: Agent[]
+    private readonly agents: IAgent[]
   ) {}
 
   readonly history: ChatCompletionRequestMessage[] = []
@@ -39,10 +39,20 @@ export class ChatGpt implements ChatTunedLlm {
     return { message: messageFromChatGpt }
   }
 
-  private contructAgentListPrompt(agents: Agent[]): string {
+  private contructAgentListPrompt(agents: IAgent[]): string {
     return agents.reduce((prev, curr) => {
       return prev + `${curr.name}:${curr.description}\n`
     }, '')
+  }
+
+  public static create(agents: IAgent[]): ChatGpt {
+    const openai = new OpenAIApi(
+      new Configuration({
+        apiKey: process.env.OPENAI_KEY,
+      })
+    )
+
+    return new ChatGpt(openai, agents)
   }
 }
 

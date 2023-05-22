@@ -2,12 +2,14 @@ import { Md5 } from 'ts-md5'
 import { WebSocket, MessageEvent, CloseEvent, ErrorEvent } from 'ws'
 import { ClientLifecycle } from './client-lifecycle'
 import {
+  AvailableChatLlms,
   ClientHistoryItemDto,
   ClientMessageV3,
   ClientRequest,
   ClientResponse,
   ClientToEngineRequest,
   ClientToServerMessage,
+  CreateNewChatDto,
   ServerMessage,
   ServerMessageV2,
   ServerToClientMessage,
@@ -18,6 +20,10 @@ import { DateTime } from 'luxon'
 import { ClientHistoryStore } from './client-history-store'
 import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
+import Chat from '../enginev2/chat/chat'
+import { IAgent } from '../enginev2/agent/agent'
+import { ChatGpt, ChatTunedLlm } from '../enginev2'
+import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
 
 export class Client {
   id: string
@@ -25,6 +31,8 @@ export class Client {
   accountId?: string
   workspaceId?: string
   isIdentified = false
+  chats: Chat[] = []
+  currentChatId: string | undefined
 
   constructor(
     private readonly ws: WebSocket,
@@ -85,10 +93,7 @@ export class Client {
     )
   }
 
-  private handleMessageTypes(
-    message: ClientToServerMessage<ClientRequest>,
-    user: User
-  ) {
+  private handleMessageTypes(message: ClientToServerMessage<any>, user: User) {
     switch (message.event) {
       case 'Identify': {
         if (!message.data) break
@@ -104,6 +109,13 @@ export class Client {
         this.handleMessage(message.data)
         break
       }
+      case 'CreateNewChat':
+        this.createNewChat(message.data as CreateNewChatDto)
+        break
+      case 'NewChatSelected':
+        this.currentChatId = message.data as string
+        break
+
       case 'Ping':
         this.onPing()
         break
@@ -116,6 +128,34 @@ export class Client {
   onPing() {
     if (!this.isIdentified) return
     this.sendHistory()
+  }
+
+  private createNewChat(dto: CreateNewChatDto) {
+    const chat = new Chat({
+      accountId: this.accountId ?? '',
+      workspaceId: this.workspaceId ?? '',
+      userId: this.userId ?? '',
+      agents: [],
+      clientId: this.id,
+      llm: this.getLLm(dto.llm, []),
+    })
+
+    this.chats.push(chat)
+    return chat
+  }
+
+  private getChat(chatId: string): Chat | undefined {
+    return this.chats.find((c) => c.chatId === chatId)
+  }
+
+  private getLLm(name: AvailableChatLlms, agents: IAgent[]): ChatTunedLlm {
+    switch (name) {
+      case 'ChatGpt-3.5':
+        return ChatGpt.create(agents)
+
+      default:
+        return ChatGpt.create(agents)
+    }
   }
 
   private handleIdentify(accountId: string, workspaceId: string, user: User) {
@@ -180,6 +220,24 @@ export class Client {
       timestampMillis: DateTime.now().toUnixInteger() * 1000,
     }
 
+    if (!request.payload.chatId) {
+      console.log('Client: No chatId in request')
+      return
+    }
+
+    const chat = this.getChat(request.payload.chatId)
+    if (!chat) {
+      console.log('Client: No chat found for chatId: ', request.payload.chatId)
+      return
+    }
+
+    if (!request.payload.prompt) {
+      console.log('Client: No prompt in request. ChatId: ', chat.chatId)
+      return
+    }
+
+    chat.accept(request.payload.prompt)
+
     this.maybeNotifyFirstActionTriggered()
 
     if (!historyItem.isFramed) {
@@ -187,7 +245,7 @@ export class Client {
       this.sendHistory()
     }
 
-    this.clientToEngineMessenger.sendRequestToEngine(request)
+    // this.clientToEngineMessenger.sendRequestToEngine(request)
   }
 
   async onResponseReceivedFromEngine(response: ClientResponse) {
@@ -233,10 +291,12 @@ export class Client {
   }
 
   async sendHistory() {
-    const history = await this.getHistory(10)
-    const historyResponse: ServerToClientMessage<ClientHistoryItemDto[]> = {
+    if (!this.currentChatId) return
+
+    const currentChat = this.getChat(this.currentChatId)
+    const historyResponse: ServerToClientMessage<ChatHistoryItem[]> = {
       event: 'History',
-      data: history,
+      data: currentChat?.history || [],
     }
     this.ws.send(JSON.stringify(historyResponse))
   }
