@@ -4,12 +4,13 @@ export interface UserMessage {
 
 export interface LlmResponse {
   message: string
+  error?: string
 }
 
 export interface LlmOpts {
   temperature: number
   model: string
-  stop: string[]
+  stop?: string[]
 }
 
 export interface Llm {

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   AuthenticationMessage,
-  ClientHistoryItemDto,
   OnboardingDto,
   ServerToClientMessage,
 } from '@razzle/dto'
@@ -90,27 +89,10 @@ function isOnboardingComplete(onboarding: OnboardingDto) {
 }
 
 function MessagesView(props: { messages: ChatHistoryItem[] }) {
-  const { messages } = props
-  // force everyone to have a frame ID
-  const messagesWithFrameIDs = messages.map((m, idx) => ({
-    ...m,
-    message: {
-      ...m.message,
-      frameId: m.message.frameId || `frame-${idx}`,
-    },
-  }))
-
   return (
     <>
-      {messagesWithFrameIDs.map((message, idx) => {
-        const frameId = message.message.frameId
-        return (
-          <HistoryItemView
-            key={`${idx}.${message.hash}`}
-            item={message}
-            frameId={frameId}
-          />
-        )
+      {props.messages.map((message, idx) => {
+        return <HistoryItemView key={`${idx}.${message.id}`} item={message} />
       })}
     </>
   )

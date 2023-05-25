@@ -9,7 +9,11 @@ export class NlpProxyAgent implements IAgent {
     private readonly app: App,
     private readonly promptResolverService: PromptResolverService,
     private readonly sequencer: Sequencer
-  ) {}
+  ) {
+    console.log(`Initializing NlpProxyAgent for app ${app.name}`)
+    this.name = app.name
+    this.description = app.description
+  }
   name: string
   description: string
 

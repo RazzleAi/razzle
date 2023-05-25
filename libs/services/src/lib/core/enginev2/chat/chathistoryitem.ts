@@ -5,6 +5,7 @@ export interface ChatHistoryItem {
   text: string
   agent?: ChatHistoryItemAgentProps
   role: 'user' | 'llm'
+  timestamp: number
 }
 
 export interface ChatHistoryItemAgentProps {

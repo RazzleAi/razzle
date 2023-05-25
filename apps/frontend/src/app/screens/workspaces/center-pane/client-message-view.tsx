@@ -1,16 +1,10 @@
-import {
-  CallActionData,
-  ClientMessage,
-  ClientMessageV2,
-  ClientMessageV3,
-} from '@razzle/dto'
+import { CallActionData } from '@razzle/dto'
 import { varNameToName } from '../../../utils/var-to-sentence'
 import { Timestamp } from './timestamp'
+import { ChatHistoryItem } from '@razzle/services'
 
 interface ClientMessageViewProps {
-  messageType: 'ClientMessage' | 'ClientMessageV2' | 'ClientMessageV3'
-  message: unknown
-  timestamp?: number
+  historyItem: ChatHistoryItem
 }
 
 function getClientMessagePrompt(data: CallActionData[]) {
@@ -30,18 +24,12 @@ export function ClientMessageView(props: ClientMessageViewProps) {
         <div className="flex bg-white rounded border border-[#E8EBED] h-full ">
           <div className="flex flex-col px-5 py-5 items-start justify-center">
             <div className="text-medium font-medium">
-              {props.messageType === 'ClientMessageV2' &&
-                (props.message as ClientMessageV2).data}
-              {props.messageType === 'ClientMessageV3' &&
-                ((props.message as ClientMessageV3).data.payload.prompt as string)}
-              {props.messageType === 'ClientMessage' &&
-                Array.isArray((props.message as ClientMessage).data) &&
-                getClientMessagePrompt((props.message as ClientMessage).data)}              
+              {props.historyItem.text}
             </div>
           </div>
         </div>
         <div className="flex justify-end mr-2 mt-1">
-          <Timestamp timestampMillis={props.timestamp} />
+          <Timestamp timestampMillis={props.historyItem.timestamp} />
         </div>
       </div>
     </div>

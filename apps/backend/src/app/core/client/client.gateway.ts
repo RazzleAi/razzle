@@ -6,6 +6,8 @@ import { ClientRequestValidatorImpl } from './client-request-validator.impl'
 import { ClientHistoryStoreImpl } from './client-history-store.impl'
 import { ClientToEngineMessengerImpl } from '../messaging/client-to-engine.impl'
 import { ConnectedClientsImpl } from './connected-clients.impl'
+import { AccountServiceImpl } from '../../account/account.service-impl'
+import { AgentCallerImpl } from '../engine'
 
 @WebSocketGateway({ path: '/client' })
 export class ClientGateway implements OnGatewayConnection, ClientLifecycle {
@@ -13,10 +15,10 @@ export class ClientGateway implements OnGatewayConnection, ClientLifecycle {
     private readonly connectedClients: ConnectedClientsImpl,
     private readonly clientRequestValidator: ClientRequestValidatorImpl,
     private readonly clientHistoryStore: ClientHistoryStoreImpl,
-    private readonly clientToEngineMessenger: ClientToEngineMessengerImpl
-  ) {
-    
-  }
+    private readonly clientToEngineMessenger: ClientToEngineMessengerImpl,
+    private readonly accountService: AccountServiceImpl,
+    private readonly agentCaller: AgentCallerImpl
+  ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleConnection(ws: WebSocket, ...args: IncomingMessage[]) {
@@ -25,6 +27,8 @@ export class ClientGateway implements OnGatewayConnection, ClientLifecycle {
       this.clientRequestValidator,
       this.clientHistoryStore,
       this.clientToEngineMessenger,
+      this.accountService,
+      this.agentCaller,
       this
     )
     this.connectedClients.add(client)

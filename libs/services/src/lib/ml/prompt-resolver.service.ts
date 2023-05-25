@@ -24,7 +24,6 @@ export class PromptResolverService {
     const response = await this.gpt3.accept(promptToSend, {
       model: 'text-davinci-003',
       temperature: 0,
-      stop: [],
     })
 
     const result = response.message

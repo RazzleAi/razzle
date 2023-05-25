@@ -23,6 +23,7 @@ export default class Chat {
       id: uuidV1().toString(),
       text: message,
       role: 'user',
+      timestamp: Date.now(),
     })
 
     let messageToLlm = message
@@ -33,6 +34,8 @@ export default class Chat {
       )
 
       const parsedLlmResponse = this.parseLlmResponse(llmResponse.message)
+
+      console.log(parsedLlmResponse)
 
       this.history.push(parsedLlmResponse)
 
@@ -49,6 +52,7 @@ export default class Chat {
           id: uuidV1().toString(),
           text: `Agent ${parsedLlmResponse.agent.agentName} not found`,
           role: 'llm',
+          timestamp: Date.now(),
         })
 
         break
@@ -74,34 +78,32 @@ export default class Chat {
           id: uuidV1().toString(),
           text: `Agent ${parsedLlmResponse.agent.agentName} did not return data`,
           role: 'llm',
+          timestamp: Date.now(),
         })
 
         break
       }
 
       messageToLlm = `
-        \`\`\`
+        \`\`\`json
         {response: ${JSON.stringify(agentResponse.data)}}
         \`\`\`
         `
-
-      this.history.push({
-        id: uuidV1().toString(),
-        text: messageToLlm,
-        role: 'user',
-      })
     }
   }
 
   private parseLlmResponse(llmResponse: string): ChatHistoryItem {
-    const agentCallRegex = /```([\s\S]*)```/g
+    console.log(`Parsing LLM response: ${llmResponse}`)
+    // Get string wraped in markdown codeblock  ```json ```
+    const agentCallRegex = /```json([\s\S]*)```/gm
     const agentCallMatch = agentCallRegex.exec(llmResponse)
 
     if (agentCallMatch && agentCallMatch.length > 1) {
       // Parse the json
       const jsonToParse = agentCallMatch[1].replace(/\n/g, '')
+      console.log(`Json to parse: ${jsonToParse}`)
       const agentCallJson = JSON.parse(jsonToParse)
-      const agentName = agentCallJson.tool
+      const agentName = agentCallJson.agent
       const agentPrompt = agentCallJson.instruction
 
       // Get the text before the agent call
@@ -115,6 +117,7 @@ export default class Chat {
           agentName,
           agentPrompt,
         },
+        timestamp: Date.now(),
       }
     }
 
@@ -122,6 +125,7 @@ export default class Chat {
       id: uuidV1().toString(),
       text: llmResponse,
       role: 'llm',
+      timestamp: Date.now(),
     }
   }
 }

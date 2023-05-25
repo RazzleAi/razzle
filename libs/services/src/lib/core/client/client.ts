@@ -4,7 +4,6 @@ import { ClientLifecycle } from './client-lifecycle'
 import {
   AvailableChatLlms,
   ClientHistoryItemDto,
-  ClientMessageV3,
   ClientRequest,
   ClientResponse,
   ClientToEngineRequest,
@@ -22,8 +21,12 @@ import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
 import Chat from '../enginev2/chat/chat'
 import { IAgent } from '../enginev2/agent/agent'
-import { ChatGpt, ChatTunedLlm } from '../enginev2'
+import { ChatGpt, ChatTunedLlm, NlpProxyAgent } from '../enginev2'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
+import { AccountService } from '../../account'
+import { PromptResolverService } from '../../ml'
+import { AgentCaller } from '../agent'
+import { Sequencer } from '../engine/sequencer'
 
 export class Client {
   id: string
@@ -39,6 +42,8 @@ export class Client {
     private readonly requestValidator: ClientRequestValidator,
     private readonly historyStore: ClientHistoryStore,
     private readonly clientToEngineMessenger: ClientToEngineMessenger,
+    private readonly accountService: AccountService,
+    private readonly agentCaller: AgentCaller,
     private readonly lifecycleHandler?: ClientLifecycle
   ) {
     this.generateId()
@@ -63,7 +68,7 @@ export class Client {
       return
     }
 
-    this.handleMessageTypes(message, user)
+    await this.handleMessageTypes(message, user)
   }
 
   private onWsClose(closeEvent: CloseEvent) {
@@ -93,12 +98,15 @@ export class Client {
     )
   }
 
-  private handleMessageTypes(message: ClientToServerMessage<any>, user: User) {
+  private async handleMessageTypes(
+    message: ClientToServerMessage<any>,
+    user: User
+  ) {
     switch (message.event) {
       case 'Identify': {
         if (!message.data) break
         const { accountId, workspaceId } = message.data
-        this.handleIdentify(accountId, workspaceId, user)
+        await this.handleIdentify(accountId, workspaceId, user)
         break
       }
       case 'Message': {
@@ -112,6 +120,7 @@ export class Client {
       case 'CreateNewChat':
         this.createNewChat(message.data as CreateNewChatDto)
         break
+
       case 'NewChatSelected':
         this.currentChatId = message.data as string
         break
@@ -130,14 +139,29 @@ export class Client {
     this.sendHistory()
   }
 
-  private createNewChat(dto: CreateNewChatDto) {
+  private async createNewChat(dto: CreateNewChatDto) {
+    if (!this.accountId) {
+      console.error('Client: No account id, cannot create new chat')
+      return
+    }
+
+    console.log('Client: Creating new chat')
+
+    const allApps = await this.accountService.getAppsInAccount(this.accountId)
+    const promptResolver = new PromptResolverService()
+    const sequencer = new Sequencer(this.agentCaller, promptResolver)
+
+    const agents = allApps.map(
+      (app) => new NlpProxyAgent(app, promptResolver, sequencer)
+    )
+
     const chat = new Chat({
       accountId: this.accountId ?? '',
       workspaceId: this.workspaceId ?? '',
       userId: this.userId ?? '',
-      agents: [],
+      agents,
       clientId: this.id,
-      llm: this.getLLm(dto.llm, []),
+      llm: this.getLLm(dto.llm, agents),
     })
 
     this.chats.push(chat)
@@ -158,7 +182,11 @@ export class Client {
     }
   }
 
-  private handleIdentify(accountId: string, workspaceId: string, user: User) {
+  private async handleIdentify(
+    accountId: string,
+    workspaceId: string,
+    user: User
+  ) {
     const oldId = this.id
 
     if (
@@ -176,6 +204,11 @@ export class Client {
       console.debug(`Client: Identified client ${oldId} as ${this.id}`)
       this.isIdentified = true
       this.lifecycleHandler?.onClientIdentified(oldId, this)
+    }
+
+    if (this.chats.length === 0) {
+      await this.createNewChat({ llm: 'ChatGpt-3.5' })
+      this.currentChatId = this.chats[0].chatId
     }
 
     this.sendHistory()
@@ -208,26 +241,10 @@ export class Client {
       request.headers['pageSize'] = pagination.pageSize
     }
 
-    const historyItem: ClientHistoryItemDto = {
-      hash: new Md5().appendStr(JSON.stringify(request)).end() as string,
-      isFramed: !!pagination,
-      message: {
-        __objType__: 'ClientMessageV3',
-        frameId: pagination?.frameId,
-        type: 'Message',
-        data: request,
-      } as ClientMessageV3,
-      timestampMillis: DateTime.now().toUnixInteger() * 1000,
-    }
+    const chat = this.getChat(this.currentChatId ?? '')
 
-    if (!request.payload.chatId) {
-      console.log('Client: No chatId in request')
-      return
-    }
-
-    const chat = this.getChat(request.payload.chatId)
     if (!chat) {
-      console.log('Client: No chat found for chatId: ', request.payload.chatId)
+      console.log('Client: No chat found for chatId: ', this.currentChatId)
       return
     }
 
@@ -236,14 +253,15 @@ export class Client {
       return
     }
 
-    chat.accept(request.payload.prompt)
+    try {
+      await chat.accept(request.payload.prompt)
+    } catch (e) {
+      console.error('Client: Error accepting prompt: ', e)
+    }
+
+    this.sendHistory()
 
     this.maybeNotifyFirstActionTriggered()
-
-    if (!historyItem.isFramed) {
-      await this.addToHistory(historyItem)
-      this.sendHistory()
-    }
 
     // this.clientToEngineMessenger.sendRequestToEngine(request)
   }

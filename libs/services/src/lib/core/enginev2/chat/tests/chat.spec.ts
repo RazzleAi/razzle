@@ -98,8 +98,8 @@ describe('Chat', () => {
           message: `
       Sure! using the summaryToolBox agent to summerize the text
 
-      \`\`\`
-      {"tool": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
+      \`\`\`json
+      {"agent": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
       \`\`\`
     `,
         })
@@ -147,8 +147,8 @@ describe('Chat', () => {
           message: `
       Sure! using the summaryToolBox agent to summerize the text
 
-      \`\`\`
-      {"tool": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
+      \`\`\`json
+      {"agent": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
       \`\`\`
     `,
         })
@@ -204,8 +204,8 @@ describe('Chat', () => {
           message: `
       Sure! using the summaryToolBox agent to summerize the text
 
-      \`\`\`
-      {"tool": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
+      \`\`\`json
+      {"agent": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
       \`\`\`
     `,
         })
@@ -239,12 +239,19 @@ describe('Chat', () => {
 
       expect((TestLlm.prototype.accept as any).args[1][0]).toBe(
         `
-        \`\`\`
+        \`\`\`json
         {response: ${JSON.stringify(agentDataResponse)}}
         \`\`\`
         `
       )
     })
+  })
+
+  it('adds a millisecond timestamp to each message', async () => {
+    sandbox.stub(TestLlm.prototype, 'accept').resolves({ message: 'response' })
+
+    await chat.accept('message')
+    expect(chat.history[0].timestamp).toBeGreaterThan(0)
   })
 })
 
