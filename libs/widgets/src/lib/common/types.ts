@@ -87,6 +87,8 @@ export class WidgetPadding {
 
 export type RazzleTextSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge'
 
+export type RazzleTextAlignment = 'left' | 'center' | 'right'
+
 export type RazzleTextWeight =
   | 'light'
   | 'normal'

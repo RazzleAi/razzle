@@ -13,6 +13,7 @@ import { useGetActionArgs } from './api'
 import { v4 as uuidv4 } from 'uuid'
 import {
   buildPaddingStyles,
+  buildTextAlignClasses,
   buildTextSizeClasses,
   buildTextWeightClasses,
 } from './helpers'
@@ -87,12 +88,13 @@ export function Link(props: LinkProps) {
   })
   const textSizeClasses = buildTextSizeClasses(textSize, 'xsmall')
   const textWeightClasses = buildTextWeightClasses(textWeight, 'normal')
+  const textAlignmentClasses = buildTextAlignClasses(textAlignment, 'center')
 
   return (
     <button
       onClick={onClicked}
       style={paddingStyles}
-      className={`${textSizeClasses} ${textWeightClasses} flex flex-row justify-center w-full rounded border border-gray-200 bg-gray-100 hover:bg-gray-200 transition-colors duration-300`}
+      className={`${textSizeClasses} ${textWeightClasses} ${textAlignmentClasses} flex flex-row w-full rounded border border-gray-200 bg-gray-100 hover:bg-gray-200 transition-colors duration-300`}
     >
       <span className="font-semibold text-[#5C5C5C] underline">
         {action.label || action.action}

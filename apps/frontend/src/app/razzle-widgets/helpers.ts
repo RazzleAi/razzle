@@ -1,5 +1,6 @@
 import {
   IWidgetPadding,
+  RazzleTextAlignment,
   RazzleTextSize,
   RazzleTextWeight,
 } from '@razzle/widgets'
@@ -35,6 +36,24 @@ export function buildPaddingStyles(
   }
 
   return paddingStyle
+}
+
+export function buildTextAlignClasses(
+  textAlignment?: RazzleTextAlignment | undefined,
+  optionalDefault?: RazzleTextAlignment | undefined
+) {
+  switch (textAlignment) {
+    case 'left':
+      return 'text-left'
+    case 'center':
+      return 'text-center'
+    case 'right':
+      return 'text-right'
+    default:
+      return optionalDefault
+        ? buildTextAlignClasses(optionalDefault)
+        : 'text-center'
+  }
 }
 
 export function buildTextSizeClasses(
