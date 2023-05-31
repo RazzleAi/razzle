@@ -21,6 +21,7 @@ export class PromptResolverService {
 
   async resolve(prompt: string, actionTable: string): Promise<string> {
     const promptToSend = `${PROMPT_PREFIX}${actionTable}\nInstruction:${prompt}\nDo your work below and do not include "Output:" in your response and do not include more inputs than specified in the action table\n`
+
     const response = await this.gpt3.accept(promptToSend, {
       model: 'text-davinci-003',
       temperature: 0,

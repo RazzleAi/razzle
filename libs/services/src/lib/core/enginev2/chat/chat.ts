@@ -18,13 +18,16 @@ export default class Chat {
 
   constructor(private readonly initializationProps: ChatInitializationProps) {}
 
-  async accept(message: string): Promise<void> {
+  async *accept(message: string) {
+    const acceptedMessageId = uuidV1().toString()
     this.history.push({
-      id: uuidV1().toString(),
+      id: acceptedMessageId,
       text: message,
       role: 'user',
       timestamp: Date.now(),
     })
+
+    yield acceptedMessageId
 
     let messageToLlm = message
 
@@ -34,8 +37,6 @@ export default class Chat {
       )
 
       const parsedLlmResponse = this.parseLlmResponse(llmResponse.message)
-
-      console.log(parsedLlmResponse)
 
       this.history.push(parsedLlmResponse)
 
@@ -57,6 +58,8 @@ export default class Chat {
 
         break
       }
+
+      yield `${parsedLlmResponse.agent.agentName}[${parsedLlmResponse.agent.agentPrompt}]`
 
       const agentResponse = await agent.accept({
         accountId: this.initializationProps.accountId,

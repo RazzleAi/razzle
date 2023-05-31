@@ -13,21 +13,16 @@ export class ChatGpt implements ChatTunedLlm {
 
   async accept(message: string): Promise<LlmResponse> {
     const agentListPrompt = this.contructAgentListPrompt(this.agents)
-    const basePrompt = new Prompt(
-      BASE_PROMPT,
+    const systemPrompt = new Prompt(
+      SYSTEM_PROMPT,
       new Map([['agents', agentListPrompt]])
     )
-
-    const basePromptStr = basePrompt.toString()
-
-    this.history.push({ role: 'user', content: message })
 
     const messages: ChatCompletionRequestMessage[] = [
       {
         role: 'system',
-        content: `${SYSTEM_PROMPT.trim()}\n\n${basePromptStr.trim()}`,
+        content: `${systemPrompt.toString().trim()}`,
       },
-      { role: 'assistant', content: INIT_MESSAGE.trim() },
     ]
 
     if (this.history.length > 0) {
@@ -40,6 +35,8 @@ export class ChatGpt implements ChatTunedLlm {
     }
 
     messages.push({ role: 'user', content: message.trim() })
+
+    console.log(messages)
 
     const response = await this.openAiApi.createChatCompletion({
       model: 'gpt-3.5-turbo',
@@ -71,19 +68,9 @@ export class ChatGpt implements ChatTunedLlm {
   }
 }
 
-export const INIT_MESSAGE = `
-'Hello! How can I assist you today?'
-`
-
 export const SYSTEM_PROMPT = `
-You are AgentInstructorGPT, your job is to give instructions to agents when needed in your conversation with a user
-`
-
-export const BASE_PROMPT = `
-Your main task to talk to the user and carry out their wishes while using the agents provided for fulfilling this goal.
-For complex instructions, you can break the instructions down into sub instructions and instruct the agents to perform these instructions.
-If you can asnwer a question yourself, do not instruct an agent to do it for you.
-When you need to issue an instruction to an agent always write it in the following format markdown code format:
+You are ConductorGPT,
+You're in a group chat with a user and a number of AI agents with different capabilities, the user is primarily talking to you and I need you to interact with the user. The agents in the group chat are there to perform actions or look up information that you can't by yourself so instruct the agents when you need to. When you need to issue an instruction to an agent always write it in the following format markdown code format:
 
 \`\`\`json
 {"agent": "<name of the agent you want to instruct>", "instruction": <the instruction to the agent in natural language>}
@@ -93,18 +80,20 @@ Then wait for the user to respond to you with the response from the agent which 
 \`\`\`json
 {"response": <Agent response in JSON format>}
 \`\`\`
-Always wait for the user to present you with the agent response before presenting the next agent instruction, do not write it yourself
+
+If an instruction is complex feel free to break it down into multiple instructions to the relevant agents on at a time.
 
 Some important instructions:
-- Only use the tools provided to you
+- Only use the agents provided to you
 - Always write instructions in the format above
 - If there are no agents available, tell the user that you don't know how to accomplish the task
 - Do not seek confirmation from the user to use an agent
 - Do not write responses yourself, wait for the user
 - Do not present the user with a summary, just do what they ask
 - Do not write instruction to more than one agent at a time and after that write nothing until the user responds
+- Do not 
 
-Here are the agents: and their decriptions:
+Here are the agents and their capabilities:
 
 {agents}
 `

@@ -32,21 +32,24 @@ describe('Chat', () => {
   })
 
   describe('accept', () => {
-    it('calls the llm when a message is received', () => {
+    it('calls the llm when a message is received', async () => {
       sandbox
         .stub(TestLlm.prototype, 'accept')
         .resolves({ message: 'response' })
 
-      chat.accept('message')
+      const acceptanceGenerator = chat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
+      await acceptanceGenerator.next()
       expect((TestLlm.prototype.accept as any).args[0][0]).toBe('message')
     })
 
-    it('adds the user message to the history', () => {
+    it('adds the user message to the history', async () => {
       sandbox
         .stub(TestLlm.prototype, 'accept')
         .resolves({ message: 'response' })
 
-      chat.accept('message')
+      const acceptanceGenerator = chat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
       expect(chat.history.length).toBe(1)
       expect(chat.history[0].role).toBe('user')
       expect(chat.history[0].text).toBe('message')
@@ -57,7 +60,9 @@ describe('Chat', () => {
         .stub(TestLlm.prototype, 'accept')
         .resolves({ message: 'response' })
 
-      await chat.accept('message')
+      const acceptanceGenerator = chat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
+      await acceptanceGenerator.next()
       expect(chat.history.length).toBe(2)
       expect(chat.history[1].role).toBe('llm')
       expect(chat.history[1].text).toBe('response')
@@ -68,8 +73,9 @@ describe('Chat', () => {
         .stub(TestLlm.prototype, 'accept')
         .resolves({ message: 'response' })
 
-      await chat.accept('message')
-
+      const acceptanceGenerator = chat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
+      await acceptanceGenerator.next()
       const someIdsFialedTest = chat.history.some((item) => {
         // Does not match the uuid v1 pattern
         return !/^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -85,8 +91,13 @@ describe('Chat', () => {
         .stub(TestLlm.prototype, 'accept')
         .resolves({ message: 'response' })
 
-      await chat.accept('message')
-      await chat.accept('message')
+      const acceptanceGenerator = chat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
+      await acceptanceGenerator.next()
+
+      const acceptanceGenerator2 = chat.accept('message')
+      await acceptanceGenerator2.next() // Skip the first yield message id
+      await acceptanceGenerator2.next()
       expect(chat.history[0].id).not.toBe(chat.history[1].id)
     })
 
@@ -126,7 +137,9 @@ describe('Chat', () => {
         clientId: 'clientId',
       })
 
-      await scopedChat.accept('message')
+      const acceptanceGenerator = scopedChat.accept('message')
+      await acceptanceGenerator.next() // Skip the first yield message id
+      await acceptanceGenerator.next()
 
       expect(agentStub.callCount).toBe(1)
       expect(agentStub.args[0][0]).toStrictEqual({
@@ -183,7 +196,9 @@ describe('Chat', () => {
         clientId: 'clientId',
       })
 
-      await scopedChat.accept('message')
+      const acceptanceGenerator = await scopedChat.accept('message')
+      await acceptanceGenerator.next()
+      await acceptanceGenerator.next()
 
       expect(scopedChat.history[1].role).toBe('llm')
       expect(scopedChat.history[1].agent).toBeDefined()
@@ -235,7 +250,9 @@ describe('Chat', () => {
         clientId: 'clientId',
       })
 
-      await scopedChat.accept('message')
+      const acceptanceGenerator = await scopedChat.accept('message')
+      await acceptanceGenerator.next()
+      await acceptanceGenerator.next()
 
       expect((TestLlm.prototype.accept as any).args[1][0]).toBe(
         `
@@ -245,13 +262,17 @@ describe('Chat', () => {
         `
       )
     })
-  })
 
-  it('adds a millisecond timestamp to each message', async () => {
-    sandbox.stub(TestLlm.prototype, 'accept').resolves({ message: 'response' })
+    it('adds a millisecond timestamp to each message', async () => {
+      sandbox
+        .stub(TestLlm.prototype, 'accept')
+        .resolves({ message: 'response' })
 
-    await chat.accept('message')
-    expect(chat.history[0].timestamp).toBeGreaterThan(0)
+      const acceptanceGenerator = await chat.accept('message')
+      await acceptanceGenerator.next()
+      await acceptanceGenerator.next()
+      expect(chat.history[0].timestamp).toBeGreaterThan(0)
+    })
   })
 })
 

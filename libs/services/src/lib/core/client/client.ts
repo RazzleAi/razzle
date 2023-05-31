@@ -254,16 +254,21 @@ export class Client {
     }
 
     try {
-      await chat.accept(request.payload.prompt)
+      const acceptance = await chat.accept(request.payload.prompt)
+
+      let nextResponse = await acceptance.next()
+      while (!nextResponse.done) {
+        console.log(nextResponse)
+        this.sendHistory()
+        nextResponse = await acceptance.next()
+      }
+
+      this.sendHistory()
     } catch (e) {
       console.error('Client: Error accepting prompt: ', e)
     }
 
-    this.sendHistory()
-
     this.maybeNotifyFirstActionTriggered()
-
-    // this.clientToEngineMessenger.sendRequestToEngine(request)
   }
 
   async onResponseReceivedFromEngine(response: ClientResponse) {
