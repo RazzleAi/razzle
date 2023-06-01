@@ -13,10 +13,13 @@ export class ChatGpt implements ChatTunedLlm {
 
   async accept(message: string): Promise<LlmResponse> {
     const agentListPrompt = this.contructAgentListPrompt(this.agents)
+
     const systemPrompt = new Prompt(
       SYSTEM_PROMPT,
       new Map([['agents', agentListPrompt]])
     )
+
+    this.history.push({ role: 'user', content: message.trim() })
 
     const messages: ChatCompletionRequestMessage[] = [
       {
@@ -91,7 +94,7 @@ Some important instructions:
 - Do not write responses yourself, wait for the user
 - Do not present the user with a summary, just do what they ask
 - Do not write instruction to more than one agent at a time and after that write nothing until the user responds
-- Do not 
+- When a question is asked, check if the answer is in the history and if so, use that answer before asking an agent
 
 Here are the agents and their capabilities:
 
