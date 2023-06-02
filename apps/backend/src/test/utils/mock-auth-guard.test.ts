@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { AuthPrincipal } from '@razzle/services'
+import { AuthPrincipal } from '@razzle/domain'
 import { AuthenticatedRequest } from '../../app/auth/authenticated-request'
 import { SKIP_AUTH_KEY } from '../../app/auth/decorators'
 import { faker } from '@faker-js/faker'
@@ -32,11 +32,11 @@ export class MockAuthGuard implements CanActivate {
     }
 
     const bearerToken = accessToken.replace('Bearer', '').trim()
-    
+
     const user = await this.prismaService.user.findUnique({
       where: {
-        authUid: bearerToken
-      }
+        authUid: bearerToken,
+      },
     })
 
     const principal: AuthPrincipal = {

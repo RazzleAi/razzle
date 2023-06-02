@@ -1,4 +1,8 @@
-import { ActionPlanWithDetailsDto, StepDto, WorkspaceActionDto } from '@razzle/dto'
+import {
+  ActionPlanWithDetailsDto,
+  StepDto,
+  WorkspaceActionDto,
+} from '@razzle/dto'
 import { useEffect, useState } from 'react'
 import { WORKSPACE_ACTION_CLICKED } from '../../../events'
 import { useDebouncedValue } from '../../../hooks'
@@ -12,7 +16,7 @@ import { v4 as uuid } from 'uuid'
 import { useWorkspacesStateStore } from '../../workspaces/workspaces-state-store'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgSpinner } from 'react-icons/cg'
-import { Step } from '@razzle/services'
+import { Step } from '@razzle/domain'
 
 export function LeftPaneNavbar() {
   return (
@@ -79,7 +83,7 @@ export function ActionsList() {
         value: null,
       })),
     })
-    
+
     setSteps(steps)
     setIsActorPaneOpen(true)
   }

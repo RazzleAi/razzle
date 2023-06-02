@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { AppsService } from '@razzle/services'
+import { AppsService } from '@razzle/domain'
 import { MixpanelEventTracker } from '../analytics/mixpanel-event-tracker'
 import { EventBusImpl } from '../event/event-bus-impl'
 import { EmbeddingServiceImpl } from '../ml/emedding.service.impl'

@@ -3,7 +3,7 @@ import {
   CreateAuthUserReq,
   AuthPrincipal,
   UserAuthRecord,
-} from '@razzle/services'
+} from '@razzle/domain'
 import { Injectable } from '@nestjs/common'
 import { Auth } from 'firebase-admin/auth'
 import { auth } from 'firebase-admin'

@@ -1,4 +1,4 @@
-import { AuthService } from '@razzle/services'
+import { AuthService } from '@razzle/domain'
 import { Injectable } from '@nestjs/common'
 import { UserServiceImpl } from '../user/user.service.impl'
 import { AuthRepoImpl } from './auth.repo'
@@ -11,7 +11,7 @@ export class AuthServiceImpl extends AuthService {
     authRepository: AuthRepoImpl,
     userServiceImpl: UserServiceImpl,
     accountServiceImpl: AccountServiceImpl,
-    accountUserInviteRepository: AccountUserInviteTokenRepoImpl,
+    accountUserInviteRepository: AccountUserInviteTokenRepoImpl
   ) {
     super(
       authRepository,

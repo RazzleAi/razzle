@@ -1,4 +1,4 @@
-import { CreateAccountData } from '@razzle/services'
+import { CreateAccountData } from '@razzle/domain'
 import { AccountRepoImpl } from '../../app/account/account.repo-impl'
 import { PrismaService } from '../../app/prisma/prisma.service'
 import { TestEnvironment } from '../containers/test-environment'
@@ -189,7 +189,9 @@ describe('AccountRepoImpl', () => {
     }
     secondAttempt()
 
-    const results = await prismaService.accountUser.findMany({where: {accountId: account.id, userId: user2.id}})
+    const results = await prismaService.accountUser.findMany({
+      where: { accountId: account.id, userId: user2.id },
+    })
     expect(results.length).toEqual(1)
   })
 

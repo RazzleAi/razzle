@@ -1,6 +1,6 @@
 import React from 'react'
 import { ClientMessageView } from './client-message-view'
-import { ChatHistoryItem } from '@razzle/services'
+import { ChatHistoryItem } from '@razzle/domain'
 import { LlmMessageView } from './llm-message-view'
 import { ClientHistoryItem } from '@prisma/client'
 

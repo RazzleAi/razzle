@@ -4,7 +4,7 @@ import { Principal, PrincipalKey } from '../auth/decorators/principal.decorator'
 import { UseExceptionResponseHandler } from '../decorators'
 import { UserServiceImpl } from './user.service.impl'
 import { UserDto } from '@razzle/dto'
-import { App } from '@razzle/services'
+import { App } from '@razzle/domain'
 
 @UseExceptionResponseHandler()
 @Controller('users')

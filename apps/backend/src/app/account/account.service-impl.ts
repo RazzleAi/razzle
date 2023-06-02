@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { AccountUser, AccountUserInviteEmail } from '@prisma/client'
-import { AccountService, ReferenceGenerator } from '@razzle/services'
+import { AccountService, ReferenceGenerator } from '@razzle/domain'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
 import { EmailDispatchGatewayImpl } from '../email/email-dispatch-gateway-impl.service'
 import { EventBusImpl } from '../event/event-bus-impl'

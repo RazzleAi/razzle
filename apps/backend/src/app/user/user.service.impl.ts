@@ -1,4 +1,4 @@
-import { UserService } from '@razzle/services'
+import { UserService } from '@razzle/domain'
 import { Injectable } from '@nestjs/common'
 import { UserRepoImpl } from './user.repo.impl'
 import { WorkspaceServiceImpl } from '../workspace/workspace.service-impl'

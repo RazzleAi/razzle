@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { WorkspaceService } from '@razzle/services'
+import { WorkspaceService } from '@razzle/domain'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
 import { EventBusImpl } from '../event/event-bus-impl'
 import { PromptResolverServiceImpl } from '../ml/args-extractor.service.impl'

@@ -5,7 +5,7 @@ import {
   NewAppDetails,
   UpdateAppInput,
   appFromPrisma,
-} from '@razzle/services'
+} from '@razzle/domain'
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
@@ -212,6 +212,5 @@ export class AppsRepoImpl implements AppsRepo {
         },
       },
     })
-    
   }
 }

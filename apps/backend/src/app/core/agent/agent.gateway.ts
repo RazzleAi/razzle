@@ -1,5 +1,5 @@
 import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets'
-import { Agent, AgentLifecycle } from '@razzle/services'
+import { Agent, AgentLifecycle } from '@razzle/domain'
 import { WebSocket } from 'ws'
 import { IncomingMessage } from 'http'
 import { WsClosureCodes } from '../../websocket/ws-status-codes'
@@ -38,7 +38,7 @@ export class AgentGateway implements OnGatewayConnection, AgentLifecycle {
       this.agentToEngineMessenger,
       this
     )
-    this.connectedAgents.addAgent(agent, app.appId)    
+    this.connectedAgents.addAgent(agent, app.appId)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

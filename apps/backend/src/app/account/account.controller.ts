@@ -29,7 +29,7 @@ import {
   AppNotFoundException,
   DuplicateMatchDomainException,
   User,
-} from '@razzle/services'
+} from '@razzle/domain'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { OnboardingServiceImpl } from '../onboarding'
@@ -93,7 +93,10 @@ export class AccountController {
     @Param('accountId') accountId: string,
     @Param('userId') userId: string
   ): Promise<AccountWithOwnerDto> {
-    const res = await this.accountService.findAccountUserWithOwner(accountId, userId)    
+    const res = await this.accountService.findAccountUserWithOwner(
+      accountId,
+      userId
+    )
     return res
   }
 

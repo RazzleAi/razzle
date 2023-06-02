@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { EmbeddingSearchService } from '@razzle/services'
+import { EmbeddingSearchService } from '@razzle/domain'
 
 @Injectable()
 export class EmbeddingSearchServiceImpl extends EmbeddingSearchService {

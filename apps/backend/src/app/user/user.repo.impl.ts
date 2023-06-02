@@ -1,4 +1,4 @@
-import { UserRepo } from '@razzle/services'
+import { UserRepo } from '@razzle/domain'
 import { Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
@@ -85,7 +85,7 @@ export class UserRepoImpl implements UserRepo {
           },
         ],
         AND: [
-          {            
+          {
             loginType: {
               not: {
                 equals: 'default',

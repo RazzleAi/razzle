@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { event, EventBus, ListenerFn } from '@razzle/services'
+import { event, EventBus, ListenerFn } from '@razzle/domain'
 
 @Injectable()
 export class EventBusImpl implements EventBus {

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-import { KafkaModule } from '../kafka/kafka.module'
 import { RedisModule } from '../redis/redis.module'
 import { UserModule } from '../user/user.module'
 import { AccountModule } from '../account/account.module'
@@ -25,12 +24,13 @@ import { MixpanelModule } from '../analytics/analytics.module'
 import { AgentToEngineMessengerImpl } from './messaging/agent-to-engine.impl'
 import { ClientToEngineMessengerImpl } from './messaging/client-to-engine.impl'
 import { AgentCallerImpl, RazzleEngineImpl } from './engine'
+import { PubSubModule } from '../pub-sub/pub-sub.module'
 
 @Module({
   imports: [
-    KafkaModule,
     RedisModule,
     PrismaModule,
+    PubSubModule,
     UserModule,
     AccountModule,
     AuthModule,

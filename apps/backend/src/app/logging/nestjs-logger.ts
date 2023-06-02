@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common'
-import { ILogger } from '@razzle/services'
+import { ILogger } from '@razzle/domain'
 
 export class LoggerService implements ILogger {
   private logger?: Logger

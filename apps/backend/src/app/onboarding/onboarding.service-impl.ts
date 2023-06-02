@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { OnboardingService } from '@razzle/services'
+import { OnboardingService } from '@razzle/domain'
 import { EventBusImpl } from '../event/event-bus-impl'
 import { OnboardingRepoImpl } from './onboarding.repo-impl'
 

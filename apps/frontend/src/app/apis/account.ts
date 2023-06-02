@@ -12,7 +12,7 @@ import {
   Page,
   WorkspaceDto,
 } from '@razzle/dto'
-import { AccountWithUser } from '@razzle/services'
+import { AccountWithUser } from '@razzle/domain'
 
 export function getMe({
   get,
@@ -69,9 +69,9 @@ export function getAppsInAccount(
   }
 }
 
-export function getPublicApps(
-  { get }: AxiosInstance,
-): Promise<AxiosResponse<{ data: AppDto[]; error?: string }>> {
+export function getPublicApps({
+  get,
+}: AxiosInstance): Promise<AxiosResponse<{ data: AppDto[]; error?: string }>> {
   try {
     return get<{ data: AppDto[] }>('/apps/public')
   } catch (error) {

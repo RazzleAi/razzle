@@ -1,5 +1,5 @@
 import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets'
-import { Client, ClientLifecycle } from '@razzle/services'
+import { Client, ClientLifecycle } from '@razzle/domain'
 import { IncomingMessage } from 'http'
 import { WebSocket } from 'ws'
 import { ClientRequestValidatorImpl } from './client-request-validator.impl'

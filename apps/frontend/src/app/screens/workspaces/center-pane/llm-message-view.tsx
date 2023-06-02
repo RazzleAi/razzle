@@ -1,4 +1,4 @@
-import { ChatHistoryItem } from '@razzle/services'
+import { ChatHistoryItem } from '@razzle/domain'
 import { Timestamp } from './timestamp'
 import { renderReponse } from '../../../utils/render-reponse'
 import { IRazzleWidget } from '@razzle/widgets'

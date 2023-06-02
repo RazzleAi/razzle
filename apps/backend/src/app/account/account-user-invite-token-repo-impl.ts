@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { AccountUserInviteToken } from '@prisma/client'
-import { AccountUserInviteTokenRepo } from '@razzle/services'
+import { AccountUserInviteTokenRepo } from '@razzle/domain'
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()
@@ -27,7 +27,7 @@ export class AccountUserInviteTokenRepoImpl
       where: {
         userId,
         accountId,
-      }, 
+      },
     })
   }
 

@@ -18,7 +18,11 @@ import {
   CreateAppResponseDto,
   UpdateAppDto,
 } from '@razzle/dto'
-import { DuplicateAppException, InvalidHandleException, User } from '@razzle/services'
+import {
+  DuplicateAppException,
+  InvalidHandleException,
+  User,
+} from '@razzle/domain'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { AppsServiceImpl } from './apps.service-impl'
 import { Principal, PrincipalKey } from '../auth/decorators'
