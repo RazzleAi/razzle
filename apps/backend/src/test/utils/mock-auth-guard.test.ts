@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { AuthPrincipal } from '@razzle/domain'
+import { AuthPrincipal } from '@razzle/services'
 import { AuthenticatedRequest } from '../../app/auth/authenticated-request'
 import { SKIP_AUTH_KEY } from '../../app/auth/decorators'
 import { faker } from '@faker-js/faker'

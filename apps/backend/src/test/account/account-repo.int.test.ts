@@ -1,4 +1,4 @@
-import { CreateAccountData } from '@razzle/domain'
+import { CreateAccountData } from '@razzle/services'
 import { AccountRepoImpl } from '../../app/account/account.repo-impl'
 import { PrismaService } from '../../app/prisma/prisma.service'
 import { TestEnvironment } from '../containers/test-environment'

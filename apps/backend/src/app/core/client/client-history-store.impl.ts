@@ -6,7 +6,7 @@ import {
 } from './client-history.repo'
 import { ClientHistoryItemDto } from '@razzle/dto'
 import { RedisBoundedList } from '../../redis/redis-bounded-list'
-import { ClientHistoryStore } from '@razzle/domain'
+import { ClientHistoryStore } from '@razzle/services'
 
 @Injectable()
 export class ClientHistoryStoreImpl implements ClientHistoryStore {

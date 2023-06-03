@@ -1,5 +1,5 @@
 import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets'
-import { Agent, AgentLifecycle } from '@razzle/domain'
+import { Agent, AgentLifecycle } from '@razzle/services'
 import { WebSocket } from 'ws'
 import { IncomingMessage } from 'http'
 import { WsClosureCodes } from '../../websocket/ws-status-codes'

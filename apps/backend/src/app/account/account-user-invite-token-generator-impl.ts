@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { AccountUser, AccountUserInviteToken } from '@prisma/client'
-import { AccountUserInviteTokenGenerator } from '@razzle/domain'
+import { AccountUserInviteTokenGenerator } from '@razzle/services'
 import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()

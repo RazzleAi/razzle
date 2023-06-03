@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { AnalyticsEventTracker } from '@razzle/domain'
+import { AnalyticsEventTracker } from '@razzle/services'
 import * as Mixpanel from 'mixpanel'
 
 @Injectable()

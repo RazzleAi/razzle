@@ -2,7 +2,7 @@ import {
   MessagePublisher,
   MessageSubscriber,
   SubscriptionHandle,
-} from '@razzle/domain'
+} from '@razzle/services'
 import { v4 as uuid } from 'uuid'
 
 type MessageHandler = {
@@ -15,10 +15,7 @@ export abstract class QueueBasedPubSub
 {
   protected readonly subscribers: Map<string, MessageHandler[]> = new Map()
 
-  public abstract publishMessage(
-    topic: string,
-    message: string
-  ): Promise<void>
+  public abstract publishMessage(topic: string, message: string): Promise<void>
 
   subscribeToMessages(
     topic: string,

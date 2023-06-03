@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Email } from '@prisma/client'
-import { EmailRepo, EmailService } from '@razzle/domain'
+import { EmailRepo, EmailService } from '@razzle/services'
 import { EmailRepoImpl } from './email.repo-impl'
 
 @Injectable()

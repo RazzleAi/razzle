@@ -1,7 +1,7 @@
 import { CallActionData } from '@razzle/dto'
 import { varNameToName } from '../../../utils/var-to-sentence'
 import { Timestamp } from './timestamp'
-import { ChatHistoryItem } from '@razzle/domain'
+import { ChatHistoryItem } from '@razzle/services'
 
 interface ClientMessageViewProps {
   historyItem: ChatHistoryItem

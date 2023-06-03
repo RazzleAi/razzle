@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { AgentHeaderValidator, App } from '@razzle/domain'
+import { AgentHeaderValidator, App } from '@razzle/services'
 import { AppsServiceImpl } from '../../apps/apps.service-impl'
 
 @Injectable()

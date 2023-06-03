@@ -22,7 +22,7 @@ import {
   DuplicateAppException,
   InvalidHandleException,
   User,
-} from '@razzle/domain'
+} from '@razzle/services'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { AppsServiceImpl } from './apps.service-impl'
 import { Principal, PrincipalKey } from '../auth/decorators'

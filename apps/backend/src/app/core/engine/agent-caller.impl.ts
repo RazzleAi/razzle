@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { AgentCaller } from '@razzle/domain'
+import { AgentCaller } from '@razzle/services'
 import { AgentToEngineMessengerImpl } from '../messaging/agent-to-engine.impl'
 
 @Injectable()

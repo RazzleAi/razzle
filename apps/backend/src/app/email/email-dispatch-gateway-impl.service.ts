@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Email } from '@prisma/client'
-import { EmailDispatchGateway, EmailGenerator } from '@razzle/domain'
+import { EmailDispatchGateway, EmailGenerator } from '@razzle/services'
 import { EmailDispatchTaskScheduler } from './email-task-scheduler'
 
 import { EmailServiceImpl } from './email.service-impl'

@@ -4,7 +4,7 @@ import {
   ThirdPartyAuthDto,
   ThirdPartyAuthResponseDto,
 } from '@razzle/dto'
-import { DuplicateUserException, SignupException } from '@razzle/domain'
+import { DuplicateUserException, SignupException } from '@razzle/services'
 import {
   Body,
   Controller,

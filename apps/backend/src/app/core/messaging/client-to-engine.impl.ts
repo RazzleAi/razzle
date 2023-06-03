@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ClientToEngineMessenger } from '@razzle/domain'
+import { ClientToEngineMessenger } from '@razzle/services'
 import { ConnectedClientsImpl } from '../client/connected-clients.impl'
 import { AwsSQSPubSub } from '../../pub-sub/sqs-pub-sub'
 

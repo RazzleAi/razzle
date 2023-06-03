@@ -29,7 +29,7 @@ import {
   AppNotFoundException,
   DuplicateMatchDomainException,
   User,
-} from '@razzle/domain'
+} from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { OnboardingServiceImpl } from '../onboarding'

@@ -8,7 +8,7 @@ import {
   App,
   CreateAccountData,
   appFromPrisma,
-} from '@razzle/domain'
+} from '@razzle/services'
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()

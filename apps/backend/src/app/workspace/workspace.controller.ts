@@ -19,7 +19,7 @@ import {
 import {
   DuplicateWorkspaceNameException,
   WorkspaceWithUser,
-} from '@razzle/domain'
+} from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { WorkspaceServiceImpl } from './workspace.service-impl'

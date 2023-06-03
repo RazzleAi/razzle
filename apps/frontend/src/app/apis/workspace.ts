@@ -6,7 +6,7 @@ import {
   WorkspaceActionDto,
   WorkspaceDto,
 } from '@razzle/dto'
-import { WorkspaceWithUser } from '@razzle/domain'
+import { WorkspaceWithUser } from '@razzle/services'
 import { AxiosInstance, AxiosResponse } from 'axios'
 
 export async function createWorkspace(

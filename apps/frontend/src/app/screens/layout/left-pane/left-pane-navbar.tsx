@@ -16,7 +16,7 @@ import { v4 as uuid } from 'uuid'
 import { useWorkspacesStateStore } from '../../workspaces/workspaces-state-store'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgSpinner } from 'react-icons/cg'
-import { Step } from '@razzle/domain'
+import { Step } from '@razzle/services'
 
 export function LeftPaneNavbar() {
   return (

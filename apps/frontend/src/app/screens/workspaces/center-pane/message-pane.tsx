@@ -11,7 +11,7 @@ import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFetchOnboardingStatus } from '../../queries'
 import { HistoryItemView } from './history-item-view'
 import { OnboardingView } from './onboarding-view'
-import { ChatHistoryItem } from '@razzle/domain'
+import { ChatHistoryItem } from '@razzle/services'
 
 export function MessagePane() {
   const [messages, setMessages] = useState<ChatHistoryItem[]>([])

@@ -16,10 +16,10 @@
     "strictPropertyInitialization": false,
     "baseUrl": ".",
     "paths": {
-      "@razzle/domain": ["libs/domain/src/index.ts"],
       "@razzle/dto": ["libs/dto/src/index.ts"],
       "@razzle/razzle-widgets": ["libs/razzle-widgets/src/index.ts"],
       "@razzle/sdk": ["libs/razzle-sdk/src/index.ts"],
+      "@razzle/services": ["libs/services/src/index.ts"],
       "@razzle/widgets": ["libs/widgets/src/index.ts"]
     }
   },

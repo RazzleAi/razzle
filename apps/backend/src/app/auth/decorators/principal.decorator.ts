@@ -1,4 +1,4 @@
-import { AuthPrincipal, User } from '@razzle/domain'
+import { AuthPrincipal, User } from '@razzle/services'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 import { AuthenticatedRequest } from '../authenticated-request'
 

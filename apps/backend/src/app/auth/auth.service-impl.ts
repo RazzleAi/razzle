@@ -1,4 +1,4 @@
-import { AuthService } from '@razzle/domain'
+import { AuthService } from '@razzle/services'
 import { Injectable } from '@nestjs/common'
 import { UserServiceImpl } from '../user/user.service.impl'
 import { AuthRepoImpl } from './auth.repo'

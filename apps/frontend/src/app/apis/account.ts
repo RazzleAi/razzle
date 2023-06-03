@@ -12,7 +12,7 @@ import {
   Page,
   WorkspaceDto,
 } from '@razzle/dto'
-import { AccountWithUser } from '@razzle/domain'
+import { AccountWithUser } from '@razzle/services'
 
 export function getMe({
   get,

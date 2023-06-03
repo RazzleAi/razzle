@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
-import { AccountUserInviteTokenRepo } from '@razzle/domain'
+import { AccountUserInviteTokenRepo } from '@razzle/services'
 import { AccountUserInviteTokenRepoImpl } from './account-user-invite-token-repo-impl'
 
 @Injectable()
