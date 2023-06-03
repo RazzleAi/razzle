@@ -5,12 +5,14 @@ import { App } from '../../../apps'
 import { Sequencer } from '../../engine/sequencer'
 
 export class NlpProxyAgent implements IAgent {
+  id: string
   constructor(
     private readonly app: App,
     private readonly promptResolverService: PromptResolverService,
     private readonly sequencer: Sequencer
   ) {
     console.log(`Initializing NlpProxyAgent for app ${app.name}`)
+    this.id = app.id
     this.name = app.name
     this.description = app.description
   }

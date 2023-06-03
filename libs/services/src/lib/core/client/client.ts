@@ -8,7 +8,6 @@ import {
   ClientResponse,
   ClientToEngineRequest,
   ClientToServerMessage,
-  CreateNewChatDto,
   ServerMessage,
   ServerMessageV2,
   ServerToClientMessage,
@@ -19,14 +18,9 @@ import { DateTime } from 'luxon'
 import { ClientHistoryStore } from './client-history-store'
 import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
-import Chat from '../enginev2/chat/chat'
-import { IAgent } from '../enginev2/agent/agent'
-import { ChatGpt, ChatTunedLlm, NlpProxyAgent } from '../enginev2'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
-import { AccountService } from '../../account'
-import { PromptResolverService } from '../../ml'
-import { AgentCaller } from '../agent'
-import { Sequencer } from '../engine/sequencer'
+import { ChatService } from '../enginev2/chat/chat.service'
+import Chat from '../enginev2/chat/chat'
 
 export class Client {
   id: string
@@ -34,16 +28,14 @@ export class Client {
   accountId?: string
   workspaceId?: string
   isIdentified = false
-  chats: Chat[] = []
-  currentChatId: string | undefined
+  currentChat: Chat | undefined
 
   constructor(
     private readonly ws: WebSocket,
     private readonly requestValidator: ClientRequestValidator,
     private readonly historyStore: ClientHistoryStore,
     private readonly clientToEngineMessenger: ClientToEngineMessenger,
-    private readonly accountService: AccountService,
-    private readonly agentCaller: AgentCaller,
+    private readonly chatService: ChatService,
     private readonly lifecycleHandler?: ClientLifecycle
   ) {
     this.generateId()
@@ -118,11 +110,25 @@ export class Client {
         break
       }
       case 'CreateNewChat':
-        this.createNewChat(message.data as CreateNewChatDto)
+        if (!this.accountId || !this.userId || !this.workspaceId) {
+          console.error(
+            'Client: Cannot create new chat, client is not identified'
+          )
+          break
+        }
+
+        this.chatService.createNewChat(
+          this.accountId,
+          this.userId,
+          this.workspaceId,
+          this.id,
+          message.data
+        )
+
         break
 
       case 'NewChatSelected':
-        this.currentChatId = message.data as string
+        this.onNewChatSelected(message.data as string)
         break
 
       case 'Ping':
@@ -139,47 +145,14 @@ export class Client {
     this.sendHistory()
   }
 
-  private async createNewChat(dto: CreateNewChatDto) {
-    if (!this.accountId) {
-      console.error('Client: No account id, cannot create new chat')
+  private async onNewChatSelected(chatId: string) {
+    const chat = await this.chatService.getChat(chatId)
+    if (!chat) {
+      console.error(`Client: Chat ${chatId} not found`)
       return
     }
 
-    console.log('Client: Creating new chat')
-
-    const allApps = await this.accountService.getAppsInAccount(this.accountId)
-    const promptResolver = new PromptResolverService()
-    const sequencer = new Sequencer(this.agentCaller, promptResolver)
-
-    const agents = allApps.map(
-      (app) => new NlpProxyAgent(app, promptResolver, sequencer)
-    )
-
-    const chat = new Chat({
-      accountId: this.accountId ?? '',
-      workspaceId: this.workspaceId ?? '',
-      userId: this.userId ?? '',
-      agents,
-      clientId: this.id,
-      llm: this.getLLm(dto.llm, agents),
-    })
-
-    this.chats.push(chat)
-    return chat
-  }
-
-  private getChat(chatId: string): Chat | undefined {
-    return this.chats.find((c) => c.chatId === chatId)
-  }
-
-  private getLLm(name: AvailableChatLlms, agents: IAgent[]): ChatTunedLlm {
-    switch (name) {
-      case 'ChatGpt-3.5':
-        return ChatGpt.create(agents)
-
-      default:
-        return ChatGpt.create(agents)
-    }
+    this.currentChat = chat
   }
 
   private async handleIdentify(
@@ -206,9 +179,28 @@ export class Client {
       this.lifecycleHandler?.onClientIdentified(oldId, this)
     }
 
-    if (this.chats.length === 0) {
-      await this.createNewChat({ llm: 'ChatGpt-3.5' })
-      this.currentChatId = this.chats[0].chatId
+    const currentChatsForUser = await this.chatService.getChatsForUser(
+      this.userId
+    )
+
+    if (currentChatsForUser.length === 0) {
+      console.log('Client: No chats found for user, creating new chat')
+      const createdChat = await this.chatService.createNewChat(
+        this.accountId,
+        this.userId,
+        this.workspaceId,
+        this.id,
+        'ChatGpt-3.5'
+      )
+
+      console.log('Client: Created new chat: ', createdChat.chatId)
+      this.currentChat = createdChat
+    } else {
+      console.log(currentChatsForUser)
+      console.log(
+        `Found ${currentChatsForUser.length} chats for user ${user.id} using chat ${currentChatsForUser[0].chatId} as current chat`
+      )
+      this.currentChat = currentChatsForUser[0]
     }
 
     this.sendHistory()
@@ -241,25 +233,35 @@ export class Client {
       request.headers['pageSize'] = pagination.pageSize
     }
 
-    const chat = this.getChat(this.currentChatId ?? '')
+    console.log(`Current chatId: ${this.currentChat?.chatId}`)
 
-    if (!chat) {
-      console.log('Client: No chat found for chatId: ', this.currentChatId)
+    if (!request.payload.prompt) {
+      console.log(
+        'Client: No prompt in request. ChatId: ',
+        this.currentChat?.chatId
+      )
       return
     }
 
-    if (!request.payload.prompt) {
-      console.log('Client: No prompt in request. ChatId: ', chat.chatId)
+    if (!this.currentChat) {
+      console.error(
+        `Client: Cannot send message to engine. No current chat. Client: ${this.id}`
+      )
       return
     }
 
     try {
-      const acceptance = await chat.accept(request.payload.prompt)
+      const acceptance = await this.currentChat.accept(request.payload.prompt)
+      this.chatService.saveChat(this.currentChat)
 
       let nextResponse = await acceptance.next()
       while (!nextResponse.done) {
-        console.log(nextResponse)
-        this.sendHistory()
+        await this.sendHistory()
+        await this.chatService.saveToChatHistory(
+          this.currentChat.chatId,
+          nextResponse.value as ChatHistoryItem
+        )
+
         nextResponse = await acceptance.next()
       }
 
@@ -314,13 +316,13 @@ export class Client {
   }
 
   async sendHistory() {
-    if (!this.currentChatId) return
+    if (!this.currentChat?.chatId) return
 
-    const currentChat = this.getChat(this.currentChatId)
     const historyResponse: ServerToClientMessage<ChatHistoryItem[]> = {
       event: 'History',
-      data: currentChat?.history || [],
+      data: this.currentChat?.history || [],
     }
+
     this.ws.send(JSON.stringify(historyResponse))
   }
 

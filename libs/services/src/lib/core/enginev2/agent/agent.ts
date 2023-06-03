@@ -9,6 +9,7 @@ export interface NlpProxyAgentAcceptParams {
 }
 
 export interface IAgent {
+  id: string
   name: string
   description: string
   accept(params: NlpProxyAgentAcceptParams): Promise<RazzleResponse>

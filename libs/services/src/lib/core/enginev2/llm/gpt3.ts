@@ -1,7 +1,8 @@
 import { OpenAIApi } from 'openai'
-import { Llm, LlmOpts, LlmResponse } from './llm'
+import { InstructTunedLlm, LlmOpts, LlmResponse } from './llm'
 
-export class Gpt3 implements Llm {
+export class Gpt3 implements InstructTunedLlm {
+  name = 'Gpt3'
   constructor(private readonly openaiApi: OpenAIApi) {}
 
   async accept(prompt: string, opts?: LlmOpts): Promise<LlmResponse> {

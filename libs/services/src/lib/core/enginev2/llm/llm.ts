@@ -14,9 +14,20 @@ export interface LlmOpts {
 }
 
 export interface Llm {
+  name: string
+}
+
+export interface InstructTunedLlm extends Llm {
   accept(message: string, opts?: LlmOpts): Promise<LlmResponse>
 }
 
+export type ChatLlmHIstoryItemRole = 'user' | 'llm'
+
+export interface ChatLlmHistoryItem {
+  role: ChatLlmHIstoryItemRole
+  content: string
+}
+
 export interface ChatTunedLlm extends Llm {
-  history: any[]
+  accept(message: string, history: ChatLlmHistoryItem[]): Promise<LlmResponse>
 }
