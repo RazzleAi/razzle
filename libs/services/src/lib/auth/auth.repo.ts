@@ -34,7 +34,9 @@ export interface AuthPrincipal {
 
 export interface AuthRepo {
   getUserByEmail(email: string): Promise<UserAuthRecord>
-  createUser(req: CreateAuthUserReq): Promise<{ user: UserAuthRecord; authToken: string }>
+  createUser(
+    req: CreateAuthUserReq
+  ): Promise<{ user: UserAuthRecord; authToken: string }>
   deleteUser(authId: string): Promise<void>
   verifyAuthToken(token: string): Promise<AuthPrincipal>
 }

@@ -141,7 +141,7 @@ export class AppsService {
     if (app.isPublic !== undefined) {
       data.isPublic = app.isPublic
     }
-    
+
     return this.appsRepo.updateApp(id, data)
   }
 

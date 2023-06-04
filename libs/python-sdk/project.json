@@ -25,12 +25,10 @@
       "outputs": [],
       "dependsOn": [
         {
-          "target": "build",
-          "projects": "self"
+          "target": "build"
         },
         {
-          "target": "install",
-          "projects": "self"
+          "target": "install"
         }
       ],
       "options": {

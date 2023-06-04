@@ -11,9 +11,9 @@ export class MixpanelEventTracker implements AnalyticsEventTracker {
   }
 
   trackEvent(event: string, properties?: any): void {
-    this.mixpanel.track(event, {...properties, nodeEnv: process.env.NODE_ENV})
+    this.mixpanel.track(event, { ...properties, nodeEnv: process.env.NODE_ENV })
   }
-  
+
   identify(userId: string, email?: string): void {
     this.mixpanel.people.set(userId, {
       $email: email,

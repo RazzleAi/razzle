@@ -2,8 +2,8 @@ import { Md5 } from 'ts-md5'
 import { WebSocket, MessageEvent, CloseEvent, ErrorEvent } from 'ws'
 import { ClientLifecycle } from './client-lifecycle'
 import {
+  AvailableChatLlms,
   ClientHistoryItemDto,
-  ClientMessageV3,
   ClientRequest,
   ClientResponse,
   ClientToEngineRequest,
@@ -18,6 +18,9 @@ import { DateTime } from 'luxon'
 import { ClientHistoryStore } from './client-history-store'
 import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
+import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
+import { ChatService } from '../enginev2/chat/chat.service'
+import Chat from '../enginev2/chat/chat'
 
 export class Client {
   id: string
@@ -25,12 +28,14 @@ export class Client {
   accountId?: string
   workspaceId?: string
   isIdentified = false
+  currentChat: Chat | undefined
 
   constructor(
     private readonly ws: WebSocket,
     private readonly requestValidator: ClientRequestValidator,
     private readonly historyStore: ClientHistoryStore,
     private readonly clientToEngineMessenger: ClientToEngineMessenger,
+    private readonly chatService: ChatService,
     private readonly lifecycleHandler?: ClientLifecycle
   ) {
     this.generateId()
@@ -55,7 +60,7 @@ export class Client {
       return
     }
 
-    this.handleMessageTypes(message, user)
+    await this.handleMessageTypes(message, user)
   }
 
   private onWsClose(closeEvent: CloseEvent) {
@@ -85,15 +90,15 @@ export class Client {
     )
   }
 
-  private handleMessageTypes(
-    message: ClientToServerMessage<ClientRequest>,
+  private async handleMessageTypes(
+    message: ClientToServerMessage<any>,
     user: User
   ) {
     switch (message.event) {
       case 'Identify': {
         if (!message.data) break
         const { accountId, workspaceId } = message.data
-        this.handleIdentify(accountId, workspaceId, user)
+        await this.handleIdentify(accountId, workspaceId, user)
         break
       }
       case 'Message': {
@@ -104,6 +109,28 @@ export class Client {
         this.handleMessage(message.data)
         break
       }
+      case 'CreateNewChat':
+        if (!this.accountId || !this.userId || !this.workspaceId) {
+          console.error(
+            'Client: Cannot create new chat, client is not identified'
+          )
+          break
+        }
+
+        this.chatService.createNewChat(
+          this.accountId,
+          this.userId,
+          this.workspaceId,
+          this.id,
+          message.data
+        )
+
+        break
+
+      case 'NewChatSelected':
+        this.onNewChatSelected(message.data as string)
+        break
+
       case 'Ping':
         this.onPing()
         break
@@ -118,7 +145,21 @@ export class Client {
     this.sendHistory()
   }
 
-  private handleIdentify(accountId: string, workspaceId: string, user: User) {
+  private async onNewChatSelected(chatId: string) {
+    const chat = await this.chatService.getChat(chatId)
+    if (!chat) {
+      console.error(`Client: Chat ${chatId} not found`)
+      return
+    }
+
+    this.currentChat = chat
+  }
+
+  private async handleIdentify(
+    accountId: string,
+    workspaceId: string,
+    user: User
+  ) {
     const oldId = this.id
 
     if (
@@ -136,6 +177,30 @@ export class Client {
       console.debug(`Client: Identified client ${oldId} as ${this.id}`)
       this.isIdentified = true
       this.lifecycleHandler?.onClientIdentified(oldId, this)
+    }
+
+    const currentChatsForUser = await this.chatService.getChatsForUser(
+      this.userId
+    )
+
+    if (currentChatsForUser.length === 0) {
+      console.log('Client: No chats found for user, creating new chat')
+      const createdChat = await this.chatService.createNewChat(
+        this.accountId,
+        this.userId,
+        this.workspaceId,
+        this.id,
+        'ChatGpt-3.5'
+      )
+
+      console.log('Client: Created new chat: ', createdChat.chatId)
+      this.currentChat = createdChat
+    } else {
+      console.log(currentChatsForUser)
+      console.log(
+        `Found ${currentChatsForUser.length} chats for user ${user.id} using chat ${currentChatsForUser[0].chatId} as current chat`
+      )
+      this.currentChat = currentChatsForUser[0]
     }
 
     this.sendHistory()
@@ -168,26 +233,44 @@ export class Client {
       request.headers['pageSize'] = pagination.pageSize
     }
 
-    const historyItem: ClientHistoryItemDto = {
-      hash: new Md5().appendStr(JSON.stringify(request)).end() as string,
-      isFramed: !!pagination,
-      message: {
-        __objType__: 'ClientMessageV3',
-        frameId: pagination?.frameId,
-        type: 'Message',
-        data: request,
-      } as ClientMessageV3,
-      timestampMillis: DateTime.now().toUnixInteger() * 1000,
+    console.log(`Current chatId: ${this.currentChat?.chatId}`)
+
+    if (!request.payload.prompt) {
+      console.log(
+        'Client: No prompt in request. ChatId: ',
+        this.currentChat?.chatId
+      )
+      return
+    }
+
+    if (!this.currentChat) {
+      console.error(
+        `Client: Cannot send message to engine. No current chat. Client: ${this.id}`
+      )
+      return
+    }
+
+    try {
+      const acceptance = await this.currentChat.accept(request.payload.prompt)
+      this.chatService.saveChat(this.currentChat)
+
+      let nextResponse = await acceptance.next()
+      while (!nextResponse.done) {
+        await this.sendHistory()
+        await this.chatService.saveToChatHistory(
+          this.currentChat.chatId,
+          nextResponse.value as ChatHistoryItem
+        )
+
+        nextResponse = await acceptance.next()
+      }
+
+      this.sendHistory()
+    } catch (e) {
+      console.error('Client: Error accepting prompt: ', e)
     }
 
     this.maybeNotifyFirstActionTriggered()
-
-    if (!historyItem.isFramed) {
-      await this.addToHistory(historyItem)
-      this.sendHistory()
-    }
-
-    this.clientToEngineMessenger.sendRequestToEngine(request)
   }
 
   async onResponseReceivedFromEngine(response: ClientResponse) {
@@ -233,11 +316,13 @@ export class Client {
   }
 
   async sendHistory() {
-    const history = await this.getHistory(10)
-    const historyResponse: ServerToClientMessage<ClientHistoryItemDto[]> = {
+    if (!this.currentChat?.chatId) return
+
+    const historyResponse: ServerToClientMessage<ChatHistoryItem[]> = {
       event: 'History',
-      data: history,
+      data: this.currentChat?.history || [],
     }
+
     this.ws.send(JSON.stringify(historyResponse))
   }
 

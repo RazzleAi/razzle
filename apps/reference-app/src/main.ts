@@ -9,7 +9,6 @@ function startApp() {
     appId: process.env.RAZZLE_APP_ID || '',
     apiKey: process.env.RAZZLE_API_KEY || '',
     modules: [
-      // { module: TodoModule, deps: [new TodoService()] },
       { module: ExpenseManagerModule, deps: [new ExpenseManagerService()] },
     ],
   })

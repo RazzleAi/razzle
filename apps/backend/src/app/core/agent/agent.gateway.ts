@@ -38,7 +38,7 @@ export class AgentGateway implements OnGatewayConnection, AgentLifecycle {
       this.agentToEngineMessenger,
       this
     )
-    this.connectedAgents.addAgent(agent, app.appId)    
+    this.connectedAgents.addAgent(agent, app.appId)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

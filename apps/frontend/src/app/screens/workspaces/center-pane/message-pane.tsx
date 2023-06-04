@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
   AuthenticationMessage,
-  ClientHistoryItemDto,
   OnboardingDto,
   ServerToClientMessage,
 } from '@razzle/dto'
@@ -12,9 +11,10 @@ import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFetchOnboardingStatus } from '../../queries'
 import { HistoryItemView } from './history-item-view'
 import { OnboardingView } from './onboarding-view'
+import { ChatHistoryItem } from '@razzle/services'
 
 export function MessagePane() {
-  const [messages, setMessages] = useState<ClientHistoryItemDto[]>([])
+  const [messages, setMessages] = useState<ChatHistoryItem[]>([])
   const { setOnMessageReceived, removeOnMessageReceived } = useWSClientStore()
 
   const { accountId } = useParams()
@@ -47,7 +47,7 @@ export function MessagePane() {
     const response = JSON.parse(message) as ServerToClientMessage<unknown>
     switch (response.event) {
       case 'History': {
-        const historyItems = response.data as ClientHistoryItemDto[]
+        const historyItems = response.data as ChatHistoryItem[]
         setMessages(historyItems)
         break
       }
@@ -88,28 +88,11 @@ function isOnboardingComplete(onboarding: OnboardingDto) {
   )
 }
 
-function MessagesView(props: { messages: ClientHistoryItemDto[] }) {
-  const { messages } = props
-  // force everyone to have a frame ID
-  const messagesWithFrameIDs = messages.map((m, idx) => ({
-    ...m,
-    message: {
-      ...m.message,
-      frameId: m.message.frameId || `frame-${idx}`,
-    },
-  }))
-
+function MessagesView(props: { messages: ChatHistoryItem[] }) {
   return (
     <>
-      {messagesWithFrameIDs.map((message, idx) => {
-        const frameId = message.message.frameId
-        return (
-          <HistoryItemView
-            key={`${idx}.${message.hash}`}
-            item={message}
-            frameId={frameId}
-          />
-        )
+      {props.messages.map((message, idx) => {
+        return <HistoryItemView key={`${idx}.${message.id}`} item={message} />
       })}
     </>
   )

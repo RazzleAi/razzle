@@ -41,3 +41,7 @@ Thumbs.db
 apps/backend/mongo
 
 ./get_users.js
+
+# Environment variables
+.env
+.env.*

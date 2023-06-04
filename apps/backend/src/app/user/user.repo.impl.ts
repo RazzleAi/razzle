@@ -85,7 +85,7 @@ export class UserRepoImpl implements UserRepo {
           },
         ],
         AND: [
-          {            
+          {
             loginType: {
               not: {
                 equals: 'default',

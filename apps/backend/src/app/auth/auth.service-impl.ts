@@ -11,7 +11,7 @@ export class AuthServiceImpl extends AuthService {
     authRepository: AuthRepoImpl,
     userServiceImpl: UserServiceImpl,
     accountServiceImpl: AccountServiceImpl,
-    accountUserInviteRepository: AccountUserInviteTokenRepoImpl,
+    accountUserInviteRepository: AccountUserInviteTokenRepoImpl
   ) {
     super(
       authRepository,

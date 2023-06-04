@@ -94,7 +94,7 @@ export async function getWorkspaceMemberCount(
 export async function getAllWorkspaceMembers(
   httpClient: AxiosInstance,
   workspaceId: string
-): Promise<AxiosResponse<{data: WorkspaceWithUser[]; error: string}>> {
+): Promise<AxiosResponse<{ data: WorkspaceWithUser[]; error: string }>> {
   // eslint-disable-next-line no-useless-catch
   try {
     const response = await httpClient.get(

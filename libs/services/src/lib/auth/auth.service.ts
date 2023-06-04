@@ -8,7 +8,6 @@ import { UserService } from '../user'
 import { AuthPrincipal, AuthRepo } from './auth.repo'
 import { faker } from '@faker-js/faker'
 
-
 export class AuthService {
   constructor(
     private authRepo: AuthRepo,
@@ -49,7 +48,7 @@ export class AuthService {
       return { authUid: existingUser.authUid, userId: existingUser.id }
     }
 
-    const username = await this.generateUniqueUsernameFromEmail(user.email)    
+    const username = await this.generateUniqueUsernameFromEmail(user.email)
     const usr = await this.userService.createUser({
       authUid: user.authUid,
       email: user.email,

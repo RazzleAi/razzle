@@ -1,21 +1,21 @@
-import { App } from "../../apps"
-import { PromptAndSteps, Step } from "../../ml"
+import { App } from '../../apps'
+import { PromptAndSteps, Step } from '../../ml'
 
 export interface SequencerInput {
-    workspaceId: string
-  
-    userId: string
-  
-    accountId: string
-  
-    promptSteps: PromptAndSteps
-  
-    headers?: Record<string, any>
-    appsInWorkspace?: App[]
-  }
-  
-  export interface SequencerOutput {
-    resolved: boolean
-    agentError?: string
-    steps: Step[]
-  }
+  workspaceId: string
+
+  userId: string
+
+  accountId: string
+
+  promptSteps: PromptAndSteps
+
+  headers?: Record<string, any>
+  appsInWorkspace?: App[]
+}
+
+export interface SequencerOutput {
+  resolved: boolean
+  agentError?: string
+  steps: Step[]
+}

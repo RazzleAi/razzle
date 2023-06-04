@@ -1,4 +1,8 @@
-import { ActionPlanWithDetailsDto, StepDto, WorkspaceActionDto } from '@razzle/dto'
+import {
+  ActionPlanWithDetailsDto,
+  StepDto,
+  WorkspaceActionDto,
+} from '@razzle/dto'
 import { useEffect, useState } from 'react'
 import { WORKSPACE_ACTION_CLICKED } from '../../../events'
 import { useDebouncedValue } from '../../../hooks'
@@ -79,7 +83,7 @@ export function ActionsList() {
         value: null,
       })),
     })
-    
+
     setSteps(steps)
     setIsActorPaneOpen(true)
   }

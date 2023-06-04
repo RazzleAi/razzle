@@ -37,8 +37,3 @@ EXPOSE 3333
 
 # Start the server
 CMD npx prisma db push && npx prisma generate && node ./main.js
-
-
-
-
-

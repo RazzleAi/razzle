@@ -54,18 +54,31 @@ export class AgentCaller {
 
     return new Promise((resolve, reject) => {
       let waitTime = 0
+      let loggedWaiting = false
       const interval = setInterval(() => {
-        console.log('AgentCaller: Waiting for response with key: ', {key: headers['responseKey'], appId})
+        if (!loggedWaiting) {
+          console.log('AgentCaller: Waiting for response with key: ', {
+            key: headers['responseKey'],
+            appId,
+          })
+          loggedWaiting = true
+        }
         const response = this.responseMap.get(headers['responseKey'])
         if (response) {
-          console.log('AgentCaller: Got response from key: ', headers['responseKey'])
+          console.log(
+            'AgentCaller: Got response from key: ',
+            headers['responseKey']
+          )
           clearInterval(interval)
           resolve(response)
           return
         } else if (waitTime > 50000) {
           // TODO: move this to a configuration
           clearInterval(interval)
-          console.error('AgentCaller: Timeout while waiting for response with key: ', headers['responseKey'])
+          console.error(
+            'AgentCaller: Timeout while waiting for response with key: ',
+            headers['responseKey']
+          )
           reject('Timeout while waiting for response ' + headers['responseKey'])
           return
         }

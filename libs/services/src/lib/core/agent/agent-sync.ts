@@ -18,6 +18,11 @@ export class AgentSyncService {
     const newDataHashBuilder = createHash('sha256')
     newDataHashBuilder.update(data.sdkVersion).update(`${data.requiresAuth}`)
 
+    console.log(
+      'AgentSyncService: Syncing agent for app: ',
+      JSON.stringify(data)
+    )
+
     for (const action of data.actions) {
       newDataHashBuilder
         .update(action.name)
@@ -58,7 +63,7 @@ export class AgentSyncService {
             oldDataHashBuilder.update(param.name).update(param.type)
           }
         }
-      }      
+      }
       const existingDataHAsh = oldDataHashBuilder.digest('hex')
       if (newDataHash === existingDataHAsh) {
         shouldUpdateData = false

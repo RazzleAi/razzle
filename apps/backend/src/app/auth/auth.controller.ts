@@ -46,7 +46,6 @@ export class AuthController {
     return this.authService.thirdPartyAuth(signupDto)
   }
 
-
   @ExceptionResponse(
     {
       types: [DuplicateUserException],
@@ -67,13 +66,11 @@ export class AuthController {
     return this.authService.thirdPartyAuthWithAccountInvite(signupDto)
   }
 
-
   @SkipAuth()
   @Get('email/available')
   async isEmailAvailable(@Query('email') email: string): Promise<boolean> {
     return !(await this.authService.isEmailTaken(email))
   }
-
 
   @Get('/me')
   async getMe(
@@ -85,6 +82,4 @@ export class AuthController {
       user: user,
     }
   }
-
-
 }

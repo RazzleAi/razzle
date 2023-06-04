@@ -14,7 +14,7 @@ import { PrismaService } from '../prisma/prisma.service'
 @Injectable()
 export class AccountRepoImpl implements AccountRepo {
   constructor(private readonly prismaService: PrismaService) {}
-  
+
   async getAllAccounts(): Promise<AccountWithOwner[]> {
     const res = await this.prismaService.account.findMany({
       include: {
@@ -254,7 +254,10 @@ export class AccountRepoImpl implements AccountRepo {
     })
   }
 
-  async findAccountUserWithOwner(accountId: string, userId: string): Promise<AccountWithOwner> {
+  async findAccountUserWithOwner(
+    accountId: string,
+    userId: string
+  ): Promise<AccountWithOwner> {
     const res = await this.prismaService.accountUser.findFirst({
       where: {
         accountId,

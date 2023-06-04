@@ -244,16 +244,25 @@ export class WorkspaceService {
     return this.embeddingSearchService.search(searchSpace, searchQuery)
   }
 
-  async addAppToWorkspace(appId: string, workspaceId: string): Promise<WorkspaceApp> {
-    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(workspaceId, appId)
+  async addAppToWorkspace(
+    appId: string,
+    workspaceId: string
+  ): Promise<WorkspaceApp> {
+    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(
+      workspaceId,
+      appId
+    )
     if (workspaceApp) {
       return workspaceApp
-    }    
+    }
     return this.workspaceRepo.addAppToWorkspace(workspaceId, appId)
   }
 
   async isAppInWorkspace(workspaceId: string, appId: string): Promise<boolean> {
-    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(workspaceId, appId)
+    const workspaceApp = await this.workspaceRepo.getWorkspaceApp(
+      workspaceId,
+      appId
+    )
     return !!workspaceApp
   }
 
