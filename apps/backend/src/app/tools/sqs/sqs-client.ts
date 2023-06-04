@@ -37,18 +37,23 @@ export class AwsSQSClient {
   }
 
   async createQueue(name: string): Promise<string | null> {
-    this.logger.log(`Creating queue ${name}`)
-    const createQueueCommand = new CreateQueueCommand({
-      QueueName: name,
-      Attributes: {
-        DelaySeconds: '0',
-        FifoQueue: 'true',
-        ContentBasedDeduplication: 'true',
-      },
-    })
-    const result = await this.sqs.send(createQueueCommand)
-    this.logger.log(`Created queue ${name}`, result)
-    return result.QueueUrl || null
+    try {
+      this.logger.log(`Creating queue ${name}`)
+      const createQueueCommand = new CreateQueueCommand({
+        QueueName: name,
+        Attributes: {
+          DelaySeconds: '0',
+          FifoQueue: 'true',
+          ContentBasedDeduplication: 'true',
+        },
+      })
+      const result = await this.sqs.send(createQueueCommand)
+      this.logger.log(`Created queue ${name}`, result)
+      return result.QueueUrl || null
+    } catch (err) {
+      this.logger.error(`Error creating queue ${name}`, err)
+      return null
+    }
   }
 
   async sendMessage(
@@ -81,7 +86,6 @@ export class AwsSQSClient {
         this.logger.log(`Message processed: ${cbRes}`)
       },
     })
-    consumer.start()    
+    consumer.start()
   }
-
 }
