@@ -14,7 +14,7 @@ export class AccountUserInviteExpiryTaskScheduler {
   ) {}
 
   // TODO: Move this to config file
-  // @Cron('0 0/1 * 1/1 * *')
+  @Cron('0 0/1 * 1/1 * *')
   handleCron() {
     this.logger.debug('Commencing Account Invite Expiry Cron..')
     this.accountUserInviteTokenRepo.invalidateExpiredTokens()

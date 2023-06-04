@@ -10,7 +10,7 @@ type MessageHandler = {
   callback: (message: string) => void
 }
 
-export abstract class QueueBasedPubSub
+export abstract class BasePubSub
   implements MessagePublisher, MessageSubscriber
 {
   protected readonly subscribers: Map<string, MessageHandler[]> = new Map()

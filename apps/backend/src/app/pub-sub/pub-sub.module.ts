@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AwsSQSPubSub } from './sqs-pub-sub'
+import { AwsSQSPubSub } from './sqs'
 import { ToolsModule } from '../tools/tools.module'
 
 export const PUB_SUB_PUBLISHER = 'PUB_SUB_PUBLISHER'

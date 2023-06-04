@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { KafkaClient } from '../tools/kafka/kafka-client'
 import { Producer } from 'kafkajs'
-import { QueueBasedPubSub } from './pub-sub'
+import { BasePubSub } from './pub-sub'
 
 @Injectable()
-export class KafkaPubSub extends QueueBasedPubSub {
+export class KafkaPubSub extends BasePubSub {
   private readonly kafkaProducer: Producer
 
   constructor(private readonly kafkaClient: KafkaClient) {

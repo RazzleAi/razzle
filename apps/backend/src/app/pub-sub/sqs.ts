@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { AwsSQSClient } from '../tools/sqs/sqs-client'
-import { QueueBasedPubSub } from './pub-sub'
+import { BasePubSub } from './pub-sub'
 import { Consumer } from 'sqs-consumer'
 
 const pubsubQueueName = `razzle_pubsub_${process.env.NODE_ENV}.fifo`
 
 @Injectable()
-export class AwsSQSPubSub extends QueueBasedPubSub {
+export class AwsSQSPubSub extends BasePubSub {
   private queueUrl: string
   private readonly logger = new Logger(AwsSQSPubSub.name)
 
