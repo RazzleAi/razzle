@@ -9,10 +9,10 @@ import { PrismaModule } from '../prisma/prisma.module'
 import {
   AgentGateway,
   AgentHeaderValidatorImpl,
-  AgentSyncServiceImpl,  
+  AgentSyncServiceImpl,
 } from './agent'
-import {ConnectedAgentsImpl} from './agent/connected-agents.impl'
-import {ConnectedClientsImpl} from './client/connected-clients.impl'
+import { ConnectedAgentsImpl } from './agent/connected-agents.impl'
+import { ConnectedClientsImpl } from './client/connected-clients.impl'
 import {
   ClientGateway,
   ClientHistoryRepoImpl,
@@ -24,6 +24,8 @@ import { MixpanelModule } from '../analytics/analytics.module'
 import { AgentToEngineMessengerImpl } from './messaging/agent-to-engine.impl'
 import { ClientToEngineMessengerImpl } from './messaging/client-to-engine.impl'
 import { AgentCallerImpl, RazzleEngineImpl } from './engine'
+import { ChatServiceImpl } from './chat/chat-service.impl'
+import { ChatRepoImpl } from './chat/chat-repo.impl'
 import { PubSubModule } from '../pub-sub/pub-sub.module'
 
 @Module({
@@ -38,7 +40,7 @@ import { PubSubModule } from '../pub-sub/pub-sub.module'
     AppsModule,
     EventModule,
     MixpanelModule,
-  ],  
+  ],
   providers: [
     ConnectedClientsImpl,
     ConnectedAgentsImpl,
@@ -53,7 +55,9 @@ import { PubSubModule } from '../pub-sub/pub-sub.module'
     ClientHistoryRepoImpl,
     ClientHistoryStoreImpl,
     AgentCallerImpl,
-    RazzleEngineImpl,    
+    RazzleEngineImpl,
+    ChatServiceImpl,
+    ChatRepoImpl,
   ],
   exports: [],
 })

@@ -1,25 +1,35 @@
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
-import { ChatTunedLlm, LlmResponse } from './llm'
+import {
+  ChatCompletionRequestMessage,
+  ChatCompletionRequestMessageRoleEnum,
+  Configuration,
+  OpenAIApi,
+} from 'openai'
+import {
+  ChatLlmHIstoryItemRole,
+  ChatLlmHistoryItem,
+  ChatTunedLlm,
+  LlmResponse,
+} from './llm'
 import { IAgent } from '../agent/agent'
 import { Prompt } from '../prompt'
 
 export class ChatGpt implements ChatTunedLlm {
+  name = 'ChatGpt'
   constructor(
     private readonly openAiApi: OpenAIApi,
     private readonly agents: IAgent[]
   ) {}
 
-  readonly history: ChatCompletionRequestMessage[] = []
-
-  async accept(message: string): Promise<LlmResponse> {
+  async accept(
+    message: string,
+    history: ChatLlmHistoryItem[]
+  ): Promise<LlmResponse> {
     const agentListPrompt = this.contructAgentListPrompt(this.agents)
 
     const systemPrompt = new Prompt(
       SYSTEM_PROMPT,
       new Map([['agents', agentListPrompt]])
     )
-
-    this.history.push({ role: 'user', content: message.trim() })
 
     const messages: ChatCompletionRequestMessage[] = [
       {
@@ -28,18 +38,14 @@ export class ChatGpt implements ChatTunedLlm {
       },
     ]
 
-    if (this.history.length > 0) {
-      this.history.forEach((message) => {
-        messages.push({
-          role: message.role,
-          content: message.content.trim(),
-        })
+    history.forEach((message) => {
+      messages.push({
+        role: this.convertToLLMNativeRole(message.role),
+        content: message.content.trim(),
       })
-    }
+    })
 
     messages.push({ role: 'user', content: message.trim() })
-
-    console.log(messages)
 
     const response = await this.openAiApi.createChatCompletion({
       model: 'gpt-3.5-turbo',
@@ -48,8 +54,6 @@ export class ChatGpt implements ChatTunedLlm {
     })
 
     const messageFromChatGpt = response.data.choices[0].message?.content ?? ''
-
-    this.history.push({ role: 'assistant', content: messageFromChatGpt })
 
     return { message: messageFromChatGpt }
   }
@@ -68,6 +72,19 @@ export class ChatGpt implements ChatTunedLlm {
     )
 
     return new ChatGpt(openai, agents)
+  }
+
+  private convertToLLMNativeRole(
+    role: ChatLlmHIstoryItemRole
+  ): ChatCompletionRequestMessageRoleEnum {
+    switch (role) {
+      case 'user':
+        return ChatCompletionRequestMessageRoleEnum.User
+      case 'llm':
+        return ChatCompletionRequestMessageRoleEnum.Assistant
+      default:
+        throw new Error(`Unknown role ${role}`)
+    }
   }
 }
 

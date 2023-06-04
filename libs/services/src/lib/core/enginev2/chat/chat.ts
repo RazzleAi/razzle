@@ -1,7 +1,8 @@
 import { IAgent } from '../agent/agent'
-import { ChatTunedLlm } from '../llm'
+import { ChatLlmHistoryItem, ChatTunedLlm } from '../llm'
 import { ChatHistoryItem } from './chathistoryitem'
 import { v1 as uuidV1 } from 'uuid'
+import { IChat } from './chatinterface'
 
 interface ChatInitializationProps {
   llm: ChatTunedLlm
@@ -10,35 +11,45 @@ interface ChatInitializationProps {
   workspaceId: string
   userId: string
   clientId: string
+  chatId?: string
 }
 
 export default class Chat {
   history: ChatHistoryItem[] = []
-  chatId: string = uuidV1().toString()
-
-  constructor(private readonly initializationProps: ChatInitializationProps) {}
+  chatId: string
+  constructor(readonly initializationProps: ChatInitializationProps) {
+    this.chatId = initializationProps.chatId ?? uuidV1().toString()
+  }
 
   async *accept(message: string) {
     const acceptedMessageId = uuidV1().toString()
-    this.history.push({
+    const acceptedMessage: ChatHistoryItem = {
       id: acceptedMessageId,
       text: message,
       role: 'user',
       timestamp: Date.now(),
-    })
+    }
 
-    yield acceptedMessageId
+    this.history.push(acceptedMessage)
+
+    yield acceptedMessage
 
     let messageToLlm = message
 
     while (messageToLlm) {
       const llmResponse = await this.initializationProps.llm.accept(
-        messageToLlm
+        messageToLlm,
+        this.historyToLLmHistory()
       )
 
       const parsedLlmResponse = this.parseLlmResponse(llmResponse.message)
+      const parsedLmResponseToHistory = {
+        ...parsedLlmResponse,
+        rawLmResponse: llmResponse.message,
+      }
 
-      this.history.push(parsedLlmResponse)
+      this.history.push(parsedLmResponseToHistory)
+      yield parsedLmResponseToHistory
 
       if (!parsedLlmResponse.agent) {
         break
@@ -49,17 +60,18 @@ export default class Chat {
       )
 
       if (!agent) {
-        this.history.push({
+        const historyObj: ChatHistoryItem = {
           id: uuidV1().toString(),
           text: `Agent ${parsedLlmResponse.agent.agentName} not found`,
           role: 'llm',
           timestamp: Date.now(),
-        })
+        }
+
+        this.history.push(historyObj)
+        yield historyObj
 
         break
       }
-
-      yield `${parsedLlmResponse.agent.agentName}[${parsedLlmResponse.agent.agentPrompt}]`
 
       const agentResponse = await agent.accept({
         accountId: this.initializationProps.accountId,
@@ -76,14 +88,18 @@ export default class Chat {
         agentResponse: agentResponse,
       }
 
+      yield this.history[this.history.length - 1]
+
       if (!agentResponse.data) {
-        this.history.push({
+        const historyObj: ChatHistoryItem = {
           id: uuidV1().toString(),
           text: `Agent ${parsedLlmResponse.agent.agentName} did not return data`,
           role: 'llm',
           timestamp: Date.now(),
-        })
+        }
 
+        this.history.push(historyObj)
+        yield historyObj
         break
       }
 
@@ -129,6 +145,32 @@ export default class Chat {
       text: llmResponse,
       role: 'llm',
       timestamp: Date.now(),
+    }
+  }
+
+  historyToLLmHistory(): ChatLlmHistoryItem[] {
+    return this.history.slice(0, -1).map((item) => {
+      return {
+        content: item.rawLmResponse ?? item.text,
+        role: item.role,
+      }
+    })
+  }
+
+  serialize(): IChat {
+    return {
+      chatId: this.chatId,
+      history: this.history,
+      initializationProps: {
+        llm: {
+          name: this.initializationProps.llm.name,
+        },
+        agents: this.initializationProps.agents.map((agent) => agent.id),
+        accountId: this.initializationProps.accountId,
+        workspaceId: this.initializationProps.workspaceId,
+        userId: this.initializationProps.userId,
+        clientId: this.initializationProps.clientId,
+      },
     }
   }
 }

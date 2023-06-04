@@ -23,6 +23,7 @@ model User {
   AccountUser            AccountUser[]
   UserAppAuthentication  UserAppAuthentication[]
   AccountUserInviteToken AccountUserInviteToken[]
+  Chat                   Chat[]
 }
 
 model Account {
@@ -36,6 +37,7 @@ model Account {
   apps                   App[]
   AccountUser            AccountUser[]
   AccountUserInviteToken AccountUserInviteToken[]
+  Chat                   Chat[]
 }
 
 model AccountUser {
@@ -194,4 +196,41 @@ model Onboarding {
   promptTriggered      Boolean  @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+}
+
+enum ChatHistoryRole {
+  USER
+  LLM
+}
+
+model ChatHistory {
+  Chat          Chat?           @relation(fields: [chatId], references: [chatId])
+  chatId        String?
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  uuid          String          @unique
+  text          String
+  role          ChatHistoryRole
+  timestamp     Int
+  agentName     String?
+  agentPrompt   String?
+  agentResponse Json?
+  rawLmResponse String?
+
+  @@index([chatId])
+}
+
+model Chat {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chatId    String        @unique
+  history   ChatHistory[]
+  llmName   String
+  agents    String[]
+  accountId String        @db.ObjectId
+  account   Account       @relation(fields: [accountId], references: [id])
+  userId    String        @db.ObjectId
+  user      User          @relation(fields: [userId], references: [id])
+  clientId  String
 }

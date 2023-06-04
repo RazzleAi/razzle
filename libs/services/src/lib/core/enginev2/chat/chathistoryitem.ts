@@ -3,6 +3,7 @@ import { RazzleResponse } from '@razzle/sdk'
 export interface ChatHistoryItem {
   id: string
   text: string
+  rawLmResponse?: string
   agent?: ChatHistoryItemAgentProps
   role: 'user' | 'llm'
   timestamp: number
