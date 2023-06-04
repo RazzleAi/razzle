@@ -91,13 +91,13 @@ export class Client {
   }
 
   private async handleMessageTypes(
-    message: ClientToServerMessage<any>,
+    message: ClientToServerMessage<unknown>,
     user: User
   ) {
     switch (message.event) {
       case 'Identify': {
         if (!message.data) break
-        const { accountId, workspaceId } = message.data
+        const { accountId, workspaceId } = message.data as ClientRequest
         await this.handleIdentify(accountId, workspaceId, user)
         break
       }
@@ -106,7 +106,7 @@ export class Client {
           console.error('HandleCallAction: No data in message')
           break
         }
-        this.handleMessage(message.data)
+        this.handleMessage(message.data as ClientRequest)
         break
       }
       case 'CreateNewChat':
@@ -122,7 +122,7 @@ export class Client {
           this.userId,
           this.workspaceId,
           this.id,
-          message.data
+          message.data as AvailableChatLlms
         )
 
         break
