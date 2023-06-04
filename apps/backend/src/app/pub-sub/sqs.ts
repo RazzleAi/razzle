@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { AwsSQSClient } from '../tools/sqs/sqs-client'
 import { BasePubSub } from './pub-sub'
-import { Consumer } from 'sqs-consumer'
 
 const pubsubQueueName = `razzle_pubsub_${process.env.NODE_ENV}.fifo`
 
@@ -31,10 +30,17 @@ export class AwsSQSPubSub extends BasePubSub {
   }
 
   override async publishMessage(topic: string, message: string): Promise<void> {
-    await this.sqsClient.sendMessage(
-      this.queueUrl,
-      JSON.stringify({ topic, message })
-    )
+    try {
+
+      this.logger.log(`Publishing message to topic ${topic} and queue ${this.queueUrl}`)
+      const msgId = await this.sqsClient.sendMessage(
+        this.queueUrl,
+        JSON.stringify({ topic, message })
+      )
+      this.logger.log(`Message published to queue ${this.queueUrl}`, msgId)
+    } catch (err) {
+      this.logger.error(`Error publishing message to topic ${topic}`, err)
+    }
   }
 
   async consumeMessages(): Promise<void> {

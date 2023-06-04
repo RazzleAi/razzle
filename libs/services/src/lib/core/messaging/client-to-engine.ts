@@ -84,7 +84,7 @@ export class ClientToEngineMessenger {
     await this.messageSubscriber.subscribeToMessages(
       ENGINE_TO_CLIENT_TOPIC,
       async (message) => {
-        const response = JSON.parse(message)
+        const response = JSON.parse(message) as ClientResponse
         await this.sendResponseToClient(
           response.clientId,
           response as ClientResponse
