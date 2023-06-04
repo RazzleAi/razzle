@@ -65,6 +65,7 @@ export class AwsSQSClient {
       MessageBody: message,
       QueueUrl: queueUrl,
       DelaySeconds: 0,
+      MessageGroupId: 'razzle',
     }
     if (deduplicationId) {
       input.MessageDeduplicationId = deduplicationId

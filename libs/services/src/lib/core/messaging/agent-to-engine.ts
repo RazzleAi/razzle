@@ -2,17 +2,6 @@ import { AgentMessage, ServerToAgentMessage } from '@razzle/dto'
 import { MessagePublisher, MessageSubscriber } from '../../pubsub'
 import { ConnectedAgents } from '../agent'
 
-// export interface AgentToEngineMessenger {
-//   sendMessageToEngine(resp: AgentMessage): Promise<void>
-//   sendMessageToAgent(
-//     appId: string,
-//     response: ServerToAgentMessage<AgentMessage>
-//   ): Promise<void>
-//   onResponseReceivedFromAgent(
-//     callback: (response: AgentMessage) => void
-//   ): Promise<void>
-// }
-
 const ENGINE_TO_AGENT_TOPIC = 'engine-to-agent-messages'
 
 export class AgentToEngineMessenger {
@@ -48,6 +37,7 @@ export class AgentToEngineMessenger {
 
     // send to publisher topic, let another subscriber pick it up
     if (!agent || agentCallFailed) {
+      console.debug('Sending message to publisher', message)
       this.messagePublisher.publishMessage(
         ENGINE_TO_AGENT_TOPIC,
         JSON.stringify(message)
@@ -65,6 +55,7 @@ export class AgentToEngineMessenger {
     await this.messageSubscriber.subscribeToMessages(
       ENGINE_TO_AGENT_TOPIC,
       async (message) => {
+        console.debug('Received message from publisher', message)
         const parsedMessage = JSON.parse(
           message
         ) as ServerToAgentMessage<AgentMessage>

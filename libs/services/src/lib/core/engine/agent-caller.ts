@@ -54,11 +54,15 @@ export class AgentCaller {
 
     return new Promise((resolve, reject) => {
       let waitTime = 0
+      let loggedWaiting = false
       const interval = setInterval(() => {
-        console.log('AgentCaller: Waiting for response with key: ', {
-          key: headers['responseKey'],
-          appId,
-        })
+        if (!loggedWaiting) {
+          console.log('AgentCaller: Waiting for response with key: ', {
+            key: headers['responseKey'],
+            appId,
+          })
+          loggedWaiting = true
+        }
         const response = this.responseMap.get(headers['responseKey'])
         if (response) {
           console.log(
