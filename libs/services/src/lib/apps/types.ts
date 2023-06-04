@@ -47,12 +47,12 @@ export async function appFromPrisma(
   if (!app.data) {
     return {
       ...app,
-      data: undefined
+      data: undefined,
     }
   }
-  
+
   const appJsonObj = app.data as Prisma.JsonObject
-  const actionsJsonArr = appJsonObj.actions as Prisma.JsonArray ?? []
+  const actionsJsonArr = (appJsonObj.actions as Prisma.JsonArray) ?? []
   const actions: AppAction[] = actionsJsonArr.map((action: any) => {
     return {
       name: action.name as string,
@@ -60,16 +60,17 @@ export async function appFromPrisma(
       descriptionEmbedding: action.descriptionEmbedding as number[],
       stealth: action.stealth as boolean,
       paged: action.paged as boolean,
-      parameters: action.parameters as AppActionParameter[]
+      parameters: action.parameters as AppActionParameter[],
     }
   })
   return {
     ...app,
-    data: !app.data ? undefined : {
-      requiresAuth: appJsonObj.requiresAuth as boolean ?? false,
-      sdkVersion: appJsonObj.sdkVersion as string ?? '',
-      actions: actions
-    }
+    data: !app.data
+      ? undefined
+      : {
+          requiresAuth: (appJsonObj.requiresAuth as boolean) ?? false,
+          sdkVersion: (appJsonObj.sdkVersion as string) ?? '',
+          actions: actions,
+        },
   }
-
 }

@@ -13,11 +13,12 @@ import { AccountModule } from './account/account.module'
 import { WorkspaceModule } from './workspace/workspace.module'
 import { ConstantsModule } from './constants.module'
 import { ScheduleModule } from '@nestjs/schedule'
-import { KafkaModule } from './kafka/kafka.module'
 import { RedisModule } from './redis/redis.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { EventModule } from './event/event.module'
 import { CoreModule } from './core/core.module'
+import { ToolsModule } from './tools/tools.module'
+import { PubSubModule } from './pub-sub/pub-sub.module'
 
 @Module({
   imports: [
@@ -28,8 +29,9 @@ import { CoreModule } from './core/core.module'
       delimiter: '.',
     }),
     EventModule,
+    ToolsModule,
+    PubSubModule,
     ConstantsModule,
-    KafkaModule,
     RedisModule,
     PrismaModule,
     AuthModule,

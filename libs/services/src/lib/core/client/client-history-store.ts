@@ -13,8 +13,13 @@ export interface ClientHistoryStore {
   ): Promise<ClientHistoryItemDto[]>
   getFramedHistoryItemsForClient(
     clientId: string,
-    workspaceId: string,
+    workspaceId: string
   ): Promise<ClientHistoryItemDto[]>
-  replaceHistoryItem(clientId: string, workspaceId: string, oldItem: ClientHistoryItemDto, newItem: ClientHistoryItemDto): Promise<void>
+  replaceHistoryItem(
+    clientId: string,
+    workspaceId: string,
+    oldItem: ClientHistoryItemDto,
+    newItem: ClientHistoryItemDto
+  ): Promise<void>
   countAllByWorkspaceId(workspaceId: string): Promise<number>
 }

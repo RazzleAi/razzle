@@ -35,7 +35,9 @@ export class Agent {
     })
   }
 
-  public async sendMessage(message: ServerToAgentMessage<AgentMessage>): Promise<void> {
+  public async sendMessage(
+    message: ServerToAgentMessage<AgentMessage>
+  ): Promise<void> {
     return new Promise((res, rej) => {
       this.ws.send(JSON.stringify(message), (err) => {
         if (err) {
@@ -43,11 +45,10 @@ export class Agent {
           rej(err)
           return
         }
-        
+
         res()
       })
     })
-    
   }
 
   private async onWsMessage(messageEvent: MessageEvent) {

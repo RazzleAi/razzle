@@ -32,11 +32,11 @@ export class MockAuthGuard implements CanActivate {
     }
 
     const bearerToken = accessToken.replace('Bearer', '').trim()
-    
+
     const user = await this.prismaService.user.findUnique({
       where: {
-        authUid: bearerToken
-      }
+        authUid: bearerToken,
+      },
     })
 
     const principal: AuthPrincipal = {

@@ -27,7 +27,7 @@ export class AccountUserInviteTokenRepoImpl
       where: {
         userId,
         accountId,
-      }, 
+      },
     })
   }
 

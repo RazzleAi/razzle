@@ -61,5 +61,4 @@ describe('AppsService tests', () => {
       })
     )
   })
-
 })

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-import { KafkaModule } from '../kafka/kafka.module'
 import { RedisModule } from '../redis/redis.module'
 import { UserModule } from '../user/user.module'
 import { AccountModule } from '../account/account.module'
@@ -27,12 +26,13 @@ import { ClientToEngineMessengerImpl } from './messaging/client-to-engine.impl'
 import { AgentCallerImpl, RazzleEngineImpl } from './engine'
 import { ChatServiceImpl } from './chat/chat-service.impl'
 import { ChatRepoImpl } from './chat/chat-repo.impl'
+import { PubSubModule } from '../pub-sub/pub-sub.module'
 
 @Module({
   imports: [
-    KafkaModule,
     RedisModule,
     PrismaModule,
+    PubSubModule,
     UserModule,
     AccountModule,
     AuthModule,

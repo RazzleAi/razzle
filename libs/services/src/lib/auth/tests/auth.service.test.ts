@@ -27,9 +27,11 @@ describe('AuthServiceTests', () => {
       const testEmail = 'email@host.com'
       authRepo = createMock<AuthRepo>({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        getUserByEmail: jest.fn(async (email: string): Promise<UserAuthRecord> => {
-          return fakeUserRecord({ email: testEmail })
-        }),
+        getUserByEmail: jest.fn(
+          async (email: string): Promise<UserAuthRecord> => {
+            return fakeUserRecord({ email: testEmail })
+          }
+        ),
       })
 
       authService = new AuthService(authRepo, userService)
@@ -44,9 +46,11 @@ describe('AuthServiceTests', () => {
       const testEmail = 'email@host.com'
       authRepo = createMock<AuthRepo>({
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        getUserByEmail: jest.fn(async (email: string): Promise<UserAuthRecord> => {
-          throw new Error('User not found')
-        }),
+        getUserByEmail: jest.fn(
+          async (email: string): Promise<UserAuthRecord> => {
+            throw new Error('User not found')
+          }
+        ),
       })
 
       authService = new AuthService(authRepo, userService)
@@ -70,9 +74,11 @@ describe('AuthServiceTests', () => {
       const mockAuthToken = faker.datatype.uuid()
 
       authRepo = createMock<AuthRepo>({
-        createUser: jest.fn(async (): Promise<{ user: UserAuthRecord; authToken: string }> => {
-          return { user: mockAuthUser, authToken: mockAuthToken }
-        }),
+        createUser: jest.fn(
+          async (): Promise<{ user: UserAuthRecord; authToken: string }> => {
+            return { user: mockAuthUser, authToken: mockAuthToken }
+          }
+        ),
       })
 
       const mockUserId = faker.datatype.uuid()
@@ -99,7 +105,11 @@ describe('AuthServiceTests', () => {
         fullName: mockAuthUser.displayName,
       })
 
-      expect(signupResponse).toMatchObject({ authId: mockAuthUser.uid, userId: mockUserId, token: mockAuthToken })
+      expect(signupResponse).toMatchObject({
+        authId: mockAuthUser.uid,
+        userId: mockUserId,
+        token: mockAuthToken,
+      })
     })
 
     it('throws SignupException if authRepo.createUser fails', async () => {
@@ -111,9 +121,11 @@ describe('AuthServiceTests', () => {
       }
 
       authRepo = createMock<AuthRepo>({
-        createUser: jest.fn(async (): Promise<{ user: UserAuthRecord; authToken: string }> => {
-          throw new Error('AuthRepoError')
-        }),
+        createUser: jest.fn(
+          async (): Promise<{ user: UserAuthRecord; authToken: string }> => {
+            throw new Error('AuthRepoError')
+          }
+        ),
       })
 
       authService = new AuthService(authRepo, userService)

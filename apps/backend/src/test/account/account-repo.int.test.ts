@@ -189,7 +189,9 @@ describe('AccountRepoImpl', () => {
     }
     secondAttempt()
 
-    const results = await prismaService.accountUser.findMany({where: {accountId: account.id, userId: user2.id}})
+    const results = await prismaService.accountUser.findMany({
+      where: { accountId: account.id, userId: user2.id },
+    })
     expect(results.length).toEqual(1)
   })
 

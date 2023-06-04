@@ -93,7 +93,10 @@ export class AccountController {
     @Param('accountId') accountId: string,
     @Param('userId') userId: string
   ): Promise<AccountWithOwnerDto> {
-    const res = await this.accountService.findAccountUserWithOwner(accountId, userId)    
+    const res = await this.accountService.findAccountUserWithOwner(
+      accountId,
+      userId
+    )
     return res
   }
 
