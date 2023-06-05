@@ -57,6 +57,12 @@ import { RequestLogger } from './request-logger.middleware'
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestLogger).forRoutes('*')
+    if (process.env.NODE_ENV.toLowerCase() === 'production') {
+      return
+    }
+
+    if (process.env.LOG_REQUESTS === 'true') {
+      consumer.apply(RequestLogger).forRoutes('*')
+    }
   }
 }
