@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module'
@@ -19,6 +19,7 @@ import { EventModule } from './event/event.module'
 import { CoreModule } from './core/core.module'
 import { ToolsModule } from './tools/tools.module'
 import { PubSubModule } from './pub-sub/pub-sub.module'
+import { RequestLogger } from './request-logger.middleware'
 
 @Module({
   imports: [
@@ -54,4 +55,8 @@ import { PubSubModule } from './pub-sub/pub-sub.module'
   ],
   controllers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLogger).forRoutes('*')
+  }
+}
