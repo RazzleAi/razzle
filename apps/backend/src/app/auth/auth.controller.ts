@@ -12,10 +12,9 @@ import {
   HttpStatus,
   Logger,
   Post,
-  Query,
 } from '@nestjs/common'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
-import { AuthServiceImpl } from './auth.service-impl'
+import { AuthServiceImpl } from './auth.service.impl'
 import { SkipAuth } from './decorators/no-auth.decorator'
 import { Principal, PrincipalKey } from './decorators'
 import { User } from '@prisma/client'
@@ -64,12 +63,6 @@ export class AuthController {
     @Body() signupDto: ThirdPartyAuthAccountInviteDto
   ): Promise<ThirdPartyAuthResponseDto> {
     return this.authService.thirdPartyAuthWithAccountInvite(signupDto)
-  }
-
-  @SkipAuth()
-  @Get('email/available')
-  async isEmailAvailable(@Query('email') email: string): Promise<boolean> {
-    return !(await this.authService.isEmailTaken(email))
   }
 
   @Get('/me')

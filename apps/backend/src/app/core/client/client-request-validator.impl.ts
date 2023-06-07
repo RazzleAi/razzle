@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { User } from '@prisma/client'
 import { ClientToServerMessage, ClientRequest } from '@razzle/dto'
-import { AuthServiceImpl } from '../../auth/auth.service-impl'
+import { AuthServiceImpl } from '../../auth/auth.service.impl'
 import { UserServiceImpl } from '../../user/user.service.impl'
 import { ClientRequestValidator } from '@razzle/services'
 

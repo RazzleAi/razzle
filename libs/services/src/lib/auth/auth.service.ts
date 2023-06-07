@@ -16,15 +16,6 @@ export class AuthService {
     private accountUserInviteTokenRepo: AccountUserInviteTokenRepo
   ) {}
 
-  async isEmailTaken(email: string): Promise<boolean> {
-    try {
-      const userRecord = await this.authRepo.getUserByEmail(email)
-      return userRecord !== null
-    } catch (err) {
-      return false
-    }
-  }
-
   async thirdPartyAuth(
     dto: ThirdPartyAuthDto
   ): Promise<ThirdPartyAuthResponseDto> {
@@ -112,7 +103,7 @@ export class AuthService {
     return result
   }
 
-  public async acceptAccountInvite(dto: ThirdPartyAuthAccountInviteDto) {
+  private async acceptAccountInvite(dto: ThirdPartyAuthAccountInviteDto) {
     const accountInvite = await this.accountUserInviteTokenRepo.findByToken(
       dto.token
     )
