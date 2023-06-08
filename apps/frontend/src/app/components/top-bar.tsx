@@ -9,6 +9,8 @@ import { AiOutlineAppstore } from 'react-icons/ai'
 import { MdOutlineWorkspaces } from 'react-icons/md'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useGetAccountMembers } from '../screens/queries/account'
+import { PrimaryOutlineButton } from './buttons'
+import { useWSClientStore } from '../stores/ws-client-store'
 
 export function TopBar() {
   const { account } = useAppStore()
@@ -109,6 +111,19 @@ export function RightPopup() {
   const { trackEvent } = useEventTracker()
   const { currentWorkspace, account } = useAppStore()
   const { clearAccount, clearCurrentWorkspace } = useAppStore()
+  const { sendMessage } = useWSClientStore()
+
+  async function restartChat() {
+    const accessToken = await currentUser.getIdToken()
+    sendMessage(accessToken, {
+      event: 'CreateNewChat',
+      data: {
+        headers: {
+          'content-type': 'application/json',
+        },
+      },
+    })
+  }
   console.debug('account', account)
   function signoutClicked() {
     trackEvent(LOGOUT_CLICKED)
@@ -118,7 +133,10 @@ export function RightPopup() {
 
   return (
     <Menu as="div">
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-center justify-center gap-6">
+        <div className="h-full flex">
+          <PrimaryOutlineButton text="Restart Chat" onClick={restartChat} />
+        </div>
         <Menu.Button as="div">
           <div className="flex flex-row items-center gap-1 cursor-pointer">
             {account && <AccountMembersButton />}
