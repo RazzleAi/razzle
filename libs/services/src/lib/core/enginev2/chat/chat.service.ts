@@ -42,6 +42,8 @@ export class ChatService {
 
     const allApps = await this.accountService.getAppsInAccount(accountId)
 
+    const loopLimit = process.env.CHAT_AGENT_LOOP_LIMIT
+
     const agents = allApps.map(
       (app) => new NlpProxyAgent(app, this.promptResolver, this.sequencer)
     )
@@ -53,6 +55,7 @@ export class ChatService {
       agents,
       clientId,
       llm: this.getLLm(llm, agents),
+      agentChatLoopLimit: loopLimit ? parseInt(loopLimit) : undefined,
     })
 
     await this.saveChat(chat)
