@@ -7,6 +7,7 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -21,19 +22,15 @@ import {
   OnboardingDto,
   Page,
   UpdateOnboardingDto,
-  WorkspaceDto,
 } from '@razzle/dto'
 import {
-  AccountUser,
   AccountWithUser,
-  AppNotFoundException,
   DuplicateMatchDomainException,
   User,
 } from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { OnboardingServiceImpl } from '../onboarding'
-import { WorkspaceServiceImpl } from '../workspace/workspace.service-impl'
 import { AccountServiceImpl } from './account.service-impl'
 
 @UseExceptionResponseHandler()
@@ -42,8 +39,7 @@ export class AccountController {
   private readonly logger = new Logger(AccountController.name)
   constructor(
     private readonly accountService: AccountServiceImpl,
-    private readonly onboardingService: OnboardingServiceImpl,
-    private readonly workspaceService: WorkspaceServiceImpl
+    private readonly onboardingService: OnboardingServiceImpl
   ) {}
 
   @Post()
@@ -175,7 +171,7 @@ export class AccountController {
   }
 
   @ExceptionResponse({
-    types: [AppNotFoundException],
+    types: [NotFoundException],
     statusCode: HttpStatus.BAD_REQUEST,
     message: 'This app does not exist',
   })
@@ -196,7 +192,7 @@ export class AccountController {
   }
 
   @ExceptionResponse({
-    types: [AppNotFoundException],
+    types: [NotFoundException],
     statusCode: HttpStatus.BAD_REQUEST,
     message: 'This app does not exist',
   })
@@ -224,42 +220,5 @@ export class AccountController {
       accountId,
       data
     )
-  }
-
-  @Get('/:accountId/workspace')
-  async getWorkspaceForUserAndAccount(
-    @Principal(PrincipalKey.UserId) userId: string,
-    @Param('accountId') accountId: string
-  ): Promise<WorkspaceDto> {
-    try {
-      const workspaces = await this.workspaceService.getWorkspacesForAccount(
-        accountId
-      )
-      if (workspaces.length === 0) {
-        throw new HttpException(
-          'no workspaces found for account ' + accountId,
-          HttpStatus.NOT_FOUND
-        )
-      }
-
-      const defaultWorkspace = workspaces.find((workspace) => {
-        return workspace.isDefault
-      })
-
-      if (!defaultWorkspace) {
-        throw new HttpException(
-          'no default workspace found for account ' + accountId,
-          HttpStatus.NOT_FOUND
-        )
-      }
-
-      return defaultWorkspace
-    } catch (err) {
-      this.logger.error(
-        `Failed to get workspace for user ${userId} and account ${accountId}`,
-        err
-      )
-      throw err
-    }
   }
 }

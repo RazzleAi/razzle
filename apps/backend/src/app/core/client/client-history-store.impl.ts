@@ -1,11 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { RedisClient } from '../../redis/redis-client'
 import {
   ClientHistoryItemWithMessage,
   ClientHistoryRepoImpl,
 } from './client-history.repo'
 import { ClientHistoryItemDto } from '@razzle/dto'
-import { RedisBoundedList } from '../../redis/redis-bounded-list'
 import { ClientHistoryStore } from '@razzle/services'
 
 @Injectable()
@@ -18,23 +16,18 @@ export class ClientHistoryStoreImpl implements ClientHistoryStore {
     private readonly clientHistoryRepo: ClientHistoryRepoImpl
   ) {}
 
-  getClientHistoryKey(clientId: string, workspaceId: string): string {
-    return `razzle:client-history:${clientId}:${workspaceId}`
+  getClientHistoryKey(clientId: string): string {
+    return `razzle:client-history:${clientId}`
   }
 
-  async addToHistoryForClient(
-    clientId: string,
-    workspaceId: string,
-    item: ClientHistoryItemDto
-  ) {
+  async addToHistoryForClient(clientId: string, item: ClientHistoryItemDto) {
     const createdItem = await this.clientHistoryRepo.createClientHistoryItem(
       clientId,
-      workspaceId,
       item
     )
 
     // save to redis, redis should only store the last 50 items
-    const clientHistoryKey = this.getClientHistoryKey(clientId, workspaceId)
+    const clientHistoryKey = this.getClientHistoryKey(clientId)
     const redisQueue = new RedisBoundedList(
       this.redisClient,
       clientHistoryKey,
@@ -47,16 +40,11 @@ export class ClientHistoryStoreImpl implements ClientHistoryStore {
 
   async getHistoryForClient(
     clientId: string,
-    workspaceId: string,
     count: number
   ): Promise<ClientHistoryItemDto[]> {
-    const itemsFromCache = await this.getItemsFromCache(clientId, workspaceId)
+    const itemsFromCache = await this.getItemsFromCache(clientId)
     if (count > itemsFromCache.length) {
-      const itemsFromDb = await this.getItemsFromDb(
-        clientId,
-        workspaceId,
-        count
-      )
+      const itemsFromDb = await this.getItemsFromDb(clientId, count)
       const allItems = [...itemsFromCache, ...itemsFromDb]
       return allItems.filter((item, index) => {
         return allItems.findIndex((i) => i.hash === item.hash) === index
@@ -67,20 +55,16 @@ export class ClientHistoryStoreImpl implements ClientHistoryStore {
   }
 
   async getFramedHistoryItemsForClient(
-    clientId: string,
-    workspaceId: string
+    clientId: string
   ): Promise<ClientHistoryItemDto[]> {
-    const itemsFromDb =
-      await this.clientHistoryRepo.getAllFramedByClientIdAndWorkspaceId(
-        clientId,
-        workspaceId
-      )
+    const itemsFromDb = await this.clientHistoryRepo.getAllFramedByClientId(
+      clientId
+    )
     return itemsFromDb.map((item) => this.clientHistoryItemToDto(item))
   }
 
   async replaceHistoryItem(
     clientId: string,
-    workspaceId: string,
     oldItem: ClientHistoryItemDto,
     newItem: ClientHistoryItemDto
   ): Promise<void> {
@@ -88,12 +72,11 @@ export class ClientHistoryStoreImpl implements ClientHistoryStore {
     await this.clientHistoryRepo.updateClientHistoryItem(oldItem.id, newItem)
     const updatedItemsForCache = await this.getItemsFromDb(
       clientId,
-      workspaceId,
       ClientHistoryStoreImpl.MAX_HISTORY_ITEMS
     )
 
     // get last 50 items from db and update cache
-    const clientHistoryKey = this.getClientHistoryKey(clientId, workspaceId)
+    const clientHistoryKey = this.getClientHistoryKey(clientId)
     const redisQueue = new RedisBoundedList(
       this.redisClient,
       clientHistoryKey,
@@ -105,28 +88,18 @@ export class ClientHistoryStoreImpl implements ClientHistoryStore {
     )
   }
 
-  countAllByWorkspaceId(workspaceId: string): Promise<number> {
-    return this.clientHistoryRepo.countAllByWorkspaceId(workspaceId)
-  }
-
   private async getItemsFromDb(
     clientId: string,
-    workspaceId: string,
     count: number
   ): Promise<ClientHistoryItemDto[]> {
-    const items = await this.clientHistoryRepo.getAllByClientIdAndWorkspaceId(
-      clientId,
-      workspaceId,
-      count
-    )
+    const items = await this.clientHistoryRepo.getAllByClientId(clientId, count)
     return items.map((item) => this.clientHistoryItemToDto(item))
   }
 
   private async getItemsFromCache(
-    clientId: string,
-    workspaceId: string
+    clientId: string
   ): Promise<ClientHistoryItemDto[]> {
-    const clientHistoryKey = this.getClientHistoryKey(clientId, workspaceId)
+    const clientHistoryKey = this.getClientHistoryKey(clientId)
     const redisQueue = new RedisBoundedList(
       this.redisClient,
       clientHistoryKey,

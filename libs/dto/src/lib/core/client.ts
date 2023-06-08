@@ -1,11 +1,10 @@
 import { RazzleResponse, RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { Message } from './message'
 import { ServerMessage, ServerMessageV2 } from './server'
-import { StepDto } from '../workspace'
+import { StepDto } from './step.dto'
 
 export interface ClientRequest {
   accountId: string
-  workspaceId: string
   payload: {
     steps?: StepDto[]
     prompt?: string

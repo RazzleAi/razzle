@@ -5,9 +5,7 @@ import {
   AccountRepo,
   AccountWithOwner,
   AccountWithUser,
-  App,
   CreateAccountData,
-  appFromPrisma,
 } from '@razzle/services'
 import { PrismaService } from '../prisma/prisma.service'
 
@@ -272,5 +270,54 @@ export class AccountRepoImpl implements AccountRepo {
       ...res.account,
       owner: res.user,
     }
+  }
+
+  addAppToAccount(accountId: string, appId: string): Promise<Account> {
+    return this.prismaService.account.update({
+      where: {
+        id: accountId,
+      },
+      data: {
+        accountApps: {
+          push: [
+            {
+              appId,
+              dateAdded: new Date(),
+            },
+          ],
+        },
+      },
+    })
+  }
+
+  removeAppFromAccount(accountId: string, appId: string): Promise<Account> {
+    return this.prismaService.account.update({
+      where: {
+        id: accountId,
+      },
+      data: {
+        accountApps: {
+          deleteMany: {
+            where: {
+              appId,
+            },
+          },
+        },
+      },
+    })
+  }
+
+  async isAppInAccount(accountId: string, appId: string): Promise<boolean> {
+    const count = await this.prismaService.account.count({
+      where: {
+        id: accountId,
+        accountApps: {
+          some: {
+            appId,
+          },
+        },
+      },
+    })
+    return count > 0
   }
 }

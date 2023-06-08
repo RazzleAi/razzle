@@ -1,5 +1,5 @@
 import { Account } from '@prisma/client'
-import { App } from '../apps'
+import { App } from '../../apps'
 
 export const ACCOUNT_CREATED_EVENT = 'account.created'
 export const APP_CREATED_EVENT = 'app.created'

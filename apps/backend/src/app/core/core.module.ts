@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-import { RedisModule } from '../redis/redis.module'
 import { UserModule } from '../user/user.module'
 import { AccountModule } from '../account/account.module'
 import { MlModule } from '../ml/ml.module'
@@ -30,7 +29,6 @@ import { PubSubModule } from '../pub-sub/pub-sub.module'
 
 @Module({
   imports: [
-    RedisModule,
     PrismaModule,
     PubSubModule,
     UserModule,

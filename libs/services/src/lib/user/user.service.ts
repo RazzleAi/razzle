@@ -1,7 +1,6 @@
 import { User } from '@prisma/client'
 import { UserRepo } from './user.repo'
 import { Logger } from '@nestjs/common'
-import { WorkspaceService } from '../workspace'
 import { UserDto } from '@razzle/dto'
 import { CreateUserData, UpsertUserData } from './types'
 
@@ -9,8 +8,7 @@ export class UserService {
   private readonly logger = new Logger(UserService.name)
 
   constructor(
-    private userRepo: UserRepo,
-    private readonly workspaceService: WorkspaceService
+    private userRepo: UserRepo,    
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {

@@ -1,7 +1,5 @@
 import {
   ActionAndArgsDto,
-  ActionPlanWithDetailsDto,
-  AgentSyncActionParametersDto,
   StepDto,
 } from '@razzle/dto'
 import { IRazzleList, IActionTrigger } from '@razzle/widgets'
@@ -9,7 +7,6 @@ import { useMessageDetails } from '../screens/workspaces/center-pane/history-ite
 import { useAppStore } from '../stores/app-store'
 import { useWSClientStore } from '../stores/ws-client-store'
 import { useGetActionArgs } from './api'
-import { v4 as uuidv4 } from 'uuid'
 import { useFirebaseServices } from '../firebase'
 export interface ListProps {
   list: IRazzleList
@@ -53,7 +50,7 @@ function ListItem({
   const hasActions = actions !== undefined && actions.length > 0
   const isSelectable = !hasActions && onSelect !== undefined
   const messageDetails = useMessageDetails()
-  const { account, currentWorkspace } = useAppStore()
+  const { account } = useAppStore()
   const { triggerActions } = useWSClientStore()
   const { mutate: getOnSelectActionArgs, error: onSelectActionArgsFetchError } =
     useGetActionArgs({ onSuccess: onActionArgsLoaded })
@@ -83,9 +80,9 @@ function ListItem({
       })),
     })
 
-    if (account && currentWorkspace) {
+    if (account) {
       currentUser?.getIdToken().then((accessToken) => {
-        triggerActions(accessToken, account.id, currentWorkspace.id, steps)
+        triggerActions(accessToken, account.id, steps)
       })
     }
   }
@@ -124,7 +121,7 @@ function ListItemAction({ action }: { action: IActionTrigger }) {
   const messageDetails = useMessageDetails()
   const { currentUser } = useFirebaseServices()
   const { triggerActions } = useWSClientStore()
-  const { account, currentWorkspace } = useAppStore()
+  const { account, } = useAppStore()
   const { mutate: getActionArgs, error: actionArgsError } = useGetActionArgs({
     onSuccess: onActionArgsLoaded,
   })
@@ -153,9 +150,9 @@ function ListItemAction({ action }: { action: IActionTrigger }) {
       })),
     })
 
-    if (account && currentWorkspace) {
+    if (account) {
       currentUser?.getIdToken().then((accessToken) => {
-        triggerActions(accessToken, account.id, currentWorkspace.id, steps)
+        triggerActions(accessToken, account.id, steps)
       })
     }
   }

@@ -1,23 +1,15 @@
 import { useFirebaseServices } from '../../firebase'
 import { useMutation } from 'react-query'
 import {
-  Auth,
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
 } from '@firebase/auth'
 import { FirebaseError } from '@firebase/util'
-import { UserCredential } from 'firebase/auth'
 import { useHttpClient } from '../../http-client'
-import { AxiosInstance } from 'axios'
-import {
-  ThirdPartyAuthAccountInviteDto,
-  ThirdPartyAuthDto,
-  ThirdPartyAuthResponseDto,
-} from '@razzle/dto'
-import Log from '../../utils/logger'
 import { useEventTracker } from '../../mixpanel'
 import { LOGIN_SUCCESS } from '../../events'
+import { updateThirdPartyUser, updateThirdPartyUserFromAccountInvite } from '../../apis'
 
 export type SigninType = 'google' | 'github'
 
@@ -137,37 +129,4 @@ function handleError(err) {
   }
 }
 
-async function updateThirdPartyUser(
-  httpClient: AxiosInstance,
-  userCred: UserCredential
-): Promise<ThirdPartyAuthResponseDto> {
-  const body: ThirdPartyAuthDto = {
-    authUid: userCred.user.uid,
-    email: userCred.user.email!,
-    providerId: userCred.providerId,
-    profilePictureUrl: userCred.user.photoURL,
-  }
-  const response = await httpClient.post(`/auth/third-party`, body)
-  const result = response.data as ThirdPartyAuthResponseDto
-  return result
-}
 
-async function updateThirdPartyUserFromAccountInvite(
-  httpClient: AxiosInstance,
-  userCred: UserCredential,
-  accountInviteToken: string
-): Promise<ThirdPartyAuthResponseDto> {
-  const body: ThirdPartyAuthAccountInviteDto = {
-    authUid: userCred.user.uid,
-    providerId: userCred.user.providerId,
-    email: userCred.user.email!,
-    token: accountInviteToken,
-  }
-  console.debug('SENDING BODY: ', { body })
-  const response = await httpClient.post(
-    `/auth/third-party/account-invite`,
-    body
-  )
-  const result = response.data as ThirdPartyAuthResponseDto
-  return result
-}

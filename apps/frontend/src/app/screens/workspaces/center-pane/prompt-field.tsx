@@ -13,7 +13,7 @@ export default function PromptField() {
   const { trackEvent } = useEventTracker()
   const { sendMessage } = useWSClientStore()
   const { currentUser } = useFirebaseServices()
-  const { account, currentWorkspace } = useAppStore()
+  const { account } = useAppStore()
 
   const handlePromptChange = (value: any) => {
     if (value === '') {
@@ -24,7 +24,7 @@ export default function PromptField() {
   }
 
   const sendPrompt = async (value: string) => {
-    if (!currentWorkspace || !account) {
+    if (!account) {
       console.error('No workspace or account')
       return
     }
@@ -32,7 +32,6 @@ export default function PromptField() {
     sendMessage(accessToken, {
       event: 'Message',
       data: {
-        workspaceId: currentWorkspace.id,
         accountId: account.id,
         payload: { prompt: value },
       },

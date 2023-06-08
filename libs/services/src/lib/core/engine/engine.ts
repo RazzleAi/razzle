@@ -24,7 +24,6 @@ export class RazzleEngine {
 
   public async handlePromptMessageFromClient(message: ClientToEngineRequest) {
     const accountId = message.accountId
-    const workspaceId = message.workspaceId
     const userId = message.userId
     const clientId = message.clientId
     const prompt = message.payload.prompt as string
@@ -38,7 +37,6 @@ export class RazzleEngine {
     }
 
     const result = await this.executePromptSteps(
-      workspaceId,
       userId,
       accountId,
       promptAndSteps,
@@ -62,7 +60,6 @@ export class RazzleEngine {
       payload: {
         ...output,
         userId,
-        workspaceId,
         clientId,
         accountId,
         appId: step.appId,
@@ -83,7 +80,6 @@ export class RazzleEngine {
   }
 
   private async executePromptSteps(
-    worpspaceId: string,
     userId: string,
     accountId: string,
     promptAndSteps: PromptAndSteps,
@@ -99,7 +95,6 @@ export class RazzleEngine {
     }
 
     const result = await this.executePrompt(
-      worpspaceId,
       userId,
       accountId,
       promptAndSteps,
@@ -110,7 +105,6 @@ export class RazzleEngine {
   }
 
   async executePrompt(
-    workspaceId: string,
     userId: string,
     accountId: string,
     promptSteps: PromptAndSteps,
@@ -121,7 +115,6 @@ export class RazzleEngine {
     )
 
     const step = await this.sequencer.execute({
-      workspaceId,
       userId,
       accountId,
       promptSteps,

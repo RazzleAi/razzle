@@ -10,6 +10,7 @@ import {
   createApp,
   deleteAppById,
   generateNewAPIKey,
+  getAppById,
   getAppsInAccount,
   getAppSyncStatus,
   getPublicApps,
@@ -20,6 +21,31 @@ import {
 } from '../../apis'
 import { useHttpClient } from '../../http-client'
 import { QueryConfig } from './types'
+
+export function useGetAppById(
+  appId: string,
+  config?: {
+    enabled?: boolean
+    refetchOnWindowFocus?: boolean
+    refetchInterval?: number | false
+  }
+) {
+  const httpClient = useHttpClient()
+  return useQuery(
+    ['get-app-by-id', appId],
+    async ({ queryKey }) => {
+      const [_, appId] = queryKey
+      const res = await getAppById(httpClient, appId)
+      return res.data.data
+    },
+    {
+      enabled: config?.enabled ?? true,
+      refetchOnWindowFocus: config?.refetchOnWindowFocus ?? false,
+      refetchInterval: config?.refetchInterval ?? false,
+    }
+  )
+}
+
 
 export function useGetAppsInAccount(
   accountId: string,

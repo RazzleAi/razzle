@@ -34,7 +34,6 @@ export class ChatService {
   async createNewChat(
     accountId: string,
     userId: string,
-    workspaceId: string,
     clientId: string,
     llm: AvailableChatLlms
   ): Promise<Chat> {
@@ -48,7 +47,6 @@ export class ChatService {
 
     const chat = new Chat({
       accountId: accountId ?? '',
-      workspaceId: workspaceId ?? '',
       userId: userId ?? '',
       agents,
       clientId,
@@ -83,7 +81,7 @@ export class ChatService {
   ): Promise<Chat> {
     const apps = await Promise.all(
       chat.agents.map(async (a) => {
-        const app = this.appService.getById(a)
+        const app = this.appService.findById(a)
         return app
       })
     )
@@ -101,7 +99,6 @@ export class ChatService {
 
     const desirializedChat = new Chat({
       accountId: chat.accountId,
-      workspaceId: 'N/A', // We need to get rid of this idea of workspaces
       userId: chat.userId,
       agents,
       clientId: chat.clientId,

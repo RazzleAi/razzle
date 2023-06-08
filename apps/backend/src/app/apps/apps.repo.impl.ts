@@ -26,6 +26,17 @@ export class AppsRepoImpl implements AppsRepo {
     )
   }
 
+  async findByIds(ids: string[]): Promise<App[]> {
+    const res = await this.prisma.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    })
+    return Promise.all(res.map(async (r) => await appFromPrisma(r)))
+  }
+
   async findByAppId(props: { appId: string }): Promise<App | null> {
     const { appId } = props
 
@@ -182,35 +193,5 @@ export class AppsRepoImpl implements AppsRepo {
         },
       })
     )
-  }
-
-  // TODO: DELETE THIS AFTER CLEANUP APP HANDLES IS RUN IN PROD
-  async getAllApps(): Promise<App[]> {
-    const res = await this.prisma.findMany({})
-
-    const apps: App[] = []
-    for (const r of res) {
-      apps.push(await appFromPrisma(r))
-    }
-    return apps
-  }
-
-  async forceDeleteById(id: string): Promise<App> {
-    const res = await this.prismaService.app.delete({
-      where: {
-        id,
-      },
-    })
-    return appFromPrisma(res)
-  }
-
-  async deleteWorkspaceAppsForAppByID(appId: string): Promise<void> {
-    await this.prismaService.workspaceApp.deleteMany({
-      where: {
-        app: {
-          id: appId,
-        },
-      },
-    })
   }
 }

@@ -24,7 +24,7 @@ export class AgentHeaderValidatorImpl implements AgentHeaderValidator {
     }
 
     const appId = headers['app_id'] as string
-    const app = await this.appsService.getByAppId(appId)
+    const app = await this.appsService.findByAppId(appId)
     if (!app) {
       this.logger.log(`App with ID ${appId} does not exist`)
       return false

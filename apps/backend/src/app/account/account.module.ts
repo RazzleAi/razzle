@@ -5,7 +5,6 @@ import { EventModule } from '../event/event.module'
 import { OnboardingModule } from '../onboarding/onboarding.module'
 import { PrismaModule } from '../prisma/prisma.module'
 import { UserModule } from '../user/user.module'
-import { WorkspaceModule } from '../workspace/workspace.module'
 import { AccountUserInviteEmailRepoImpl } from './account-user-invite-email-repo-impl'
 import { AccountUserInviteExpiryTaskScheduler } from './account-user-invite-expiry-task-scheduler'
 import { AccountUserInviteTokenGeneratorImpl } from './account-user-invite-token-generator-impl'
@@ -17,7 +16,6 @@ import { AccountServiceImpl } from './account.service-impl'
 @Module({
   imports: [
     PrismaModule,
-    WorkspaceModule,
     EmailModule,
     UserModule,
     AppsModule,

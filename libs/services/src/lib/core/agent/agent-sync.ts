@@ -1,12 +1,13 @@
 import { AgentSyncDto } from '@razzle/dto'
-import { AppNotFoundException, AppsService } from '../../apps'
+import { AppsService } from '../../apps'
 import {
   AppSyncedEventPayload,
   EventBus,
   FIRST_APP_SYNCED_EVENT,
-} from '../../event'
-import { APP_SYNCED_EVENT, AnalyticsEventTracker } from '../../analytics'
+} from '../../tools'
+import { APP_SYNCED_EVENT, AnalyticsEventTracker } from '../../tools/analytics'
 import { createHash } from 'crypto'
+import { NotFoundException } from '@nestjs/common'
 
 export class AgentSyncService {
   constructor(
@@ -35,9 +36,9 @@ export class AgentSyncService {
     }
     const newDataHash = newDataHashBuilder.digest('hex')
 
-    const existingApp = await this.appsService.getById(appId)
+    const existingApp = await this.appsService.findById(appId)
     if (!existingApp) {
-      throw new AppNotFoundException()
+      throw new NotFoundException()
     }
 
     const isFirstSync = !existingApp.isDefault && existingApp.data === null

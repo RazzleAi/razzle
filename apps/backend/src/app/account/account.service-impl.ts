@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { AccountUser, AccountUserInviteEmail } from '@prisma/client'
-import { AccountService, ReferenceGenerator } from '@razzle/services'
+import { AccountService } from '@razzle/services'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
 import { EmailDispatchGatewayImpl } from '../email/email-dispatch-gateway-impl.service'
 import { EventBusImpl } from '../event/event-bus-impl'
 import { UserServiceImpl } from '../user/user.service.impl'
-import { WorkspaceServiceImpl } from '../workspace/workspace.service-impl'
 import { AccountInviteEmailGeneratorImpl } from './account-invite-email-generator'
 import { AccountUserInviteEmailRepoImpl } from './account-user-invite-email-repo-impl'
 import { AccountUserInviteTokenGeneratorImpl } from './account-user-invite-token-generator-impl'
 import { AccountUserInviteTokenRepoImpl } from './account-user-invite-token-repo-impl'
 import { AccountRepoImpl } from './account.repo-impl'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class AccountServiceImpl extends AccountService {
@@ -18,7 +18,6 @@ export class AccountServiceImpl extends AccountService {
     accountRepoImpl: AccountRepoImpl,
     accountUserInviteTokenRepoImpl: AccountUserInviteTokenRepoImpl,
     private readonly accountUserInviteEmailRepoImpl: AccountUserInviteEmailRepoImpl,
-    workspaceServiceImpl: WorkspaceServiceImpl,
     accountUserInviteTokenGeneratorImpl: AccountUserInviteTokenGeneratorImpl,
     emailDispatchGatewayImpl: EmailDispatchGatewayImpl,
     userServiceImpl: UserServiceImpl,
@@ -29,7 +28,6 @@ export class AccountServiceImpl extends AccountService {
       accountRepoImpl,
       accountUserInviteTokenRepoImpl,
       userServiceImpl,
-      workspaceServiceImpl,
       accountUserInviteTokenGeneratorImpl,
       emailDispatchGatewayImpl,
       appsServiceImpl,
@@ -55,8 +53,8 @@ export class AccountServiceImpl extends AccountService {
         )
       ))
 
-    const emailReference = ReferenceGenerator.generate()
-    const inviteEmailRef = await this.accountUserInviteEmailRepoImpl.create({
+    const emailReference = `${uuidv4()}-${new Date().getTime()}-${uuidv4()}`
+    await this.accountUserInviteEmailRepoImpl.create({
       emailReference,
       accountUserInviteTokenId: token.id,
     } as AccountUserInviteEmail)

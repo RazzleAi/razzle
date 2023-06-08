@@ -4,7 +4,7 @@ import { useAppStore } from '../../stores/app-store'
 import AppsLayout from '../apps/apps.page'
 import { Banners } from '../banners'
 import { WorkspacePage } from '../workspaces'
-import { LeftPaneButtonBar } from './left-pane/left-pane-button-bar'
+import { LeftPaneButtonBar } from './left-pane-button-bar'
 
 export function MainLayout() {
   const location = useLocation()

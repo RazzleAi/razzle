@@ -1,6 +1,5 @@
 import { Account, AccountUser, User } from '@prisma/client'
 import { Page, PageParams } from '@razzle/dto'
-import { App } from '../apps'
 import { AccountWithOwner, AccountWithUser, CreateAccountData } from './types'
 
 export interface AccountRepo {
@@ -25,4 +24,7 @@ export interface AccountRepo {
   ): Promise<AccountWithOwner>
   isUserInAccount(userId: string, accountId: string): Promise<boolean>
   removeUserFromAccount(userId: string, accountId: string): Promise<boolean>
+  addAppToAccount(appId: string, accountId: string): Promise<Account>
+  removeAppFromAccount(appId: string, accountId: string): Promise<Account>
+  isAppInAccount(appId: string, accountId: string): Promise<boolean>
 }

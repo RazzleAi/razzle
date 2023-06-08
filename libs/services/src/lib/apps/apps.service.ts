@@ -7,9 +7,7 @@ import {
   UpdateAppDto,
 } from '@razzle/dto'
 import { AppsRepo } from './apps.repo'
-import { DuplicateAppException } from './exceptions'
 import { createHash } from 'crypto'
-import { AppNotFoundException } from './exceptions/app-not-found.exception'
 import { EmbeddingService } from '../ml'
 import { Action } from './action'
 import {
@@ -19,11 +17,12 @@ import {
   EventBus,
   FIRST_APP_CREATED_EVENT,
   FIRST_APP_SYNCED_EVENT,
-} from '../event'
-import { AnalyticsEventTracker, APP_SYNCED_EVENT } from '../analytics'
+} from '../tools'
+import { AnalyticsEventTracker, APP_SYNCED_EVENT } from '../tools/analytics'
 import { App, UpdateAppInput } from './types'
 import { User } from '../user'
 import { InvalidHandleException } from './exceptions/invalid-handle.exception'
+import { DuplicateResourceException, NotFoundException } from '../exceptions'
 
 export class AppsService {
   constructor(
@@ -42,7 +41,9 @@ export class AppsService {
     const appId = optionalProps?.appId ?? this.generateNewAppId(accountId)
     const existingApp = await this.appsRepo.findByAppId({ appId })
     if (existingApp) {
-      throw new DuplicateAppException(`An app with ${appId} already exists`)
+      throw new DuplicateResourceException(
+        `An app with ${appId} already exists`
+      )
     }
 
     await this.validateHandle(app, user)
@@ -50,7 +51,7 @@ export class AppsService {
     const appsInAccount = await this.getAppsCreatedByAccount(accountId)
     for (const appInAccount of appsInAccount) {
       if (appInAccount.name === app.name) {
-        throw new DuplicateAppException(
+        throw new DuplicateResourceException(
           `An app with name ${app.name} already exists`
         )
       }
@@ -90,7 +91,7 @@ export class AppsService {
       handle: app.handle,
     })
     if (existingAppWithHandle) {
-      throw new DuplicateAppException(
+      throw new DuplicateResourceException(
         `An app with handle ${app.handle} already exists`
       )
     }
@@ -120,18 +121,22 @@ export class AppsService {
     return this.appsRepo.findAllByCreatorId(userId)
   }
 
-  async getByAppId(appId: string): Promise<App | null> {
+  async findByAppId(appId: string): Promise<App | null> {
     return this.appsRepo.findByAppId({ appId })
   }
 
-  async getById(id: string): Promise<App | null> {
+  async findById(id: string): Promise<App | null> {
     return this.appsRepo.findById(id)
+  }
+
+  async findByIds(ids: string[]): Promise<App[]> {
+    return this.appsRepo.findByIds(ids)
   }
 
   async updateAppById(id: string, app: UpdateAppDto): Promise<App | null> {
     const existingApp = await this.appsRepo.findById(id)
     if (!existingApp) {
-      throw new AppNotFoundException(`App with id ${id} not found`)
+      throw new DuplicateResourceException(`App with id ${id} not found`)
     }
 
     const data: UpdateAppInput = {
@@ -146,7 +151,7 @@ export class AppsService {
   }
 
   async getAppSyncStatus(id: string): Promise<AppSyncStatusDto | null> {
-    const app = await this.getById(id)
+    const app = await this.findById(id)
     if (!app) {
       return null
     }
@@ -207,7 +212,7 @@ export class AppsService {
 
     const existingApp = await this.appsRepo.findByAppId({ appId })
     if (!existingApp) {
-      throw new AppNotFoundException()
+      throw new NotFoundException()
     }
 
     const isFirstSync = !existingApp.isDefault && existingApp.data === null
@@ -283,7 +288,7 @@ export class AppsService {
   async deleteApp(id: string): Promise<boolean> {
     const app = await this.appsRepo.findById(id)
     if (!app) {
-      throw new AppNotFoundException()
+      throw new NotFoundException()
     }
 
     const res = await this.appsRepo.deleteById(id)

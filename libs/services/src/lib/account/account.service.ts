@@ -1,19 +1,17 @@
-import { Workspace } from '@prisma/client'
 import {
   CreateAccountDto,
   CreateAccountResponseDto,
   Page,
   PageParams,
 } from '@razzle/dto'
-import { WorkspaceService } from '../workspace'
 import { AccountUserInviteTokenRepo } from './account-user-invite-token-repo'
 import { AccountRepo } from './account.repo'
 import { DuplicateMatchDomainException } from './exceptions'
 import { AccountUserInviteTokenGenerator } from './account-invite-token-generator'
-import { EmailDispatchGateway } from '../email/email-dispatch-gateway.service'
+import { EmailDispatchGateway } from '../tools/email/email-dispatch-gateway.service'
 import { User, UserService } from '../user'
-import { App, AppNotFoundException, AppsService } from '../apps'
-import { ACCOUNT_CREATED_EVENT, EventBus } from '../event'
+import { App, AppsService } from '../apps'
+import { ACCOUNT_CREATED_EVENT, EventBus } from '../tools'
 import {
   Account,
   AccountUser,
@@ -21,13 +19,13 @@ import {
   AccountWithUser,
 } from './types'
 import { IllegalArgumentException } from '../exceptions/illegal-argument.exception'
+import { NotFoundException } from '@nestjs/common'
 
 export class AccountService {
   constructor(
     protected readonly accountRepo: AccountRepo,
     protected readonly accountUserInviteTokenRepo: AccountUserInviteTokenRepo,
     protected readonly userService: UserService,
-    protected readonly workspaceService: WorkspaceService,
     protected readonly accountUserInviteTokenGenerator: AccountUserInviteTokenGenerator,
     protected readonly emailDispatchGateway: EmailDispatchGateway,
     protected readonly appsService: AppsService,
@@ -59,17 +57,12 @@ export class AccountService {
       enableDomainMatching: createAccountDto.enableDomainMatching,
       matchDomain: createAccountDto.matchDomain,
     })
-    await this.createDefaultWorkspaceForAccount(account, userId)
     this.eventBus.emit(ACCOUNT_CREATED_EVENT, { ...account, userId })
     return account
   }
 
   async getById(accountId: string): Promise<AccountWithOwner | null> {
     return this.accountRepo.findById(accountId)
-  }
-
-  async getAccountsByOwner(ownerId: string): Promise<AccountWithOwner[]> {
-    return this.accountRepo.getAccountsByOwnerId(ownerId)
   }
 
   async getAccountByMatchDomain(domain: string): Promise<Account | null> {
@@ -112,7 +105,6 @@ export class AccountService {
   async addUserToAccount(userId: string, accountId: string) {
     if (!(await this.accountRepo.isUserInAccount(userId, accountId))) {
       await this.accountRepo.addUserToAccount(userId, accountId)
-      await this.addUserToDefaultWorkspaceForAccount(userId, accountId)
     }
   }
 
@@ -131,60 +123,7 @@ export class AccountService {
     userId: string,
     accountId: string
   ): Promise<boolean> {
-    // remove user from all workspaces
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      accountId
-    )
-    for (const workspace of workspaces) {
-      await this.workspaceService.removeUserFromWorkspace(userId, workspace.id)
-    }
     return await this.accountRepo.removeUserFromAccount(userId, accountId)
-  }
-
-  private async createDefaultWorkspaceForAccount(
-    account: Account,
-    userId: string
-  ): Promise<Workspace> {
-    const result = await this.workspaceService.createWorkspaceWithUser(
-      {
-        accountId: account.id,
-        name: `${account.name}-default`,
-        description: `Default workspace for ${account.name}`,
-        isDefault: true,
-      },
-      userId
-    )
-    return result.workspace
-  }
-
-  private async addUserToDefaultWorkspaceForAccount(
-    userId: string,
-    accountId: string
-  ) {
-    const account = await this.getById(accountId)
-    if (!account) {
-      throw new Error(`Account ${accountId} not found`)
-    }
-
-    const defaultWorkspace = await this.findDefaultWorkspaceForAccount(account)
-    if (defaultWorkspace) {
-      await this.workspaceService.addUserToWorkspace(
-        userId,
-        defaultWorkspace.id
-      )
-    }
-  }
-
-  private async findDefaultWorkspaceForAccount(
-    account: Account
-  ): Promise<Workspace | null> {
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      account.id
-    )
-    const defaultWorkspace = workspaces.find(
-      (w) => w.isDefault || w.name === `${account.name}-default`
-    )
-    return defaultWorkspace || null
   }
 
   public async findAccountUser(
@@ -202,17 +141,15 @@ export class AccountService {
   }
 
   async getAppsInAccount(accountId: string): Promise<App[]> {
-    // also get apps installed in the workspaces
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      accountId
-    )
-    const apps: App[] = []
-    for (const workspace of workspaces) {
-      const workspaceApps = await this.workspaceService.getAppsInWorkspace(
-        workspace.id
-      )
-      apps.push(...workspaceApps)
+    const account = await this.getById(accountId)
+    if (!account) {
+      throw new NotFoundException(`Account ${accountId} not found`)
     }
+
+    const accountAppIds = account.accountApps.map(
+      (accountApp) => accountApp.appId
+    )
+    const apps = await this.appsService.findByIds(accountAppIds)
 
     const createdApps = await this.appsService.getAppsCreatedByAccount(
       accountId
@@ -236,50 +173,45 @@ export class AccountService {
   }
 
   async addAppToAccount(accountId: string, appId: string): Promise<App | null> {
-    const app = await this.appsService.getById(appId)
+    const app = await this.appsService.findById(appId)
     if (!app) {
-      throw new AppNotFoundException(`App ${appId} not found`)
+      throw new NotFoundException(`App ${appId} not found`)
     }
 
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      accountId
-    )
-
-    for (const workspace of workspaces) {
-      await this.workspaceService.addAppToWorkspace(appId, workspace.id)
+    const account = await this.getById(accountId)
+    if (!account) {
+      throw new NotFoundException(`Account ${accountId} not found`)
     }
+
+    if (app.creatorId === accountId) {
+      return app
+    }
+
+    await this.accountRepo.addAppToAccount(accountId, appId)
+
     return app
   }
 
   async isAppInAccount(accountId: string, appId: string): Promise<boolean> {
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      accountId
-    )
-    const app = await this.appsService.getById(appId)
+    const app = await this.appsService.findById(appId)
     if (!app) {
-      throw new AppNotFoundException(`App ${appId} not found`)
+      throw new NotFoundException(`App ${appId} not found`)
     }
 
     if (app.creatorId === accountId) {
       return true
     }
 
-    for (const workspace of workspaces) {
-      if (await this.workspaceService.isAppInWorkspace(workspace.id, appId)) {
-        return true
-      }
-    }
-
-    return false
+    return this.accountRepo.isAppInAccount(accountId, appId)
   }
 
   async removeAppFromAccount(
     accountId: string,
     appId: string
   ): Promise<boolean> {
-    const app = await this.appsService.getById(appId)
+    const app = await this.appsService.findById(appId)
     if (!app) {
-      throw new AppNotFoundException(`App ${appId} not found`)
+      throw new NotFoundException(`App ${appId} not found`)
     }
 
     // can't remove an app if it's the default app or if it's owned by the account
@@ -287,12 +219,8 @@ export class AccountService {
       throw new IllegalArgumentException(`Can't remove app ${appId}`)
     }
 
-    const workspaces = await this.workspaceService.getWorkspacesForAccount(
-      accountId
-    )
-    for (const workspace of workspaces) {
-      await this.workspaceService.removeAppFromWorkspace(appId, workspace.id)
-    }
+    await this.accountRepo.removeAppFromAccount(accountId, appId)
+
     return true
   }
 }

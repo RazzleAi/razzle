@@ -29,13 +29,11 @@ export class ClientHistoryRepoImpl {
 
   async createClientHistoryItem(
     clientId: string,
-    workspaceId: string,
     item: ClientHistoryItemDto
   ): Promise<ClientHistoryItemWithMessage> {
     const created = await this.prisma.create({
       data: {
         clientId: clientId,
-        workspaceId: workspaceId,
         hash: item.hash,
         isFramed: item.isFramed || false,
         message: this.itemMessageToJson(item.message),
@@ -45,15 +43,13 @@ export class ClientHistoryRepoImpl {
     return { ...created, messageVal: this.itemMessageFromJson(created.message) }
   }
 
-  async getAllByClientIdAndWorkspaceId(
+  async getAllByClientId(
     clientId: string,
-    workspaceId: string,
     count?: number
   ): Promise<ClientHistoryItemWithMessage[]> {
     const res = await this.prisma.findMany({
       where: {
         clientId: clientId,
-        workspaceId: workspaceId,
       },
       orderBy: {
         timestampMillis: 'desc',
@@ -66,14 +62,12 @@ export class ClientHistoryRepoImpl {
     return items
   }
 
-  async getAllFramedByClientIdAndWorkspaceId(
-    clientId: string,
-    workspaceId: string
+  async getAllFramedByClientId(
+    clientId: string
   ): Promise<ClientHistoryItemWithMessage[]> {
     const res = await this.prisma.findMany({
       where: {
         clientId: clientId,
-        workspaceId: workspaceId,
         isFramed: true,
       },
       orderBy: {
@@ -100,14 +94,6 @@ export class ClientHistoryRepoImpl {
       },
     })
     return { ...updated, messageVal: this.itemMessageFromJson(updated.message) }
-  }
-
-  async countAllByWorkspaceId(workspaceId: string): Promise<number> {
-    return this.prisma.count({
-      where: {
-        workspaceId: workspaceId,
-      },
-    })
   }
 
   itemMessageToJson(message: any): Record<string, string | any> {

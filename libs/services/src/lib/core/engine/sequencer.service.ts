@@ -1,5 +1,5 @@
-import { App } from '../apps'
-import { PromptAndSteps, Step } from '../ml/resolved-prompt-parser'
+import { App } from '../../apps'
+import { PromptAndSteps, Step } from '../../ml/resolved-prompt-parser'
 
 /**
  * We need to resolve the:

@@ -19,7 +19,7 @@ import {
   UpdateAppDto,
 } from '@razzle/dto'
 import {
-  DuplicateAppException,
+  DuplicateResourceException,
   InvalidHandleException,
   User,
 } from '@razzle/services'
@@ -35,7 +35,7 @@ export class AppsController {
   @ExceptionResponse(
     {
       statusCode: HttpStatus.CONFLICT,
-      types: [DuplicateAppException],
+      types: [DuplicateResourceException],
     },
     {
       statusCode: HttpStatus.BAD_REQUEST,
@@ -60,7 +60,7 @@ export class AppsController {
     @Param('appId') appId: string,
     @Param('actionName') actionName: string
   ): Promise<ActionAndArgsDto> {
-    const app = await this.appService.getById(appId)
+    const app = await this.appService.findById(appId)
 
     if (!app) {
       throw new Error('App not found')
@@ -91,7 +91,7 @@ export class AppsController {
 
   @Get('/:appId')
   async getAppById(@Param('appId') appId: string): Promise<AppDto> {
-    return await this.appService.getById(appId)
+    return await this.appService.findById(appId)
   }
 
   @Get('/:id/status')
