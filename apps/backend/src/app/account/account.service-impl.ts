@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { AccountUser, AccountUserInviteEmail } from '@prisma/client'
 import { AccountService } from '@razzle/services'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
-import { EmailDispatchGatewayImpl } from '../email/email-dispatch-gateway-impl.service'
-import { EventBusImpl } from '../event/event-bus-impl'
+import { EventBusImpl } from '../tools/event/event-bus-impl'
 import { UserServiceImpl } from '../user/user.service.impl'
 import { AccountInviteEmailGeneratorImpl } from './account-invite-email-generator'
 import { AccountUserInviteEmailRepoImpl } from './account-user-invite-email-repo-impl'
@@ -11,6 +10,7 @@ import { AccountUserInviteTokenGeneratorImpl } from './account-user-invite-token
 import { AccountUserInviteTokenRepoImpl } from './account-user-invite-token-repo-impl'
 import { AccountRepoImpl } from './account.repo-impl'
 import { v4 as uuidv4 } from 'uuid'
+import { EmailDispatchGatewayImpl } from '../email/email-dispatch-gateway-impl.service'
 
 @Injectable()
 export class AccountServiceImpl extends AccountService {

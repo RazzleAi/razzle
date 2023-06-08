@@ -1,4 +1,4 @@
-export interface ILogger {
+export interface RazzleLogger {
   /**
    * Write a 'log' level log.
    */

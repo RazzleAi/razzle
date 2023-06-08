@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common'
 import { AppsModule } from '../apps/apps.module'
-import { EmailModule } from '../email/email.module'
-import { EventModule } from '../event/event.module'
 import { OnboardingModule } from '../onboarding/onboarding.module'
 import { PrismaModule } from '../prisma/prisma.module'
 import { UserModule } from '../user/user.module'
@@ -12,6 +10,8 @@ import { AccountUserInviteTokenRepoImpl } from './account-user-invite-token-repo
 import { AccountController } from './account.controller'
 import { AccountRepoImpl } from './account.repo-impl'
 import { AccountServiceImpl } from './account.service-impl'
+import { ToolsModule } from '../tools/tools.module'
+import { EmailModule } from '../email/email.module'
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { AccountServiceImpl } from './account.service-impl'
     UserModule,
     AppsModule,
     OnboardingModule,
-    EventModule,
+    ToolsModule,
   ],
   providers: [
     AccountServiceImpl,

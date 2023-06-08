@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common'
-import { MixpanelModule } from '../analytics/analytics.module'
-import { EventModule } from '../event/event.module'
 import { MlModule } from '../ml/ml.module'
 import { PrismaModule } from '../prisma/prisma.module'
 import { AppsController } from './apps.controller'
@@ -8,9 +6,10 @@ import { AppsRepoImpl } from './apps.repo.impl'
 import { AppsServiceImpl } from './apps.service-impl'
 import UserAppAuthenticationHandlerImpl from './user-app-authentication-message-handler'
 import { UserAppAuthenticationRepoImpl } from './user-app-authentication.repo'
+import { ToolsModule } from '../tools/tools.module'
 
 @Module({
-  imports: [PrismaModule, MlModule, EventModule, MixpanelModule],
+  imports: [PrismaModule, MlModule, ToolsModule],
   controllers: [AppsController],
   providers: [
     AppsServiceImpl,

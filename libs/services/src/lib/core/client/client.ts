@@ -2,20 +2,13 @@ import { Md5 } from 'ts-md5'
 import { WebSocket, MessageEvent, CloseEvent, ErrorEvent } from 'ws'
 import { ClientLifecycle } from './client-lifecycle'
 import {
-  ClientHistoryItemDto,
   ClientRequest,
-  ClientResponse,
   ClientToEngineRequest,
   ClientToServerMessage,
-  ServerMessage,
-  ServerMessageV2,
   ServerToClientMessage,
 } from '@razzle/dto'
 import { ClientRequestValidator } from './client-request-validator'
 import { User } from '../../user'
-import { DateTime } from 'luxon'
-import { ClientHistoryStore } from './client-history-store'
-import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
 import { ChatService } from '../enginev2/chat/chat.service'
@@ -31,7 +24,6 @@ export class Client {
   constructor(
     private readonly ws: WebSocket,
     private readonly requestValidator: ClientRequestValidator,
-    private readonly historyStore: ClientHistoryStore,
     private readonly clientToEngineMessenger: ClientToEngineMessenger,
     private readonly chatService: ChatService,
     private readonly lifecycleHandler?: ClientLifecycle
@@ -79,13 +71,6 @@ export class Client {
     this.id = new Md5()
       .appendStr(new Date().getTime().toString())
       .end() as string
-  }
-
-  private listenForResponses() {
-    this.clientToEngineMessenger.onResponseReceivedFromEngine(
-      this.id,
-      this.onResponseReceivedFromEngine.bind(this)
-    )
   }
 
   private async handleMessageTypes(
@@ -189,7 +174,6 @@ export class Client {
     }
 
     this.sendHistory()
-    this.listenForResponses()
   }
 
   private async handleMessage(req: ClientRequest) {
@@ -257,46 +241,6 @@ export class Client {
     this.maybeNotifyFirstActionTriggered()
   }
 
-  async onResponseReceivedFromEngine(response: ClientResponse) {
-    const historyItem: ClientHistoryItemDto = {
-      hash: new Md5().appendStr(JSON.stringify(response)).end() as string,
-      isFramed: !!response.payload.pagination?.frameId,
-      message: {
-        __objType__: 'ServerMessageV2',
-        type: 'NewMessage',
-        frameId: response.payload.pagination?.frameId,
-        data: response,
-      } as ServerMessageV2,
-      timestampMillis: DateTime.now().toUnixInteger() * 1000,
-    }
-    // if not framed, add to history and send
-    if (!historyItem.isFramed) {
-      await this.addToHistory(historyItem)
-      this.sendHistory()
-    } else if (
-      historyItem.isFramed &&
-      response.payload.pagination &&
-      response.payload.pagination?.frameId
-    ) {
-      // if framed, do not simply add to history, check history for message with same frame id and replace it
-      const frameId = response.payload.pagination.frameId
-      const existingItem =
-        await this.getFramedServerMessageHistoryItemWithFrameId(frameId)
-      if (existingItem) {
-        // preserve timestamp
-        historyItem.timestampMillis = existingItem.timestampMillis
-        await this.historyStore.replaceHistoryItem(
-          this.id,
-          existingItem,
-          historyItem
-        )
-      } else {
-        await this.addToHistory(historyItem)
-      }
-      this.sendHistory()
-    }
-  }
-
   async sendHistory() {
     if (!this.currentChat?.chatId) return
 
@@ -306,41 +250,6 @@ export class Client {
     }
 
     this.ws.send(JSON.stringify(historyResponse))
-  }
-
-  async addToHistory(historyItem: ClientHistoryItemDto) {
-    if (!this.isIdentified) return
-    await this.historyStore.addToHistoryForClient(this.id, historyItem)
-  }
-
-  getHistory(tail: number): Promise<ClientHistoryItemDto[]> {
-    if (!this.isIdentified) return Promise.resolve([])
-    return this.historyStore.getHistoryForClient(this.id, tail)
-  }
-
-  private async getFramedServerMessageHistoryItemWithFrameId(
-    frameId: string
-  ): Promise<ClientHistoryItemDto | undefined> {
-    if (!this.isIdentified) return undefined
-    const allFramedItems =
-      await this.historyStore.getFramedHistoryItemsForClient(this.id)
-    const matchingItem = allFramedItems.find((item: ClientHistoryItemDto) => {
-      const message = item.message
-      if (message.__objType__ === 'ClientMessage') return false
-      let response: RazzleResponseWithActionArgs | undefined
-      if (message.__objType__ === 'ServerMessage') {
-        const serverMessage = message as ServerMessage
-        response = serverMessage.data.message as RazzleResponseWithActionArgs
-      } else if (message.__objType__ === 'ServerMessageV2') {
-        const serverMessage = message as ServerMessageV2
-        response = serverMessage.data.payload as RazzleResponseWithActionArgs
-      }
-
-      if (!response || !response.pagination) return false
-      return response.pagination.frameId === frameId
-    })
-
-    return matchingItem
   }
 
   private async maybeNotifyFirstActionTriggered() {

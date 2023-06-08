@@ -1,9 +1,26 @@
 import { Module } from '@nestjs/common'
-import { KafkaClient } from '../tools/kafka/kafka-client'
 import { AwsSQSClient } from './sqs/sqs-client'
+import { MixpanelEventTracker } from './analytics/mixpanel-event-tracker'
+import { NestLogger } from './logging/nestjs-logger'
+import { EventBusImpl } from './event/event-bus-impl'
+import { KafkaClient } from './kafka/kafka-client'
+import { AwsSQSPubSub } from './pub-sub/sqs'
 
-@Module({
-  exports: [KafkaClient, AwsSQSClient],
-  providers: [KafkaClient, AwsSQSClient],
+@Module({  
+  exports: [
+    AwsSQSClient,
+    MixpanelEventTracker,
+    AwsSQSPubSub,
+    NestLogger,
+    EventBusImpl,
+  ],
+  providers: [
+    KafkaClient,
+    AwsSQSClient,
+    MixpanelEventTracker,
+    NestLogger,
+    EventBusImpl,
+    AwsSQSPubSub,
+  ],
 })
 export class ToolsModule {}

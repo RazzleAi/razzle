@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
-import { ILogger } from '@razzle/services'
+import { RazzleLogger } from '@razzle/services'
 
-export class LoggerService implements ILogger {
+export class NestLogger implements RazzleLogger {
   private logger?: Logger
   constructor(context?: string) {
     this.logger = new Logger(context)

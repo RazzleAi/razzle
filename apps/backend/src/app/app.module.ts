@@ -13,11 +13,10 @@ import { AccountModule } from './account/account.module'
 import { ConstantsModule } from './constants.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { EventEmitterModule } from '@nestjs/event-emitter'
-import { EventModule } from './event/event.module'
 import { CoreModule } from './core/core.module'
 import { ToolsModule } from './tools/tools.module'
-import { PubSubModule } from './pub-sub/pub-sub.module'
 import { RequestLogger } from './request-logger.middleware'
+import { EmailModule } from './email/email.module'
 
 @Module({
   imports: [
@@ -26,10 +25,9 @@ import { RequestLogger } from './request-logger.middleware'
     EventEmitterModule.forRoot({
       wildcard: true,
       delimiter: '.',
-    }),
-    EventModule,
+    }),    
     ToolsModule,
-    PubSubModule,
+    EmailModule,
     ConstantsModule,
     PrismaModule,
     AuthModule,

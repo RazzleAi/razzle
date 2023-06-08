@@ -7,7 +7,7 @@ import { EmailDispatchTaskScheduler } from './email-task-scheduler'
 import { EmailRepoImpl } from './email.repo-impl'
 import { EmailServiceImpl } from './email.service-impl'
 
-
+// TODO: refactor this, move core email sending logic into tools
 @Module({
   imports: [
     PrismaModule,

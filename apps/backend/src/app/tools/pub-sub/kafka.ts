@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { KafkaClient } from '../tools/kafka/kafka-client'
+import { KafkaClient } from '../kafka/kafka-client'
 import { Producer } from 'kafkajs'
 import { BasePubSub } from './pub-sub'
 
