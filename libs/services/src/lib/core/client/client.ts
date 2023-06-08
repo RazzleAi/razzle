@@ -2,7 +2,6 @@ import { Md5 } from 'ts-md5'
 import { WebSocket, MessageEvent, CloseEvent, ErrorEvent } from 'ws'
 import { ClientLifecycle } from './client-lifecycle'
 import {
-  AvailableChatLlms,
   ClientHistoryItemDto,
   ClientRequest,
   ClientResponse,
