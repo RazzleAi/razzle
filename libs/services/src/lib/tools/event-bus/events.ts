@@ -1,4 +1,4 @@
-import { Account } from '@prisma/client'
+import { Account } from '../../account'
 import { App } from '../../apps'
 
 export const ACCOUNT_CREATED_EVENT = 'account.created'

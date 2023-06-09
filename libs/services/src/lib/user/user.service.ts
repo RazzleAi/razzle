@@ -1,8 +1,7 @@
-import { User } from '@prisma/client'
 import { UserRepo } from './user.repo'
 import { Logger } from '@nestjs/common'
 import { UserDto } from '@razzle/dto'
-import { CreateUserData, UpsertUserData } from './types'
+import { CreateUserData, UpsertUserData, User } from './types'
 
 export class UserService {
   private readonly logger = new Logger(UserService.name)

@@ -1,6 +1,4 @@
-import { Injectable } from '@nestjs/common'
-import { AccountUser, AccountUserInviteToken } from '@prisma/client'
-import { v4 as uuidv4 } from 'uuid'
+import { AccountUser, AccountUserInviteToken } from './types'
 
 export interface AccountUserInviteTokenGenerator {
   generateInviteToken(

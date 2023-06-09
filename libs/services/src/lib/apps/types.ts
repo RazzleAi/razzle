@@ -1,4 +1,4 @@
-import { Prisma, App as PrismaApp } from '@prisma/client'
+import { Prisma, App as PrismaApp, UserAppAuthentication as PrismaUserAppAuthentication } from '@prisma/client'
 
 export type NewAppDetails = Pick<
   PrismaApp,
@@ -31,6 +31,8 @@ export type AppAction = {
   parameters: Array<AppActionParameter>
 }
 export type AppActionParameter = { name: string; type: string }
+
+export type UserAppAuthentication = PrismaUserAppAuthentication
 
 export async function appFromPrisma(
   app: PrismaApp | null | undefined | Promise<PrismaApp | null | undefined>

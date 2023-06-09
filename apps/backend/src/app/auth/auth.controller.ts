@@ -4,7 +4,7 @@ import {
   ThirdPartyAuthDto,
   ThirdPartyAuthResponseDto,
 } from '@razzle/dto'
-import { DuplicateUserException, SignupException } from '@razzle/services'
+import { DuplicateUserException, SignupException, User } from '@razzle/services'
 import {
   Body,
   Controller,
@@ -17,7 +17,6 @@ import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { AuthServiceImpl } from './auth.service.impl'
 import { SkipAuth } from './decorators/no-auth.decorator'
 import { Principal, PrincipalKey } from './decorators'
-import { User } from '@prisma/client'
 
 @UseExceptionResponseHandler()
 @Controller('auth')

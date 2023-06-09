@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { User } from '@prisma/client'
 import { ClientToServerMessage, ClientRequest } from '@razzle/dto'
 import { AuthServiceImpl } from '../../auth/auth.service.impl'
 import { UserServiceImpl } from '../../user/user.service.impl'
-import { ClientRequestValidator } from '@razzle/services'
+import { ClientRequestValidator, User } from '@razzle/services'
 
 @Injectable()
 export class ClientRequestValidatorImpl implements ClientRequestValidator {

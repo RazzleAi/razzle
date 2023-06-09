@@ -42,3 +42,10 @@ async function bootstrap() {
 }
 
 bootstrap()
+  .then(() => {
+    console.log('🚀 Application is running on port 3333')
+  })
+  .catch((err) => {
+    console.log('❌ Error starting application')
+    console.error(err)
+  })

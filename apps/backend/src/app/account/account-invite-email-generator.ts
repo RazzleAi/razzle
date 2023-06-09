@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ContentType, Email, EmailType } from '@prisma/client'
-import { EmailGenerator } from '@razzle/services'
+import { Email, EmailGenerator, EmailType, ContentType } from '@razzle/services'
 
 @Injectable()
 export class AccountInviteEmailGeneratorImpl implements EmailGenerator {

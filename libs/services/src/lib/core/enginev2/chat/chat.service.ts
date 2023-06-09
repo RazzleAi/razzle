@@ -1,12 +1,7 @@
 import { AvailableChatLlms } from '@razzle/dto'
 import { AccountService } from '../../../account'
 import Chat from './chat'
-import {
-  ChatHistory,
-  ChatHistoryRole,
-  Chat as ChatModel,
-  Prisma,
-} from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { PromptResolverService } from '../../../ml'
 import { Sequencer } from '../../engine/sequencer'
 import { IAgent, NlpProxyAgent } from '../agent'
@@ -17,6 +12,7 @@ import { ChatRepo } from './chat.repo'
 import { AppsService } from '../../../apps'
 import { ChatHistoryItem } from './chathistoryitem'
 import { RazzleResponse } from '@razzle/sdk'
+import { ChatHistory, ChatHistoryRole, Chat as ChatModel } from './types'
 
 export class ChatService {
   constructor(
@@ -41,6 +37,8 @@ export class ChatService {
 
     const allApps = await this.accountService.getAppsInAccount(accountId)
 
+    const loopLimit = process.env.CHAT_AGENT_LOOP_LIMIT
+
     const agents = allApps.map(
       (app) => new NlpProxyAgent(app, this.promptResolver, this.sequencer)
     )
@@ -51,6 +49,7 @@ export class ChatService {
       agents,
       clientId,
       llm: this.getLLm(llm, agents),
+      agentChatLoopLimit: loopLimit ? parseInt(loopLimit) : undefined,
     })
 
     await this.saveChat(chat)

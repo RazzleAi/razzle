@@ -1,6 +1,6 @@
-import { Account, AccountUser, User } from '@prisma/client'
 import { Page, PageParams } from '@razzle/dto'
-import { AccountWithOwner, AccountWithUser, CreateAccountData } from './types'
+import { Account, AccountUser, AccountWithOwner, AccountWithUser, CreateAccountData } from './types'
+import { User } from '../user'
 
 export interface AccountRepo {
   getAllAccounts(): Promise<AccountWithOwner[]>

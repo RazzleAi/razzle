@@ -1,4 +1,4 @@
-import { AccountUserInviteToken } from '@prisma/client'
+import { AccountUserInviteToken } from './types'
 
 export interface AccountUserInviteTokenRepo {
   findByToken(token: string): Promise<AccountUserInviteToken | null>

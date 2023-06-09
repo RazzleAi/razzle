@@ -8,6 +8,7 @@ describe('Chat', () => {
   let chat: Chat
   let sandbox: SinonSandbox
   let chatTunedLlm: TestLlm
+  const chatLoopLimit = 4
 
   beforeEach(() => {
     sandbox = createSandbox()
@@ -20,6 +21,7 @@ describe('Chat', () => {
       workspaceId: 'workspaceId',
       userId: 'userId',
       clientId: 'clientId',
+      agentChatLoopLimit: chatLoopLimit,
     })
   })
 
@@ -379,6 +381,61 @@ describe('Chat', () => {
       await acceptanceGenerator.next()
       await acceptanceGenerator.next()
       expect(chat.history[0].timestamp).toBeGreaterThan(0)
+    })
+
+    it('exists with error message when the chat loop runs up to the max number of iterations', async () => {
+      const agentCallMessage = `
+      Sure! using the summaryToolBox agent to summerize the text
+
+      \`\`\`json
+      {"agent": "summaryToolBox", "instruction": "Summerize this test: The quick brown fox jumped over the lazy dog"}
+      \`\`\`
+    `
+      sandbox
+        .stub(TestLlm.prototype, 'accept')
+        .onFirstCall()
+        .resolves({
+          message: agentCallMessage,
+        })
+        .onSecondCall()
+        .resolves({
+          message: agentCallMessage,
+        })
+        .onThirdCall()
+        .resolves({
+          message: agentCallMessage,
+        })
+
+      const agentStub = sandbox.stub()
+      agentStub.resolves({
+        data: {},
+      } as RazzleResponse)
+
+      const scopedChat = new Chat({
+        llm: chatTunedLlm,
+        agents: [
+          {
+            id: 'summaryToolBox',
+            name: 'summaryToolBox',
+            accept: agentStub,
+            description: 'A tool to summerize text',
+          },
+        ],
+        accountId: 'accountId',
+        workspaceId: 'workspaceId',
+        userId: 'userId',
+        clientId: 'clientId',
+        agentChatLoopLimit: 2,
+      })
+
+      const acceptanceGenerator = scopedChat.accept('message')
+      while ((await acceptanceGenerator.next()).done === false) {
+        // Do nothing
+      }
+
+      expect(scopedChat.history[scopedChat.history.length - 1].text).toBe(
+        'Hey! It looks like I would not fulfil that request, maybe try and rephrase your prompt'
+      )
     })
   })
 

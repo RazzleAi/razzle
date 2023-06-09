@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import {
   AgentSyncDto,
   AppSyncStatusDto,
@@ -161,10 +160,7 @@ export class AppsService {
       appId: app.appId,
       name: app.name,
       isSynced: !!app.data,
-      numActions: app.data
-        ? ((app.data as Prisma.JsonObject)['actions'] as Prisma.JsonArray)
-            .length
-        : undefined,
+      numActions: app.data ? app.data?.actions?.length : undefined,
     }
   }
 

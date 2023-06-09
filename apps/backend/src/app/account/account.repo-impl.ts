@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { Account, AccountUser, User } from '@prisma/client'
 import { Page, PageParams } from '@razzle/dto'
 import {
   AccountRepo,
   AccountWithOwner,
   AccountWithUser,
   CreateAccountData,
+  Account,
+  AccountUser,
+  User,
 } from '@razzle/services'
 import { PrismaService } from '../prisma/prisma.service'
 

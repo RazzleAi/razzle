@@ -9,7 +9,7 @@ import { useAppStore } from '../../../stores/app-store'
 
 export default function PromptField() {
   const [query, setQuery] = useState('')
-  const [prompt, setPrompt] = useState<any>(null)
+  const [setPrompt] = useState<any>(null)
   const { trackEvent } = useEventTracker()
   const { sendMessage } = useWSClientStore()
   const { currentUser } = useFirebaseServices()

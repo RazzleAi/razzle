@@ -1,9 +1,9 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { Email } from '@prisma/client';
 import sgMail = require("@sendgrid/mail");
 import { EmailServiceImpl } from './email.service-impl';
+import { Email } from '@razzle/services';
 
 
 @Injectable()

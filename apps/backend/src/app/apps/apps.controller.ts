@@ -8,10 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
 import {
   ActionAndArgsDto,
-  AgentSyncActionsDto,
   AppDto,
   AppSyncStatusDto,
   CreateAppDto,
@@ -66,15 +64,8 @@ export class AppsController {
       throw new Error('App not found')
     }
 
-    const actionsArr = (app.data as Prisma.JsonObject)[
-      'actions'
-    ] as Prisma.JsonArray
-
-    const actions = actionsArr
-      .map((a) => a as unknown as AgentSyncActionsDto)
-      .filter((a) => a.name === actionName)
+    const actions = app.data?.actions?.map((a) => a ).filter((a) => a.name === actionName)
     if (actions.length === 0) {
-      // TODO: throw exception that acn be caught ahdnhandled
       throw new Error('No matching action found')
     }
 

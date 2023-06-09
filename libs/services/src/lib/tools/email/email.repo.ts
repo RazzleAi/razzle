@@ -1,4 +1,4 @@
-import { Email, Prisma } from '@prisma/client'
+import { Email } from './types'
 
 export interface EmailRepo {
   saveEmail(email: Email): Promise<Email>

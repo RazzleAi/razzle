@@ -1,4 +1,4 @@
-import { AccountUserInviteEmail } from '@prisma/client'
+import { AccountUserInviteEmail } from './types'
 
 export interface AccountUserInviteEmailRepo {
   findByEmailReference(email: string): Promise<AccountUserInviteEmail | null>
