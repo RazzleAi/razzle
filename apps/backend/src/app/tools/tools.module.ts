@@ -5,6 +5,7 @@ import { NestLogger } from './logging/nestjs-logger'
 import { EventBusImpl } from './event/event-bus-impl'
 import { KafkaClient } from './kafka/kafka-client'
 import { AwsSQSPubSub } from './pub-sub/sqs'
+import { EmailerImpl } from './email/emailer.impl'
 
 @Module({  
   exports: [
@@ -13,6 +14,7 @@ import { AwsSQSPubSub } from './pub-sub/sqs'
     AwsSQSPubSub,
     NestLogger,
     EventBusImpl,
+    EmailerImpl,
   ],
   providers: [
     KafkaClient,
@@ -21,6 +23,7 @@ import { AwsSQSPubSub } from './pub-sub/sqs'
     NestLogger,
     EventBusImpl,
     AwsSQSPubSub,
+    EmailerImpl,
   ],
 })
 export class ToolsModule {}

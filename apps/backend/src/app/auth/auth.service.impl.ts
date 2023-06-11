@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { UserServiceImpl } from '../user/user.service.impl'
 import { AuthRepoImpl } from './auth.repo'
 import { AccountServiceImpl } from '../account/account.service-impl'
-import { AccountUserInviteTokenRepoImpl } from '../account/account-user-invite-token-repo-impl'
+import { AccountInvitationRepoImpl } from '../account/account-invitation.repo.impl'
 
 @Injectable()
 export class AuthServiceImpl extends AuthService {
@@ -11,13 +11,13 @@ export class AuthServiceImpl extends AuthService {
     authRepository: AuthRepoImpl,
     userServiceImpl: UserServiceImpl,
     accountServiceImpl: AccountServiceImpl,
-    accountUserInviteRepository: AccountUserInviteTokenRepoImpl
+    accountInviteRepo: AccountInvitationRepoImpl
   ) {
     super(
       authRepository,
       userServiceImpl,
       accountServiceImpl,
-      accountUserInviteRepository
+      accountInviteRepo
     )
   }
 }

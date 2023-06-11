@@ -2,8 +2,7 @@ import {
   AccountUser as PrismaAccountUser,
   Account as PrismaAccount,
   AccountApp as PrismaAccountApp,
-  AccountUserInviteToken as PrismaAccountUserInviteToken,
-  AccountUserInviteEmail as PrismaAccountUserInviteEmail,
+  AccountInvitation as PrismaAccountInvitation,
 } from '@prisma/client'
 import { User } from '../user'
 
@@ -23,5 +22,24 @@ export interface CreateAccountData {
 export type AccountWithOwner = Account & { owner: User }
 export type AccountWithUser = AccountUser & { account: Account; user: User }
 
-export type AccountUserInviteToken = PrismaAccountUserInviteToken
-export type AccountUserInviteEmail = PrismaAccountUserInviteEmail
+export type AccountInvitation = PrismaAccountInvitation & {invitedBy: User, account: Account}
+
+export interface CreateAccountInvitationInput {
+  inviteeEmail: string
+  invitedByUserId: string
+  accountId: string
+  expiryDate: Date
+  token: string
+}
+
+export type UpdateAccountInvitationInput = Pick<
+  AccountInvitation,
+  'token' | 'expiryDate'
+>
+
+export type AccountInvitationFilter = Partial<
+  Pick<
+    AccountInvitation,
+    'accountId' | 'inviteeEmail' | 'invitedById' | 'token'
+  >
+>

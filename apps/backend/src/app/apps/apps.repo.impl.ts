@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import {
   App,
+  AppData,
   AppsRepo,
   NewAppDetails,
   UpdateAppInput,
@@ -169,7 +170,7 @@ export class AppsRepoImpl implements AppsRepo {
     )
   }
 
-  async updateAppData(id: string, data: { [key: string]: any }): Promise<App> {
+  async updateAppData(id: string, data: AppData): Promise<App> {
     return appFromPrisma(
       this.prisma.update({
         where: {

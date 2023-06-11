@@ -6,13 +6,16 @@ import { event, EventBus, ListenerFn } from '@razzle/services'
 export class EventBusImpl implements EventBus {
   constructor(private readonly emitter: EventEmitter2) {}
 
-  emit(event: string | symbol | event[], ...values: any[]): boolean {
+  emit(
+    event: string | symbol | event[],
+    ...values: Record<string, unknown>[]
+  ): boolean {
     return this.emitter.emit(event, ...values)
   }
   emitAsync(
     event: string | symbol | event[],
-    ...values: any[]
-  ): Promise<any[]> {
+    ...values: Record<string, unknown>[]
+  ): Promise<Record<string, unknown>[]> {
     return this.emitter.emitAsync(event, ...values)
   }
 

@@ -4,32 +4,32 @@ import {
   Page,
   PageParams,
 } from '@razzle/dto'
-import { AccountUserInviteTokenRepo } from './account-user-invite-token-repo'
 import { AccountRepo } from './account.repo'
-import { DuplicateMatchDomainException } from './exceptions'
-import { AccountUserInviteTokenGenerator } from './account-invite-token-generator'
-import { EmailDispatchGateway } from '../tools/email/email-dispatch-gateway.service'
-import { User, UserService } from '../user'
+import { User } from '../user'
 import { App, AppsService } from '../apps'
 import { ACCOUNT_CREATED_EVENT, EventBus } from '../tools'
 import {
   Account,
+  AccountInvitation,
   AccountUser,
   AccountWithOwner,
   AccountWithUser,
 } from './types'
 import { IllegalArgumentException } from '../exceptions/illegal-argument.exception'
 import { NotFoundException } from '@nestjs/common'
-
+import { AccountInvitationRepo } from './account-invitation.repo'
+import { v4 as uuidv4 } from 'uuid'
+import { DateTime } from 'luxon'
+import { Emailer } from '../tools/email/emailer'
+import Mailgen from 'mailgen'
+import { DuplicateResourceException } from '../exceptions'
 export class AccountService {
   constructor(
-    protected readonly accountRepo: AccountRepo,
-    protected readonly accountUserInviteTokenRepo: AccountUserInviteTokenRepo,
-    protected readonly userService: UserService,
-    protected readonly accountUserInviteTokenGenerator: AccountUserInviteTokenGenerator,
-    protected readonly emailDispatchGateway: EmailDispatchGateway,
-    protected readonly appsService: AppsService,
-    protected readonly eventBus: EventBus
+    private readonly accountRepo: AccountRepo,
+    private readonly accountInvitationRepo: AccountInvitationRepo,
+    private readonly emailer: Emailer,
+    private readonly appsService: AppsService,
+    private readonly eventBus: EventBus
   ) {}
 
   async createAccount(
@@ -45,7 +45,7 @@ export class AccountService {
           createAccountDto.matchDomain
         )
       if (accountWithMatchDomain) {
-        throw new DuplicateMatchDomainException(
+        throw new DuplicateResourceException(
           'An account already exists with this domain.'
         )
       }
@@ -100,6 +100,64 @@ export class AccountService {
   async getMemberCountForAccount(accountId: string): Promise<number> {
     const memberCount = await this.accountRepo.countUsersInAccount(accountId)
     return memberCount
+  }
+
+  async inviteMember(
+    accountId: string,
+    invitorId: string,
+    inviteeEmail: string
+  ): Promise<AccountInvitation> {
+    const invitationToken = uuidv4()
+    const expiryDate = DateTime.now().plus({ days: 7 }).toJSDate()
+    const invitation = await this.accountInvitationRepo.createAccountInvitation(
+      {
+        accountId,
+        expiryDate,
+        invitedByUserId: invitorId,
+        inviteeEmail,
+        token: invitationToken,
+      }
+    )
+
+    const emailBody = await this.generateInvitationEmailBody(invitation)
+    const subject = `You have been invited to join the ${invitation.account.name} account on Razzle`
+    const sent = await this.emailer.sendEmail(inviteeEmail, subject, emailBody)
+    if (!sent) {
+      // TODO: log this and handle it
+    }
+    return invitation
+  }
+
+  private async generateInvitationEmailBody(
+    invitation: AccountInvitation
+  ): Promise<string> {
+    const mailGen = new Mailgen({
+      theme: 'default',
+      product: {
+        name: 'Razzle',
+        link: 'https://getrazzle.com',
+        logo: 'https://uploads-ssl.webflow.com/639100b6167ec2e23dd14776/63910d398c56e239eb5f3113_Razzle%20Black%403x.png',
+      },
+    })
+    const email: Mailgen.Content = {
+      body: {
+        title: 'You have been invited to join a Razzle account',
+        intro: [
+          `You have been invited to join the ${invitation.account.name} account on Razzle.`,
+          invitation.invitedBy
+            ? `You were invited by ${invitation.invitedBy.username}`
+            : '',
+        ],
+        action: {
+          instructions: `Click the link below to accept the invitation.`,
+          button: {
+            text: 'Accept Invitation',
+            link: `https://app.getrazzle.com/accept-invitation/${invitation.token}`,
+          },
+        },
+      },
+    }
+    return mailGen.generate(email)
   }
 
   async addUserToAccount(userId: string, accountId: string) {

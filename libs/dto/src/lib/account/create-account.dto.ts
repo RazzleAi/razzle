@@ -30,7 +30,7 @@ export type AccountAppDto = {
 export type CreateAccountResponseDto = {
   id: string
   name: string
-  matchDomain?: string
+  matchDomain: string | null
   enableDomainMatching: boolean
   accountApps: AccountAppDto[]
 }

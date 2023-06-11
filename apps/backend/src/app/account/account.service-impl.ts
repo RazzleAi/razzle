@@ -1,74 +1,29 @@
 import { Injectable } from '@nestjs/common'
 import {
   AccountService,
-  AccountUser,
-  AccountUserInviteEmail,
 } from '@razzle/services'
 import { AppsServiceImpl } from '../apps/apps.service-impl'
 import { EventBusImpl } from '../tools/event/event-bus-impl'
-import { UserServiceImpl } from '../user/user.service.impl'
-import { AccountInviteEmailGeneratorImpl } from './account-invite-email-generator'
-import { AccountUserInviteEmailRepoImpl } from './account-user-invite-email-repo-impl'
-import { AccountUserInviteTokenGeneratorImpl } from './account-user-invite-token-generator-impl'
-import { AccountUserInviteTokenRepoImpl } from './account-user-invite-token-repo-impl'
 import { AccountRepoImpl } from './account.repo-impl'
-import { v4 as uuidv4 } from 'uuid'
-import { EmailDispatchGatewayImpl } from '../email/email-dispatch-gateway-impl.service'
+import { AccountInvitationRepoImpl } from './account-invitation.repo.impl'
+import { EmailerImpl } from '../tools/email/emailer.impl'
 
 @Injectable()
 export class AccountServiceImpl extends AccountService {
   constructor(
-    accountRepoImpl: AccountRepoImpl,
-    accountUserInviteTokenRepoImpl: AccountUserInviteTokenRepoImpl,
-    private readonly accountUserInviteEmailRepoImpl: AccountUserInviteEmailRepoImpl,
-    accountUserInviteTokenGeneratorImpl: AccountUserInviteTokenGeneratorImpl,
-    emailDispatchGatewayImpl: EmailDispatchGatewayImpl,
-    userServiceImpl: UserServiceImpl,
+    accountRepo: AccountRepoImpl,
+    accountInvitationRepo: AccountInvitationRepoImpl,
+    emailer: EmailerImpl,
     appsServiceImpl: AppsServiceImpl,
     eventBus: EventBusImpl
   ) {
     super(
-      accountRepoImpl,
-      accountUserInviteTokenRepoImpl,
-      userServiceImpl,
-      accountUserInviteTokenGeneratorImpl,
-      emailDispatchGatewayImpl,
+      accountRepo,
+      accountInvitationRepo,
+      emailer,
       appsServiceImpl,
       eventBus
     )
   }
 
-  public async inviteUserToAccount(
-    accountOwner: AccountUser,
-    emailInvitee: string
-  ) {
-    let token =
-      await this.accountUserInviteTokenRepo.findValidTokenByAccountIdAndEmail(
-        accountOwner.accountId,
-        emailInvitee
-      )
-    token =
-      token ||
-      (await this.accountUserInviteTokenRepo.createToken(
-        this.accountUserInviteTokenGenerator.generateInviteToken(
-          accountOwner,
-          emailInvitee
-        )
-      ))
-
-    const emailReference = `${uuidv4()}-${new Date().getTime()}-${uuidv4()}`
-    await this.accountUserInviteEmailRepoImpl.create({
-      emailReference,
-      accountUserInviteTokenId: token.id,
-    } as AccountUserInviteEmail)
-
-    this.emailDispatchGateway.dispatchEmail(
-      new Map([
-        ['to', emailInvitee],
-        ['type', AccountInviteEmailGeneratorImpl.TYPE],
-        ['token', token.token],
-        ['reference', emailReference],
-      ])
-    )
-  }
 }

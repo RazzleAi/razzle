@@ -10,7 +10,7 @@ export class MixpanelEventTracker implements AnalyticsEventTracker {
     this.mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN)
   }
 
-  trackEvent(event: string, properties?: any): void {
+  trackEvent(event: string, properties?: Record<string, unknown>): void {
     this.mixpanel.track(event, { ...properties, nodeEnv: process.env.NODE_ENV })
   }
 

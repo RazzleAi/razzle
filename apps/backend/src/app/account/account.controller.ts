@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Logger,
   NotFoundException,
@@ -25,13 +24,14 @@ import {
 } from '@razzle/dto'
 import {
   AccountWithUser,
-  DuplicateMatchDomainException,
+  DuplicateResourceException,
   User,
 } from '@razzle/services'
 import { Principal, PrincipalKey } from '../auth/decorators'
 import { ExceptionResponse, UseExceptionResponseHandler } from '../decorators'
 import { OnboardingServiceImpl } from '../onboarding'
 import { AccountServiceImpl } from './account.service-impl'
+import { AccountInvitation } from '@prisma/client'
 
 @UseExceptionResponseHandler()
 @Controller('account')
@@ -45,7 +45,7 @@ export class AccountController {
   @Post()
   @HttpCode(201)
   @ExceptionResponse({
-    types: [DuplicateMatchDomainException],
+    types: [DuplicateResourceException],
     statusCode: HttpStatus.CONFLICT,
     message: 'An account with this domain already exists',
   })
@@ -101,21 +101,14 @@ export class AccountController {
     @Param('accountId') accountId: string,
     @Param('userId') userId: string,
     @Query('email') email: string
-  ): Promise<void> {
-    const accountUser = await this.accountService.findAccountUser(
-      accountId,
-      userId
-    )
-    if (!accountUser) {
-      throw new HttpException(
-        `Account User not found, Account ID: ` +
-          accountId +
-          `, User ID: ` +
-          userId,
-        HttpStatus.NOT_FOUND
+  ): Promise<AccountInvitation> {
+    const account = await this.accountService.getById(accountId)
+    if (!account) {
+      throw new NotFoundException(
+        `Account not found, Account ID: ` + accountId
       )
-    }
-    return this.accountService.inviteUserToAccount(accountUser, email)
+    }    
+    return this.accountService.inviteMember(accountId, userId, email)
   }
 
   @Get(':id/users')

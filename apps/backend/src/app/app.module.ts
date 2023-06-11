@@ -16,7 +16,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 import { CoreModule } from './core/core.module'
 import { ToolsModule } from './tools/tools.module'
 import { RequestLogger } from './request-logger.middleware'
-import { EmailModule } from './email/email.module'
 
 @Module({
   imports: [
@@ -27,7 +26,6 @@ import { EmailModule } from './email/email.module'
       delimiter: '.',
     }),    
     ToolsModule,
-    EmailModule,
     ConstantsModule,
     PrismaModule,
     AuthModule,

@@ -29,7 +29,7 @@ export interface AuthPrincipal {
   sub: string
   uid: string
   // Other arbitrary claims
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface AuthRepo {

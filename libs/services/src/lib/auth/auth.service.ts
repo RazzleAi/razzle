@@ -3,17 +3,18 @@ import {
   ThirdPartyAuthDto,
   ThirdPartyAuthResponseDto,
 } from '@razzle/dto'
-import { AccountService, AccountUserInviteTokenRepo } from '../account'
+import { AccountInvitationRepo, AccountService } from '../account'
 import { UserService } from '../user'
 import { AuthPrincipal, AuthRepo } from './auth.repo'
 import { faker } from '@faker-js/faker'
+import { DateTime } from 'luxon'
 
 export class AuthService {
   constructor(
     private authRepo: AuthRepo,
     private userService: UserService,
     private accountService: AccountService,
-    private accountUserInviteTokenRepo: AccountUserInviteTokenRepo
+    private accountInviteRepo: AccountInvitationRepo
   ) {}
 
   async thirdPartyAuth(
@@ -104,20 +105,23 @@ export class AuthService {
   }
 
   private async acceptAccountInvite(dto: ThirdPartyAuthAccountInviteDto) {
-    const accountInvite = await this.accountUserInviteTokenRepo.findByToken(
-      dto.token
-    )
-    if (!accountInvite) {
+    const invitations = await this.accountInviteRepo.findAccountInvitation({
+      token: dto.token,
+    })
+    if (invitations.length === 0) {
       throw new Error(`Token ${dto.token} not found`)
     }
 
-    if (!accountInvite.valid) {
-      throw new Error(`Token ${dto.token} is invalid`)
+    const invitation = invitations[0]
+    const now = DateTime.now()
+    const expiry = DateTime.fromJSDate(invitation.expiryDate)
+    if (now > expiry) {
+      throw new Error(`Token ${dto.token} has expired`)
     }
 
-    const account = await this.accountService.getById(accountInvite.accountId)
+    const account = await this.accountService.getById(invitation.accountId)
     if (!account) {
-      throw new Error(`Account ${accountInvite.accountId} not found`)
+      throw new Error(`Account ${invitation.accountId} not found`)
     }
 
     const user = await this.createOrUpdateThirdPartyUser({
@@ -128,7 +132,7 @@ export class AuthService {
     })
     this.accountService.addUserToAccount(user.userId, account.id)
 
-    await this.accountUserInviteTokenRepo.invalidateToken(dto.token)
+    await this.accountInviteRepo.deleteAccountInvitation(invitation.id)
     return user
   }
 
