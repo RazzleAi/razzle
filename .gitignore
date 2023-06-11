@@ -45,3 +45,11 @@ apps/backend/mongo
 # Environment variables
 .env
 .env.*
+
+
+./libs/java-sdk/*.iml
+./libs/java-sdk/.idea
+./libs/java-sdk/target
+
+
+
