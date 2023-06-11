@@ -15,7 +15,7 @@ export class EmailerImpl implements Emailer {
     message: string
   ): Promise<boolean> {
     const resp = await this.postmarkClient.sendEmail({
-      From: 'no-reply@razzle.ai',
+      From: process.env.DEFAULT_EMAIL_SENDER,
       To: recipient,
       Subject: subject,
       HtmlBody: message,
