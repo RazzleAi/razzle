@@ -6,6 +6,7 @@ import {
   MongoDBContainer,
 } from 'testcontainers'
 import { PrismaService } from '../../app/prisma/prisma.service'
+import { MigrationService } from '../../app/prisma/migration'
 
 export class TestEnvironment {  
   mongoContainer: StartedMongoDBContainer
@@ -22,7 +23,8 @@ export class TestEnvironment {
   }
 
   getMongoClient(): PrismaService {
-    return new PrismaService(this.configService)
+    const migrationService = new MigrationService()
+    return new PrismaService(this.configService, migrationService)
   }
 
   async shutdownTestContainers(): Promise<void> {

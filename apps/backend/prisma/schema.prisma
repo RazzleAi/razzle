@@ -21,8 +21,9 @@ model User {
   profilePictureUrl     String?
   AccountUser           AccountUser[]
   UserAppAuthentication UserAppAuthentication[]
-  Chat                  Chat[]
   AccountInvitation     AccountInvitation[]
+  WorkspaceUser         WorkspaceUser[]
+  Chat                  Chat[]
 }
 
 model Account {
@@ -37,6 +38,7 @@ model Account {
   Chat                 Chat[]
   accountApps          AccountApp[]
   AccountInvitation    AccountInvitation[]
+  Workspace            Workspace[]
 }
 
 type AccountApp {
@@ -74,12 +76,14 @@ model App {
   deleted               Boolean                 @default(false)
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
+  workspaceApps         WorkspaceApp[]
   UserAppAuthentication UserAppAuthentication[]
 }
 
 model ClientHistoryItem {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   clientId        String
+  workspaceId     String
   hash            String
   isFramed        Boolean? @default(false)
   message         Json
@@ -108,30 +112,6 @@ model AccountInvitation {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
-
-// model AccountUserInviteToken {
-//   id                     String                   @id @default(auto()) @map("_id") @db.ObjectId
-//   createdAt              DateTime                 @default(now())
-//   updatedAt              DateTime                 @updatedAt
-//   account                Account                  @relation(fields: [accountId], references: [id])
-//   accountId              String                   @db.ObjectId
-//   user                   User                     @relation(fields: [userId], references: [id])
-//   userId                 String                   @db.ObjectId
-//   token                  String                   @unique
-//   emailInvitee           String
-//   expiresOn              DateTime
-//   valid                  Boolean                  @default(false)
-//   accountUserInviteEmail AccountUserInviteEmail[]
-// }
-
-// model AccountUserInviteEmail {
-//   id                       String                 @id @default(auto()) @map("_id") @db.ObjectId
-//   createdAt                DateTime               @default(now())
-//   updatedAt                DateTime               @updatedAt
-//   accountUserInviteToken   AccountUserInviteToken @relation(fields: [accountUserInviteTokenId], references: [id])
-//   accountUserInviteTokenId String                 @db.ObjectId
-//   emailReference           String
-// }
 
 model Email {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
@@ -204,4 +184,48 @@ model Chat {
   userId    String        @db.ObjectId
   user      User          @relation(fields: [userId], references: [id])
   clientId  String
+}
+
+model Workspace {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String?
+  deleted       Boolean         @default(false)
+  isDefault     Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  workspaceApps WorkspaceApp[]
+  accountId     String          @db.ObjectId
+  account       Account         @relation(fields: [accountId], references: [id])
+  workspaceUser WorkspaceUser[]
+}
+
+model WorkspaceApp {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String    @db.ObjectId
+  app         App       @relation(fields: [appId], references: [id])
+  appId       String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, appId])
+}
+
+model WorkspaceUser {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id])
+  workspaceId String              @db.ObjectId
+  user        User                @relation(fields: [userId], references: [id])
+  userId      String              @db.ObjectId
+  role        WorkspaceUserRole[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([workspaceId, userId])
+}
+
+enum WorkspaceUserRole {
+  ADMIN
+  MEMBER
 }

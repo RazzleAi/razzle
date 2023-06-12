@@ -1,10 +1,11 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
+import { MigrationService } from './migration';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  constructor(config: ConfigService) {
+  constructor(config: ConfigService, private migrationService: MigrationService) {
     super({
       datasources: {
         db: {
@@ -16,6 +17,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async onModuleInit() {
     await this.$connect();
+    this.migrationService.migrate(this);
   }
 
   async enableShutdownHooks(app: INestApplication) {
