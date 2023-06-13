@@ -147,13 +147,12 @@ export class WsServer {
     })
   }
 
-  identify(accessToken: string, workspaceId: string, accountId: string) {
+  identify(accessToken: string, accountId: string) {
     console.debug('Server: Sending Identify message')
     const message: ClientToServerMessage<ClientRequest> = {
       event: 'Identify',
       data: {
         accountId,
-        workspaceId,
         payload: {},
       },
     }

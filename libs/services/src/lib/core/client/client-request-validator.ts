@@ -1,5 +1,5 @@
-import { User } from '@prisma/client'
 import { ClientRequest, ClientToServerMessage } from '@razzle/dto'
+import { User } from '../../user'
 
 export interface ClientRequestValidator {
   validateRequest(

@@ -1,13 +1,13 @@
 import { OnboardingDto, UpdateOnboardingDto } from '@razzle/dto'
+import { OnboardingRepo } from './onboarding.repo'
 import {
-  AccountCreatedEventPayload,
   ACCOUNT_CREATED_EVENT,
+  AccountCreatedEventPayload,
   AppCreatedEventPayload,
   EventBus,
   FIRST_APP_CREATED_EVENT,
   FIRST_APP_SYNCED_EVENT,
-} from '../event'
-import { OnboardingRepo } from './onboarding.repo'
+} from '../tools'
 
 export class OnboardingService {
   constructor(

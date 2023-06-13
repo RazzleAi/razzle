@@ -1,5 +1,5 @@
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment, ReactNode } from 'react'
+import { Fragment } from 'react'
 import { useFirebaseServices } from '../firebase'
 import logo_black from '../../assets/images/razzle_logo_black.svg'
 import { useAppStore } from '../stores/app-store'
@@ -15,12 +15,11 @@ export function TopBar() {
   const { auth } = useFirebaseServices()
   const { signout } = useAppStore()
   const { trackEvent } = useEventTracker()
-  const { clearAccount, clearCurrentWorkspace } = useAppStore()
+  const { clearAccount } = useAppStore()
 
   function signoutClicked() {
     trackEvent(LOGOUT_CLICKED)
     clearAccount()
-    clearCurrentWorkspace()
     auth.signOut()
     signout()
   }
@@ -107,9 +106,9 @@ export function RightPopup() {
   const { auth, currentUser } = useFirebaseServices()
   const { signout, me } = useAppStore()
   const { trackEvent } = useEventTracker()
-  const { currentWorkspace, account } = useAppStore()
-  const { clearAccount, clearCurrentWorkspace } = useAppStore()
-  console.debug('account', account)
+  const { account } = useAppStore()
+  const { clearAccount } = useAppStore()
+
   function signoutClicked() {
     trackEvent(LOGOUT_CLICKED)
     auth.signOut()
@@ -163,8 +162,7 @@ export function RightPopup() {
                 onClick={(e) => {
                   e.preventDefault()
 
-                  clearAccount()
-                  clearCurrentWorkspace()
+                  clearAccount()                  
                   navigate('/accounts')
                 }}
               >
@@ -205,41 +203,6 @@ export function RightPopup() {
         </Menu.Items>
       </Transition>
     </Menu>
-  )
-}
-
-function abbreviateName(name: string) {
-  const names = name.split(' ')
-  if (names.length > 1) {
-    return `${names[0][0]}${names[1][0]}`
-  }
-  return names[0][0]
-}
-
-function IconButton({
-  children,
-  active,
-  onClick,
-}: {
-  children: ReactNode
-  active?: boolean
-  onClick?: () => void
-}) {
-  return (
-    <div
-      onClick={onClick}
-      className={`flex flex-row justify-center items-center w-[50px] h-[50px] rounded-[50%] ${
-        active ? 'bg-[#ABABAB]' : 'bg-[#E8EBED]'
-      } cursor-pointer shadow-sm transition-all ease-in hover:bg-[#ABABAB]`}
-    >
-      <div
-        className={`flex flex-row justify-center items-center w-[45px] h-[45px] rounded-[50%] ${
-          active ? 'bg-[#E8EBED]' : 'bg-white'
-        } cursor-pointer shadow-sm transition-all ease-in hover:bg-[#E8EBED]`}
-      >
-        {children}
-      </div>
-    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { UserAppAuthentication } from '@prisma/client'
+import { UserAppAuthentication } from './types'
 
 export interface UserAppAuthenticationRepo {
   findByUserIdAndAppId(

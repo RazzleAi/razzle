@@ -14,10 +14,8 @@ export function WorkspacePage() {
   const {
     account,
     me,
-    currentWorkspace,
     setMe,
     setAccount,
-    setCurrentWorkspace,
   } = useAppStore()
 
   const {
@@ -46,24 +44,22 @@ export function WorkspacePage() {
 
     setMe(appCtxData.me || me)
     setAccount(appCtxData.account || account)    
-    setCurrentWorkspace(appCtxData.workspace)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appCtxData])
 
   useEffect(() => {
-    if (!currentUser || !currentWorkspace || !account) return
+    if (!currentUser || !account) return
     currentUser.getIdToken().then((accessToken) => {
       console.debug(
         'Identifying user with WS server',
         accessToken,
         currentUser.uid,
-        currentWorkspace?.id,
         account?.id
       )
-      identify(accessToken, currentWorkspace?.id, account?.id)
+      identify(accessToken, account?.id)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentWorkspace, account, isConnected])
+  }, [account, isConnected])
 
   useEffect(() => {
     const connHandle = setOnConnected(() => {

@@ -2,11 +2,9 @@ import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import { AppsModule } from '../app/apps/apps.module'
 import { PrismaModule } from '../app/prisma/prisma.module'
-import { RedisModule } from '../app/redis/redis.module'
 import { UserModule } from '../app/user/user.module'
 import { AuthModule } from '../app/auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
-import { WorkspaceModule } from '../app/workspace/workspace.module'
 import { MlModule } from '../app/ml/ml.module'
 import { AccountModule } from '../app/account/account.module'
 import configuration from '../app/config/configuration'
@@ -19,12 +17,10 @@ export async function initNestApp(): Promise<INestApplication> {
   const module = await Test.createTestingModule({
     imports: [
       ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),      
-      RedisModule,
       PrismaModule,
       AuthModule,
       UserModule,
       AppsModule,
-      WorkspaceModule,
       MlModule,
       AccountModule,
     ],

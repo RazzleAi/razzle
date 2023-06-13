@@ -6,42 +6,28 @@ import {
   MongoDBContainer,
 } from 'testcontainers'
 import { PrismaService } from '../../app/prisma/prisma.service'
-import { RedisClient } from '../../app/redis/redis-client'
+import { MigrationService } from '../../app/prisma/migration'
 
-export class TestEnvironment {
-  redisContainer: StartedTestContainer
+export class TestEnvironment {  
   mongoContainer: StartedMongoDBContainer
   configService: ConfigService
 
-  async startTestContainers(): Promise<void> {
-    this.redisContainer = await new GenericContainer('redis')
-      .withExposedPorts(6379)
-      .start()
-
+  async startTestContainers(): Promise<void> {    
     this.mongoContainer = await new MongoDBContainer()
       .withExposedPorts(27017)
       .start()
 
     this.configService = new ConfigService({
-      DATABASE_URL: this.mongoContainer.getConnectionString(),
-      redis: {
-        port: this.redisContainer.getMappedPort(6379),
-        host: this.redisContainer.getHost(),
-        // password: process.env.REDIS_PASSWORD,
-      },
+      DATABASE_URL: this.mongoContainer.getConnectionString(),      
     })
   }
 
-  getRedisClient(): RedisClient {
-    return new RedisClient(this.configService)
-  }
-
   getMongoClient(): PrismaService {
-    return new PrismaService(this.configService)
+    const migrationService = new MigrationService()
+    return new PrismaService(this.configService, migrationService)
   }
 
   async shutdownTestContainers(): Promise<void> {
-    await this.redisContainer.stop()
     await this.mongoContainer.stop()
   }
 }

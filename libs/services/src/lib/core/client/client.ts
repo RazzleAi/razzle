@@ -2,20 +2,13 @@ import { Md5 } from 'ts-md5'
 import { WebSocket, MessageEvent, CloseEvent, ErrorEvent } from 'ws'
 import { ClientLifecycle } from './client-lifecycle'
 import {
-  ClientHistoryItemDto,
   ClientRequest,
-  ClientResponse,
   ClientToEngineRequest,
   ClientToServerMessage,
-  ServerMessage,
-  ServerMessageV2,
   ServerToClientMessage,
 } from '@razzle/dto'
 import { ClientRequestValidator } from './client-request-validator'
 import { User } from '../../user'
-import { DateTime } from 'luxon'
-import { ClientHistoryStore } from './client-history-store'
-import { RazzleResponseWithActionArgs } from '@razzledotai/sdk'
 import { ClientToEngineMessenger } from '../messaging'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
 import { ChatService } from '../enginev2/chat/chat.service'
@@ -25,14 +18,12 @@ export class Client {
   id: string
   userId?: string
   accountId?: string
-  workspaceId?: string
   isIdentified = false
   currentChat: Chat | undefined
 
   constructor(
     private readonly ws: WebSocket,
     private readonly requestValidator: ClientRequestValidator,
-    private readonly historyStore: ClientHistoryStore,
     private readonly clientToEngineMessenger: ClientToEngineMessenger,
     private readonly chatService: ChatService,
     private readonly lifecycleHandler?: ClientLifecycle
@@ -82,13 +73,6 @@ export class Client {
       .end() as string
   }
 
-  private listenForResponses() {
-    this.clientToEngineMessenger.onResponseReceivedFromEngine(
-      this.id,
-      this.onResponseReceivedFromEngine.bind(this)
-    )
-  }
-
   private async handleMessageTypes(
     message: ClientToServerMessage<any>,
     user: User
@@ -96,8 +80,8 @@ export class Client {
     switch (message.event) {
       case 'Identify': {
         if (!message.data) break
-        const { accountId, workspaceId } = message.data
-        await this.handleIdentify(accountId, workspaceId, user)
+        const { accountId } = message.data
+        await this.handleIdentify(accountId, user)
         break
       }
       case 'Message': {
@@ -109,7 +93,7 @@ export class Client {
         break
       }
       case 'CreateNewChat':
-        if (!this.accountId || !this.userId || !this.workspaceId) {
+        if (!this.accountId || !this.userId) {
           console.error(
             'Client: Cannot create new chat, client is not identified'
           )
@@ -119,7 +103,6 @@ export class Client {
         this.chatService.createNewChat(
           this.accountId,
           this.userId,
-          this.workspaceId,
           this.id,
           message.data
         )
@@ -154,23 +137,12 @@ export class Client {
     this.currentChat = chat
   }
 
-  private async handleIdentify(
-    accountId: string,
-    workspaceId: string,
-    user: User
-  ) {
+  private async handleIdentify(accountId: string, user: User) {
     const oldId = this.id
 
-    if (
-      this.accountId !== accountId ||
-      this.userId !== user.id ||
-      this.workspaceId !== workspaceId
-    ) {
-      this.id = new Md5()
-        .appendStr(user.id + workspaceId + accountId)
-        .end() as string
+    if (this.accountId !== accountId || this.userId !== user.id) {
+      this.id = new Md5().appendStr(user.id + accountId).end() as string
       this.accountId = accountId
-      this.workspaceId = workspaceId
       this.userId = user.id
 
       console.debug(`Client: Identified client ${oldId} as ${this.id}`)
@@ -187,7 +159,6 @@ export class Client {
       const createdChat = await this.chatService.createNewChat(
         this.accountId,
         this.userId,
-        this.workspaceId,
         this.id,
         'ChatGpt-3.5'
       )
@@ -203,7 +174,6 @@ export class Client {
     }
 
     this.sendHistory()
-    this.listenForResponses()
   }
 
   private async handleMessage(req: ClientRequest) {
@@ -212,7 +182,7 @@ export class Client {
       request.headers = {}
     }
 
-    if (!this.id || !this.accountId || !this.workspaceId || !this.userId) {
+    if (!this.id || !this.accountId || !this.userId) {
       console.error(
         `Client: Cannot send message to engine. Client is not identified. Client: ${this.id}`
       )
@@ -220,7 +190,6 @@ export class Client {
     }
 
     request.accountId = this.accountId
-    request.workspaceId = this.workspaceId
     request.userId = this.userId
     request.clientId = this.id
 
@@ -272,48 +241,6 @@ export class Client {
     this.maybeNotifyFirstActionTriggered()
   }
 
-  async onResponseReceivedFromEngine(response: ClientResponse) {
-    const historyItem: ClientHistoryItemDto = {
-      hash: new Md5().appendStr(JSON.stringify(response)).end() as string,
-      isFramed: !!response.payload.pagination?.frameId,
-      message: {
-        __objType__: 'ServerMessageV2',
-        type: 'NewMessage',
-        frameId: response.payload.pagination?.frameId,
-        data: response,
-      } as ServerMessageV2,
-      timestampMillis: DateTime.now().toUnixInteger() * 1000,
-    }
-    // if not framed, add to history and send
-    if (!historyItem.isFramed) {
-      await this.addToHistory(historyItem)
-      this.sendHistory()
-    } else if (
-      historyItem.isFramed &&
-      response.payload.pagination &&
-      response.payload.pagination?.frameId &&
-      this.workspaceId
-    ) {
-      // if framed, do not simply add to history, check history for message with same frame id and replace it
-      const frameId = response.payload.pagination.frameId
-      const existingItem =
-        await this.getFramedServerMessageHistoryItemWithFrameId(frameId)
-      if (existingItem) {
-        // preserve timestamp
-        historyItem.timestampMillis = existingItem.timestampMillis
-        await this.historyStore.replaceHistoryItem(
-          this.id,
-          this.workspaceId,
-          existingItem,
-          historyItem
-        )
-      } else {
-        await this.addToHistory(historyItem)
-      }
-      this.sendHistory()
-    }
-  }
-
   async sendHistory() {
     if (!this.currentChat?.chatId) return
 
@@ -323,52 +250,6 @@ export class Client {
     }
 
     this.ws.send(JSON.stringify(historyResponse))
-  }
-
-  async addToHistory(historyItem: ClientHistoryItemDto) {
-    if (!this.isIdentified || !this.workspaceId) return
-    await this.historyStore.addToHistoryForClient(
-      this.id,
-      this.workspaceId,
-      historyItem
-    )
-  }
-
-  getHistory(tail: number): Promise<ClientHistoryItemDto[]> {
-    if (!this.isIdentified || !this.workspaceId) return Promise.resolve([])
-    return this.historyStore.getHistoryForClient(
-      this.id,
-      this.workspaceId,
-      tail
-    )
-  }
-
-  private async getFramedServerMessageHistoryItemWithFrameId(
-    frameId: string
-  ): Promise<ClientHistoryItemDto | undefined> {
-    if (!this.isIdentified || !this.workspaceId) return undefined
-    const allFramedItems =
-      await this.historyStore.getFramedHistoryItemsForClient(
-        this.id,
-        this.workspaceId
-      )
-    const matchingItem = allFramedItems.find((item: ClientHistoryItemDto) => {
-      const message = item.message
-      if (message.__objType__ === 'ClientMessage') return false
-      let response: RazzleResponseWithActionArgs | undefined
-      if (message.__objType__ === 'ServerMessage') {
-        const serverMessage = message as ServerMessage
-        response = serverMessage.data.message as RazzleResponseWithActionArgs
-      } else if (message.__objType__ === 'ServerMessageV2') {
-        const serverMessage = message as ServerMessageV2
-        response = serverMessage.data.payload as RazzleResponseWithActionArgs
-      }
-
-      if (!response || !response.pagination) return false
-      return response.pagination.frameId === frameId
-    })
-
-    return matchingItem
   }
 
   private async maybeNotifyFirstActionTriggered() {

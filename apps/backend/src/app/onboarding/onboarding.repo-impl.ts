@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Onboarding } from '@prisma/client'
-import { OnboardingRepo } from '@razzle/services'
+import { OnboardingRepo, Onboarding } from '@razzle/services'
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()

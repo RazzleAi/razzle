@@ -10,7 +10,7 @@ export enum PrincipalKey {
 }
 
 export const Principal = createParamDecorator(
-  (data: any, ctx: ExecutionContext): AuthPrincipal | string | User => {
+  (data: unknown, ctx: ExecutionContext): AuthPrincipal | string | User => {
     const request = ctx.switchToHttp().getRequest() as AuthenticatedRequest
     if (data && typeof data === 'string') {
       return getDataFromDecodedToken(data, request)
