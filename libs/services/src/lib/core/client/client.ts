@@ -117,14 +117,16 @@ export class Client {
           break
         }
 
-        this.chatService.createNewChat(
+        console.log('CreateNewChat')
+
+        this.currentChat = await this.chatService.createNewChat(
           this.accountId,
           this.userId,
           this.workspaceId,
           this.id,
           message.data
         )
-
+        this.sendHistory()
         break
 
       case 'NewChatSelected':

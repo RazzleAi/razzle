@@ -118,9 +118,9 @@ export function RightPopup() {
     sendMessage(accessToken, {
       event: 'CreateNewChat',
       data: {
-        headers: {
-          'content-type': 'application/json',
-        },
+        accountId: account.id,
+        workspaceId: currentWorkspace.id,
+        payload: {},
       },
     })
   }
