@@ -45,3 +45,6 @@ apps/backend/mongo
 # Environment variables
 .env
 .env.*
+
+# Next.js
+.next
