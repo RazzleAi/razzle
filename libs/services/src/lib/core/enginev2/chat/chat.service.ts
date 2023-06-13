@@ -1,12 +1,7 @@
 import { AvailableChatLlms } from '@razzle/dto'
 import { AccountService } from '../../../account'
 import Chat from './chat'
-import {
-  ChatHistory,
-  ChatHistoryRole,
-  Chat as ChatModel,
-  Prisma,
-} from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { PromptResolverService } from '../../../ml'
 import { Sequencer } from '../../engine/sequencer'
 import { IAgent, NlpProxyAgent } from '../agent'
@@ -17,6 +12,7 @@ import { ChatRepo } from './chat.repo'
 import { AppsService } from '../../../apps'
 import { ChatHistoryItem } from './chathistoryitem'
 import { RazzleResponse } from '@razzle/sdk'
+import { ChatHistory, ChatHistoryRole, Chat as ChatModel } from './types'
 
 export class ChatService {
   constructor(
@@ -34,7 +30,6 @@ export class ChatService {
   async createNewChat(
     accountId: string,
     userId: string,
-    workspaceId: string,
     clientId: string,
     llm: AvailableChatLlms
   ): Promise<Chat> {
@@ -42,17 +37,19 @@ export class ChatService {
 
     const allApps = await this.accountService.getAppsInAccount(accountId)
 
+    const loopLimit = process.env.CHAT_AGENT_LOOP_LIMIT
+
     const agents = allApps.map(
       (app) => new NlpProxyAgent(app, this.promptResolver, this.sequencer)
     )
 
     const chat = new Chat({
       accountId: accountId ?? '',
-      workspaceId: workspaceId ?? '',
       userId: userId ?? '',
       agents,
       clientId,
       llm: this.getLLm(llm, agents),
+      agentChatLoopLimit: loopLimit ? parseInt(loopLimit) : undefined,
     })
 
     await this.saveChat(chat)
@@ -83,7 +80,7 @@ export class ChatService {
   ): Promise<Chat> {
     const apps = await Promise.all(
       chat.agents.map(async (a) => {
-        const app = this.appService.getById(a)
+        const app = this.appService.findById(a)
         return app
       })
     )
@@ -101,7 +98,6 @@ export class ChatService {
 
     const desirializedChat = new Chat({
       accountId: chat.accountId,
-      workspaceId: 'N/A', // We need to get rid of this idea of workspaces
       userId: chat.userId,
       agents,
       clientId: chat.clientId,

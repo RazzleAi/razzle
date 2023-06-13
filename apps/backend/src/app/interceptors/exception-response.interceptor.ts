@@ -24,7 +24,7 @@ export class ExceptionResponseInterceptor<T>
 
   intercept(
     context: ExecutionContext,
-    next: CallHandler<any>
+    next: CallHandler
   ): Observable<Response<T>> | Promise<Observable<Response<T>>> {
     return next.handle().pipe(
       catchError((err) =>

@@ -19,15 +19,6 @@ COPY --from=build_stage /build/* ./
 
 ENV DATABASE_URL="mongodb://razzle:razzle@host.docker.internal:27017/razzle_database?authSource=admin&directConnection=true"
 
-# redis
-ENV REDIS_HOST='localhost'
-ENV REDIS_PORT=6379
-ENV REDIS_PASSWORD=razzle
-
-# secret key for generating the default app api key
-ENV DEFAULT_APP_KEY_SECRET=
-ENV DEFAULT_USER_EMAIL=default-user@razzle.com
-
 ENV OPENAI_KEY=
 
 ENV EMAIL_CRON="0 0/5 * 1/1 * *"

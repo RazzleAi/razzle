@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { PrimaryButton } from '../../components/buttons'
 import { Spinner } from '../../components/spinners'
 import { useFirebaseServices } from '../../firebase'
-import { useGetAccounts } from './queries'
+import { useGetAccounts } from '../queries'
 
 export function AccountListPage() {
   const { currentUser } = useFirebaseServices()

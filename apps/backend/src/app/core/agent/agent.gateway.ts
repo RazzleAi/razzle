@@ -2,13 +2,12 @@ import { OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets'
 import { Agent, AgentLifecycle } from '@razzle/services'
 import { WebSocket } from 'ws'
 import { IncomingMessage } from 'http'
-import { WsClosureCodes } from '../../websocket/ws-status-codes'
 import { AgentToEngineMessengerImpl } from '../messaging/agent-to-engine.impl'
 import { AgentSyncServiceImpl } from './agent-sync.impl'
 import { ConnectedAgentsImpl } from './connected-agents.impl'
 import { AgentHeaderValidatorImpl } from './header-validator.impl'
-import { AgentMessage, ServerToAgentMessage } from '@razzle/dto'
 
+const STATUS_PROTOCOL_ERROR = 1002
 @WebSocketGateway({ path: '/agent' })
 export class AgentGateway implements OnGatewayConnection, AgentLifecycle {
   constructor(
@@ -22,7 +21,7 @@ export class AgentGateway implements OnGatewayConnection, AgentLifecycle {
     const headers = args[0].headers
     if (!(await this.agentHeaderValidator.validateHeaders(headers))) {
       socket.close(
-        WsClosureCodes.STATUS_PROTOCOL_ERROR,
+        STATUS_PROTOCOL_ERROR,
         'Missing or invalid headers. Make sure the app_id and api_key headers are set correctly'
       )
       return

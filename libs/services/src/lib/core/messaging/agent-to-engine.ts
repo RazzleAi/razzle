@@ -1,5 +1,5 @@
 import { AgentMessage, ServerToAgentMessage } from '@razzle/dto'
-import { MessagePublisher, MessageSubscriber } from '../../pubsub'
+import { MessagePublisher, MessageSubscriber } from '../../tools/pubsub'
 import { ConnectedAgents } from '../agent'
 
 const ENGINE_TO_AGENT_TOPIC = 'engine-to-agent-messages'

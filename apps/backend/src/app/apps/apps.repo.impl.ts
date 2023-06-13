@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import {
   App,
+  AppData,
   AppsRepo,
   NewAppDetails,
   UpdateAppInput,
@@ -24,6 +25,17 @@ export class AppsRepoImpl implements AppsRepo {
         },
       })
     )
+  }
+
+  async findByIds(ids: string[]): Promise<App[]> {
+    const res = await this.prisma.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    })
+    return Promise.all(res.map(async (r) => await appFromPrisma(r)))
   }
 
   async findByAppId(props: { appId: string }): Promise<App | null> {
@@ -158,7 +170,7 @@ export class AppsRepoImpl implements AppsRepo {
     )
   }
 
-  async updateAppData(id: string, data: { [key: string]: any }): Promise<App> {
+  async updateAppData(id: string, data: AppData): Promise<App> {
     return appFromPrisma(
       this.prisma.update({
         where: {
@@ -182,35 +194,5 @@ export class AppsRepoImpl implements AppsRepo {
         },
       })
     )
-  }
-
-  // TODO: DELETE THIS AFTER CLEANUP APP HANDLES IS RUN IN PROD
-  async getAllApps(): Promise<App[]> {
-    const res = await this.prisma.findMany({})
-
-    const apps: App[] = []
-    for (const r of res) {
-      apps.push(await appFromPrisma(r))
-    }
-    return apps
-  }
-
-  async forceDeleteById(id: string): Promise<App> {
-    const res = await this.prismaService.app.delete({
-      where: {
-        id,
-      },
-    })
-    return appFromPrisma(res)
-  }
-
-  async deleteWorkspaceAppsForAppByID(appId: string): Promise<void> {
-    await this.prismaService.workspaceApp.deleteMany({
-      where: {
-        app: {
-          id: appId,
-        },
-      },
-    })
   }
 }

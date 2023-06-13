@@ -8,10 +8,10 @@ interface ChatInitializationProps {
   llm: ChatTunedLlm
   agents: IAgent[]
   accountId: string
-  workspaceId: string
   userId: string
   clientId: string
   chatId?: string
+  agentChatLoopLimit?: number
 }
 
 export default class Chat {
@@ -35,6 +35,7 @@ export default class Chat {
     yield acceptedMessage
 
     let messageToLlm = message
+    let numberOfAgentCalls = 0
 
     while (messageToLlm) {
       const llmResponse = await this.initializationProps.llm.accept(
@@ -73,9 +74,24 @@ export default class Chat {
         break
       }
 
+      const agentCallLimit = this.initializationProps.agentChatLoopLimit ?? 10
+
+      if (numberOfAgentCalls >= agentCallLimit) {
+        const historyObj: ChatHistoryItem = {
+          id: uuidV1().toString(),
+          text: `Hey! It looks like I would not fulfil that request, maybe try and rephrase your prompt`,
+          role: 'llm',
+          timestamp: Date.now(),
+        }
+
+        this.history.push(historyObj)
+        yield historyObj
+
+        break
+      }
+
       const agentResponse = await agent.accept({
         accountId: this.initializationProps.accountId,
-        workspaceId: this.initializationProps.workspaceId,
         userId: this.initializationProps.userId,
         clientId: this.initializationProps.clientId,
         prompt: parsedLlmResponse.agent.agentPrompt,
@@ -87,6 +103,8 @@ export default class Chat {
         agentPrompt: parsedLlmResponse.agent.agentPrompt,
         agentResponse: agentResponse,
       }
+
+      numberOfAgentCalls++
 
       yield this.history[this.history.length - 1]
 
@@ -167,7 +185,6 @@ export default class Chat {
         },
         agents: this.initializationProps.agents.map((agent) => agent.id),
         accountId: this.initializationProps.accountId,
-        workspaceId: this.initializationProps.workspaceId,
         userId: this.initializationProps.userId,
         clientId: this.initializationProps.clientId,
       },

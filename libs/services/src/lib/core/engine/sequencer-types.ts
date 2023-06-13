@@ -2,8 +2,6 @@ import { App } from '../../apps'
 import { PromptAndSteps, Step } from '../../ml'
 
 export interface SequencerInput {
-  workspaceId: string
-
   userId: string
 
   accountId: string

@@ -13,7 +13,7 @@ import * as Rollbar from 'rollbar'
 import { environment } from './environments/environment'
 
 async function bootstrap() {
-  const rollbar = new Rollbar({
+  new Rollbar({
     accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
     captureUncaught: true,
     captureUnhandledRejections: true,
@@ -42,3 +42,10 @@ async function bootstrap() {
 }
 
 bootstrap()
+  .then(() => {
+    console.log('🚀 Application is running on port 3333')
+  })
+  .catch((err) => {
+    console.log('❌ Error starting application')
+    console.error(err)
+  })

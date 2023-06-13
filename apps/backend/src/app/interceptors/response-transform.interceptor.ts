@@ -7,7 +7,7 @@ export class ResponseTransformerInterceptor<T>
 {
   intercept(
     context: ExecutionContext,
-    next: CallHandler<any>
+    next: CallHandler
   ): Observable<Response<T>> | Promise<Observable<Response<T>>> {
     return next.handle().pipe(
       map((data) => {

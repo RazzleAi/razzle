@@ -10,7 +10,7 @@ import { CREATE_ACCOUNT, CREATE_ACCOUNT_SUCCESS } from '../../events'
 import { useFirebaseServices } from '../../firebase'
 import { useEventTracker } from '../../mixpanel'
 import { classNames } from '../../utils/classnames'
-import { useCreateAccount } from './queries'
+import { useCreateAccount } from '../queries'
 
 export function CreateAccountPage() {
   const { currentUser } = useFirebaseServices()

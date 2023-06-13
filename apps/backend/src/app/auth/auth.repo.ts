@@ -15,20 +15,12 @@ export class AuthRepoImpl implements AuthRepo {
     this.firebaseAuth = auth()
   }
 
-  getUserByEmail(email: string): Promise<UserAuthRecord> {
-    return this.firebaseAuth.getUserByEmail(email)
-  }
-
   async createUser(
     req: CreateAuthUserReq
   ): Promise<{ user: UserAuthRecord; authToken: string }> {
     const user = await this.firebaseAuth.createUser(req)
     const token = await this.firebaseAuth.createCustomToken(user.uid)
     return { user: user, authToken: token }
-  }
-
-  deleteUser(authId: string): Promise<void> {
-    return this.firebaseAuth.deleteUser(authId)
   }
 
   verifyAuthToken(token: string): Promise<AuthPrincipal> {

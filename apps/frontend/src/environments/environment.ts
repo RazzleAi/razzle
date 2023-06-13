@@ -3,16 +3,16 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:3333',
-  wsBaseUrl: 'ws://localhost:3333/client',
+  baseUrl: process.env.NX_BASE_URL,
+  wsBaseUrl: process.env.NX_WS_BASE_URL,
   firebaseConfig: {
-    apiKey: 'AIzaSyD76bjb2D9zmE-Y4B2FurzRUPzgPoJ50c0',
-    authDomain: 'raazzle-dev.firebaseapp.com',
-    projectId: 'raazzle-dev',
-    storageBucket: 'raazzle-dev.appspot.com',
-    messagingSenderId: '1017273380968',
-    appId: '1:1017273380968:web:093130736797ed2ebd8bdd',
-    measurementId: 'G-HHLRZ4NCCJ',
+    apiKey: process.env.NX_FIREBASE_API_KEY,
+    authDomain: process.env.NX_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NX_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NX_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NX_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NX_FIREBASE_APP_ID,
+    measurementId: process.env.NX_FIREBASE_MEASUREMENT_ID,
   },
-  mixpanelKey: '3545b8ada61f43e9317642cfd30f7d25',
+  mixpanelKey: process.env.NX_MIXPANEL_KEY,
 }

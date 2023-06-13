@@ -1,4 +1,3 @@
-import { Account } from '@prisma/client'
 import {
   IsBoolean,
   IsDefined,
@@ -23,4 +22,15 @@ export class CreateAccountDto {
   matchDomain?: string
 }
 
-export type CreateAccountResponseDto = Omit<Account, 'createdAt' | 'updatedAt'>
+export type AccountAppDto = {
+  appId: string
+  dateAdded: Date
+}
+
+export type CreateAccountResponseDto = {
+  id: string
+  name: string
+  matchDomain: string | null
+  enableDomainMatching: boolean
+  accountApps: AccountAppDto[]
+}

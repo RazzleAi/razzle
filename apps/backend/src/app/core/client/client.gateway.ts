@@ -3,7 +3,6 @@ import { Client, ClientLifecycle } from '@razzle/services'
 import { IncomingMessage } from 'http'
 import { WebSocket } from 'ws'
 import { ClientRequestValidatorImpl } from './client-request-validator.impl'
-import { ClientHistoryStoreImpl } from './client-history-store.impl'
 import { ClientToEngineMessengerImpl } from '../messaging/client-to-engine.impl'
 import { ConnectedClientsImpl } from './connected-clients.impl'
 import { ChatServiceImpl } from '../chat/chat-service.impl'
@@ -12,8 +11,7 @@ import { ChatServiceImpl } from '../chat/chat-service.impl'
 export class ClientGateway implements OnGatewayConnection, ClientLifecycle {
   constructor(
     private readonly connectedClients: ConnectedClientsImpl,
-    private readonly clientRequestValidator: ClientRequestValidatorImpl,
-    private readonly clientHistoryStore: ClientHistoryStoreImpl,
+    private readonly clientRequestValidator: ClientRequestValidatorImpl,    
     private readonly clientToEngineMessenger: ClientToEngineMessengerImpl,
     private readonly chatService: ChatServiceImpl
   ) {}
@@ -23,7 +21,6 @@ export class ClientGateway implements OnGatewayConnection, ClientLifecycle {
     const client = new Client(
       ws,
       this.clientRequestValidator,
-      this.clientHistoryStore,
       this.clientToEngineMessenger,
       this.chatService,
       this

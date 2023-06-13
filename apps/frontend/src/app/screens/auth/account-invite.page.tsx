@@ -1,10 +1,10 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { SigninType, useDoThirdPartySigninFromAccountInvite } from './api'
 import Log from '../../utils/logger'
 import logo_black from '../../../assets/images/razzle_logo_black.svg'
 import { AiOutlineGithub, AiOutlineGoogle } from 'react-icons/ai'
 import { useEventTracker } from '../../mixpanel'
 import { LOGIN_CLICKED, LOGIN_FAILED } from '../../events'
+import { SigninType, useDoThirdPartySigninFromAccountInvite } from '../queries/auth'
 
 export function AccountUserInvitePage() {
   const [searchParams] = useSearchParams()

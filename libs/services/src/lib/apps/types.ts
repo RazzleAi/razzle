@@ -1,4 +1,8 @@
-import { Prisma, App as PrismaApp } from '@prisma/client'
+import {
+  Prisma,
+  App as PrismaApp,
+  UserAppAuthentication as PrismaUserAppAuthentication,
+} from '@prisma/client'
 
 export type NewAppDetails = Pick<
   PrismaApp,
@@ -32,6 +36,8 @@ export type AppAction = {
 }
 export type AppActionParameter = { name: string; type: string }
 
+export type UserAppAuthentication = PrismaUserAppAuthentication
+
 export async function appFromPrisma(
   app: PrismaApp | null | undefined | Promise<PrismaApp | null | undefined>
 ): Promise<App | null> {
@@ -53,16 +59,23 @@ export async function appFromPrisma(
 
   const appJsonObj = app.data as Prisma.JsonObject
   const actionsJsonArr = (appJsonObj.actions as Prisma.JsonArray) ?? []
-  const actions: AppAction[] = actionsJsonArr.map((action: any) => {
-    return {
-      name: action.name as string,
-      description: action.description as string,
-      descriptionEmbedding: action.descriptionEmbedding as number[],
-      stealth: action.stealth as boolean,
-      paged: action.paged as boolean,
-      parameters: action.parameters as AppActionParameter[],
+  const actions: AppAction[] = actionsJsonArr.map(
+    (action: Prisma.JsonValue) => {
+      const actionObj = action as Exclude<
+        Prisma.JsonValue,
+        null | string | number | boolean | Prisma.JsonArray
+      >
+
+      return {
+        name: actionObj.name as string,
+        description: actionObj.description as string,
+        descriptionEmbedding: actionObj.descriptionEmbedding as number[],
+        stealth: actionObj.stealth as boolean,
+        paged: actionObj.paged as boolean,
+        parameters: actionObj.parameters as AppActionParameter[],
+      }
     }
-  })
+  )
   return {
     ...app,
     data: !app.data
