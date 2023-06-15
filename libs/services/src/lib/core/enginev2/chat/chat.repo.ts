@@ -64,7 +64,7 @@ export class ChatRepo {
   }
 
   async updateChatHistory(
-    uuid: string,
+   uuid: string,
     data: Partial<Omit<ChatHistory, 'uuid' | 'id' | 'createdAt' | 'updatedAt'>>
   ) {
     return this.prismaClient.chatHistory.update({

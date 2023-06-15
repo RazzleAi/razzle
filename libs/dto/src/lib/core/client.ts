@@ -9,7 +9,9 @@ export interface ClientRequest {
     steps?: StepDto[]
     prompt?: string
     pagination?: Pagination
-    chatId?: string
+    chatId?: string,
+    id?: string
+    userReaction?: string
   }
   headers?: NodeJS.Dict<string | any>
 }

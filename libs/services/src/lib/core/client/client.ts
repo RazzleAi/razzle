@@ -13,6 +13,7 @@ import { ClientToEngineMessenger } from '../messaging'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
 import { ChatService } from '../enginev2/chat/chat.service'
 import Chat from '../enginev2/chat/chat'
+import { ReactionType } from '@prisma/client'
 
 export class Client {
   id: string
@@ -118,19 +119,21 @@ export class Client {
       case 'Ping':
         this.onPing()
         break
-      case 'ReactToLLMMessage':
-
-        if (!message.data || !message.data.uuid || !message.data.userReaction) {
+      case 'ReactToLLMMessage': {
+        const { id, userReaction } = message.data.payload
+        if (!id || !userReaction) {
           console.error('ReactToLLMMessage: Some reaction data is missing')
           break
         }
 
         await this.chatService.reactToChat(
-          message.data.uuid,
-          message.data.userReaction
+          id as string,
+          userReaction as ReactionType
         )
+
         this.sendHistory()
         break
+      }
 
       default:
         console.error(`Client: Unknown message type: ${message.event}`)

@@ -7,7 +7,7 @@ export interface ChatHistoryItem {
   agent?: ChatHistoryItemAgentProps
   role: 'user' | 'llm'
   timestamp: number,
-  userReaction?: 'THUMBS_UP' | 'THUMBS_DOWN'
+  userReaction: 'THUMBS_UP' | 'THUMBS_DOWN'| null
 }
 
 export interface ChatHistoryItemAgentProps {

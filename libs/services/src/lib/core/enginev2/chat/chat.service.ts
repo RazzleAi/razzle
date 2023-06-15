@@ -126,6 +126,7 @@ export class ChatService {
             }
           : undefined,
       rawLmResponse: h.rawLmResponse ?? undefined,
+      userReaction: h.userReaction,
     }))
 
     return desirializedChat
@@ -184,19 +185,21 @@ export class ChatService {
     return this.desirializedChat(chat)
   }
 
-  async reactToChat(uuid: string, userReaction: ReactionType): Promise<void> {
-    const chatHistory = await this.chatRepo.getChatHistory(uuid)
+  async reactToChat(id: string, userReaction: ReactionType): Promise<void> {
+    const chatHistory = await this.chatRepo.getChatHistory(id);
 
     if (!chatHistory) {
-      console.log(`Chat history ${uuid} not found`)
+      console.log(`Chat history ${id} not found`)
       throw new Error('Chat not found')
     }
 
     if(chatHistory.role !== ChatHistoryRole.LLM) {
-      console.log(`Chat history ${uuid} is not LLM message`)
+      console.log(`Chat history ${id} is not LLM message`)
       throw new Error('Reaction can be applied only to LLM messages')
     }
 
-    await this.chatRepo.updateChatHistory(uuid, { userReaction })
+    await this.chatRepo.updateChatHistory(id, { userReaction })
   }
+
+
 }
