@@ -166,8 +166,14 @@ model ChatHistory {
   agentPrompt   String?
   agentResponse Json?
   rawLmResponse String?
+  userReaction  ReactionType?
 
   @@index([chatId])
+}
+
+enum ReactionType {
+  THUMBS_UP
+  THUMBS_DOWN
 }
 
 model Chat {

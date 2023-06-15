@@ -118,6 +118,20 @@ export class Client {
       case 'Ping':
         this.onPing()
         break
+      case 'ReactToLLMMessage':
+
+        if (!message.data || !message.data.uuid || !message.data.userReaction) {
+          console.error('ReactToLLMMessage: Some reaction data is missing')
+          break
+        }
+
+        await this.chatService.reactToChat(
+          message.data.uuid,
+          message.data.userReaction
+        )
+        this.sendHistory()
+        break
+
       default:
         console.error(`Client: Unknown message type: ${message.event}`)
         break

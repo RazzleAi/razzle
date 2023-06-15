@@ -20,6 +20,7 @@ export default function PromptField() {
       return
     }
     const accessToken = await currentUser?.getIdToken()
+    
     sendMessage(accessToken, {
       event: 'Message',
       data: {
