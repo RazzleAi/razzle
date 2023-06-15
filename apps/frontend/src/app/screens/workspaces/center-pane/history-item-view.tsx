@@ -1,53 +1,10 @@
-// import React from 'react'
-// import { ClientMessageView } from './client-message-view'
-// import { ChatHistoryItem } from '@razzle/services'
-// import { LlmMessageView } from './llm-message-view'
-
-// interface HistoryItemViewProps {
-//   item: ChatHistoryItem
-//   frameId?: string
-// }
-
-// export interface MessageDetails {
-//   appId?: string
-//   applicationId?: string
-//   appName?: string
-//   appDescription?: string
-// }
-
-// export const MessageDetailsCtx = React.createContext<MessageDetails>({
-//   appId: undefined,
-//   applicationId: undefined,
-//   appName: undefined,
-//   appDescription: undefined,
-// })
-
-// export function HistoryItemView(props: HistoryItemViewProps) {
-//   switch (props.item.role) {
-//     case 'llm':
-//       return renderServerMessage(props.item)
-
-//     case 'user':
-//       return <ClientMessageView historyItem={props.item} />
-
-//     default:
-//       return <div>Unknown message type</div>
-//   }
-// }
-
-// export function useMessageDetails() {
-//   return React.useContext(MessageDetailsCtx)
-// }
-
-// function renderServerMessage(props: ChatHistoryItem) {
-//   return <LlmMessageView historyItem={props} />
-// }
-
 import React, { useState } from 'react'
 import { ClientMessageView } from './client-message-view'
 import { ChatHistoryItem } from '@razzle/services'
 import { LlmMessageView } from './llm-message-view'
 import { RiThumbUpLine, RiThumbDownLine } from 'react-icons/ri'
+import { useWSClientStore } from '../../../stores/ws-client-store'
+import { useFirebaseServices } from '../../../firebase'
 
 interface HistoryItemViewProps {
   item: ChatHistoryItem
@@ -72,6 +29,20 @@ export function HistoryItemView(props: HistoryItemViewProps) {
   const [showReactions, setShowReactions] = useState(false)
   const [thumbsUp, setThumbsUp] = useState(false)
   const [thumbsDown, setThumbsDown] = useState(false)
+  const { sendMessage } = useWSClientStore()
+  const { auth, currentUser } = useFirebaseServices()
+
+  async function handleUserReaction() {
+    const accessToken = await currentUser.getIdToken()
+    sendMessage(accessToken, {
+      event: 'ReactToLLMMessage',
+      data: {
+        uuid: 'dd4e2530-0af7-11ee-93cf-214c3eff09a3',
+        userReaction: 'THUMBS_UP',
+        payload: {},
+      },
+    })
+  }
 
   const handleMouseEnter = () => {
     setShowReactions(true)
@@ -106,7 +77,10 @@ export function HistoryItemView(props: HistoryItemViewProps) {
             <div className="flex cursor-pointer ml-2 mt-6">
               <div
                 className={`reaction-icon ${thumbsUp ? 'active' : ''}`}
-                onClick={handleThumbsUp}
+                onClick={() => {
+                  handleThumbsUp()
+                  handleUserReaction()
+                }}
               >
                 <RiThumbUpLine
                   className={`text-x transition-colors ${
@@ -118,7 +92,10 @@ export function HistoryItemView(props: HistoryItemViewProps) {
               </div>
               <div
                 className={`reaction-icon ml-2 ${thumbsDown ? 'active' : ''}`}
-                onClick={handleThumbsDown}
+                onClick={() => {
+                  handleThumbsDown()
+                  handleUserReaction()
+                }}
               >
                 <RiThumbDownLine
                   className={`text-x transition-colors ${

@@ -113,8 +113,8 @@ export function RightPopup() {
   const { sendMessage } = useWSClientStore()
 
   async function restartChat() {
-    const accessToken = await currentUser.getIdToken();
-    console.log(accessToken);
+    const accessToken = await currentUser.getIdToken()
+    console.log(accessToken)
     sendMessage(accessToken, {
       event: 'CreateNewChat',
       data: {
