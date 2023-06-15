@@ -5,6 +5,7 @@ export type ClientToServerEvent =
   | 'CallAction'
   | 'CreateNewChat'
   | 'NewChatSelected'
+  | 'ReactToLLMMessage'
 export type AgentToServerEvent =
   | 'SyncApp'
   | 'FuncResponse'

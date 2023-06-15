@@ -6,7 +6,8 @@ export interface ChatHistoryItem {
   rawLmResponse?: string
   agent?: ChatHistoryItemAgentProps
   role: 'user' | 'llm'
-  timestamp: number
+  timestamp: number,
+  userReaction?: 'THUMBS_UP' | 'THUMBS_DOWN'
 }
 
 export interface ChatHistoryItemAgentProps {

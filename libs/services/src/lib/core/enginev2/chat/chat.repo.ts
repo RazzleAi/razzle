@@ -54,4 +54,24 @@ export class ChatRepo {
       },
     })
   }
+
+  async getChatHistory(uuid: string): Promise<ChatHistory | null> {
+    return this.prismaClient.chatHistory.findUnique({
+      where: {
+        uuid,
+      },
+    })
+  }
+
+  async updateChatHistory(
+    uuid: string,
+    data: Partial<Omit<ChatHistory, 'uuid' | 'id' | 'createdAt' | 'updatedAt'>>
+  ) {
+    return this.prismaClient.chatHistory.update({
+      where: {
+        uuid,
+      },
+      data,
+    })
+  }
 }
