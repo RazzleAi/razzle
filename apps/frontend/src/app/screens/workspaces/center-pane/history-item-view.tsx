@@ -31,6 +31,12 @@ export function HistoryItemView(props: HistoryItemViewProps) {
   const { sendMessage } = useWSClientStore()
   const { currentUser } = useFirebaseServices()
   const { account } = useAppStore()
+  const [thumbsUp, setThumbsUp] = useState(
+    props.item.userReaction === 'THUMBS_UP'
+  )
+  const [thumbsDown, setThumbsDown] = useState(
+    props.item.userReaction === 'THUMBS_DOWN'
+  )
 
   const handleUserReaction = async (id: string, userReaction: string) => {
     const accessToken = await currentUser.getIdToken()
@@ -62,13 +68,6 @@ export function HistoryItemView(props: HistoryItemViewProps) {
   const handleMouseLeave = () => {
     setShowReactions(false)
   }
-
-  const [thumbsUp, setThumbsUp] = useState(
-    props.item.userReaction === 'THUMBS_UP'
-  )
-  const [thumbsDown, setThumbsDown] = useState(
-    props.item.userReaction === 'THUMBS_DOWN'
-  )
 
   let messageContent
 
