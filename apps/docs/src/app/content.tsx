@@ -2,7 +2,7 @@
 import styles from './app.module.css'
 
 import { MDXProvider } from '@mdx-js/react'
-import QuickStart from './quickstart.mdx'
+import QuickStart from './pages/quickstart.mdx'
 import Layout from './layout'
 
 const components = {
@@ -11,7 +11,7 @@ const components = {
   ),
 }
 
-export function App() {
+export function Content() {
   return (
     <Layout>
       <MDXProvider components={components}>
@@ -21,4 +21,4 @@ export function App() {
   )
 }
 
-export default App
+export default Content
