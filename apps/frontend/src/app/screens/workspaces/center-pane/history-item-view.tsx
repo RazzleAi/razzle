@@ -6,6 +6,7 @@ import { RiThumbUpLine, RiThumbDownLine } from 'react-icons/ri'
 import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFirebaseServices } from '../../../firebase'
 import { useAppStore } from '../../../stores/app-store'
+import { ReactionType } from '@razzle/dto'
 
 interface HistoryItemViewProps {
   item: ChatHistoryItem
@@ -38,7 +39,7 @@ export function HistoryItemView(props: HistoryItemViewProps) {
     props.item.userReaction === 'THUMBS_DOWN'
   )
 
-  const handleUserReaction = async (id: string, userReaction: string) => {
+  const handleUserReaction = async (id: string, userReaction: ReactionType) => {
     const accessToken = await currentUser.getIdToken()
     await sendMessage(accessToken, {
       event: 'ReactToLLMMessage',

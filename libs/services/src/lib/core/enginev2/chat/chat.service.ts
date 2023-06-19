@@ -73,6 +73,7 @@ export class ChatService {
 
   async getChatsForUser(userId: string): Promise<Chat[]> {
     const chats = await this.chatRepo.getChatsForUser(userId)
+
     const desirializedChats = await Promise.all(
       chats.map((c) => this.desirializedChat(c))
     )

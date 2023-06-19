@@ -11,7 +11,7 @@ export interface ClientRequest {
     pagination?: Pagination
     chatId?: string,
     id?: string
-    userReaction?: string
+    userReaction?: ReactionType
   }
   headers?: NodeJS.Dict<string | any>
 }
@@ -95,3 +95,5 @@ export type Pagination = {
   totalCount: number
   frameId?: string
 }
+
+export type ReactionType = 'THUMBS_UP' | 'THUMBS_DOWN' 
