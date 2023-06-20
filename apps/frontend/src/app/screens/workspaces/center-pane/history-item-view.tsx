@@ -8,6 +8,8 @@ import { useFirebaseServices } from '../../../firebase'
 import { useAppStore } from '../../../stores/app-store'
 import { ReactionType } from '@razzle/dto'
 
+type ReactionType = 'THUMBS_UP' | 'THUMBS_DOWN'
+
 interface HistoryItemViewProps {
   item: ChatHistoryItem
   frameId?: string
@@ -32,11 +34,11 @@ export function HistoryItemView(props: HistoryItemViewProps) {
   const { sendMessage } = useWSClientStore()
   const { currentUser } = useFirebaseServices()
   const { account } = useAppStore()
-  const [thumbsUp, setThumbsUp] = useState(
-    props.item.userReaction === 'THUMBS_UP'
+  const [thumbsUp, setThumbsUp] = useState<ReactionType | undefined>(
+    props.item.userReaction === 'THUMBS_UP' ? 'THUMBS_UP' : undefined
   )
-  const [thumbsDown, setThumbsDown] = useState(
-    props.item.userReaction === 'THUMBS_DOWN'
+  const [thumbsDown, setThumbsDown] = useState<ReactionType | undefined>(
+    props.item.userReaction === 'THUMBS_DOWN' ? 'THUMBS_DOWN' : undefined
   )
 
   const handleUserReaction = async (id: string, userReaction: ReactionType) => {
@@ -54,11 +56,11 @@ export function HistoryItemView(props: HistoryItemViewProps) {
 
     // Update the reaction state in the component
     if (userReaction === 'THUMBS_UP') {
-      setThumbsUp(true)
-      setThumbsDown(false)
+      setThumbsUp('THUMBS_UP')
+      setThumbsDown(undefined)
     } else if (userReaction === 'THUMBS_DOWN') {
-      setThumbsUp(false)
-      setThumbsDown(true)
+      setThumbsUp(undefined)
+      setThumbsDown('THUMBS_DOWN')
     }
   }
 
@@ -80,35 +82,13 @@ export function HistoryItemView(props: HistoryItemViewProps) {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <LlmMessageView historyItem={props.item} />
-          {showReactions && (
-            <div className="flex cursor-pointer ml-2 mt-6">
-              <div
-                className={`reaction-icon ${thumbsUp ? 'active' : ''}`}
-                onClick={() => handleUserReaction(props.item.id, 'THUMBS_UP')}
-              >
-                <RiThumbUpLine
-                  className={`text-x transition-colors ${
-                    thumbsUp
-                      ? 'text-electricIndigo-500'
-                      : 'text-gray-500 hover:text-electricIndigo-500'
-                  }`}
-                />
-              </div>
-              <div
-                className={`reaction-icon ml-2 ${thumbsDown ? 'active' : ''}`}
-                onClick={() => handleUserReaction(props.item.id, 'THUMBS_DOWN')}
-              >
-                <RiThumbDownLine
-                  className={`text-x transition-colors ${
-                    thumbsDown
-                      ? 'text-red-500'
-                      : 'text-gray-500 hover:text-red-500'
-                  }`}
-                />
-              </div>
-            </div>
-          )}
+          <LlmMessageView
+            historyItem={props.item}
+            showReactions={showReactions}
+            thumbsUp={thumbsUp === 'THUMBS_UP'}
+            thumbsDown={thumbsDown === 'THUMBS_DOWN'}
+            handleUserReaction={handleUserReaction}
+          />
         </div>
       )
       break
