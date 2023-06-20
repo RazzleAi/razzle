@@ -114,6 +114,7 @@ export function RightPopup() {
 
   async function restartChat() {
     const accessToken = await currentUser.getIdToken()
+    console.log(accessToken)
     sendMessage(accessToken, {
       event: 'CreateNewChat',
       data: {

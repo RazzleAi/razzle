@@ -13,6 +13,7 @@ import { ClientToEngineMessenger } from '../messaging'
 import { ChatHistoryItem } from '../enginev2/chat/chathistoryitem'
 import { ChatService } from '../enginev2/chat/chat.service'
 import Chat from '../enginev2/chat/chat'
+import { ReactionType } from '../enginev2/chat/types'
 
 export class Client {
   id: string
@@ -100,8 +101,6 @@ export class Client {
           break
         }
 
-        console.log('CreateNewChat')
-
         this.currentChat = await this.chatService.createNewChat(
           this.accountId,
           this.userId,
@@ -118,6 +117,11 @@ export class Client {
       case 'Ping':
         this.onPing()
         break
+
+      case 'ReactToLLMMessage':
+        this.onUserReactionToLLMMessage(message.data.id, message.data.userReaction)
+        break
+
       default:
         console.error(`Client: Unknown message type: ${message.event}`)
         break
@@ -126,6 +130,20 @@ export class Client {
 
   onPing() {
     if (!this.isIdentified) return
+    this.sendHistory()
+  }
+
+  private async onUserReactionToLLMMessage(id: string, userReaction: ReactionType) {
+    if (!id || !userReaction) {
+      console.error('ReactToLLMMessage: Some reaction data is missing')
+      return
+    }
+
+    await this.chatService.reactToChat(
+      id as string,
+      userReaction as ReactionType
+    )
+
     this.sendHistory()
   }
 
@@ -172,7 +190,7 @@ export class Client {
       console.log(
         `Found ${currentChatsForUser.length} chats for user ${user.id} using chat ${currentChatsForUser[0].chatId} as current chat`
       )
-      this.currentChat = currentChatsForUser[0]
+      this.currentChat = currentChatsForUser[currentChatsForUser.length - 1]
     }
 
     this.sendHistory()

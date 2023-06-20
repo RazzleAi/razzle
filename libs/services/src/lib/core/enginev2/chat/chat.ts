@@ -28,6 +28,7 @@ export default class Chat {
       text: message,
       role: 'user',
       timestamp: Date.now(),
+      userReaction: null
     }
 
     this.history.push(acceptedMessage)
@@ -66,6 +67,7 @@ export default class Chat {
           text: `Agent ${parsedLlmResponse.agent.agentName} not found`,
           role: 'llm',
           timestamp: Date.now(),
+          userReaction: null
         }
 
         this.history.push(historyObj)
@@ -82,6 +84,7 @@ export default class Chat {
           text: `Hey! It looks like I would not fulfil that request, maybe try and rephrase your prompt`,
           role: 'llm',
           timestamp: Date.now(),
+          userReaction: null
         }
 
         this.history.push(historyObj)
@@ -114,6 +117,7 @@ export default class Chat {
           text: `Agent ${parsedLlmResponse.agent.agentName} did not return data`,
           role: 'llm',
           timestamp: Date.now(),
+          userReaction: null
         }
 
         this.history.push(historyObj)
@@ -155,6 +159,7 @@ export default class Chat {
           agentPrompt,
         },
         timestamp: Date.now(),
+        userReaction: null
       }
     }
 
@@ -163,6 +168,7 @@ export default class Chat {
       text: llmResponse,
       role: 'llm',
       timestamp: Date.now(),
+      userReaction: null
     }
   }
 

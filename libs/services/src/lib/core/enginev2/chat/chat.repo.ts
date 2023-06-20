@@ -1,57 +1,21 @@
-import { PrismaClient } from '@prisma/client'
 import { Chat, ChatHistory } from './types'
 
-export class ChatRepo {
-  constructor(private readonly prismaClient: PrismaClient) {}
+export interface ChatRepo {
+  saveChat(chat: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'>): Promise<void>
 
-  async saveChat(chat: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'>) {
-    await this.prismaClient.chat.create({
-      data: {
-        chatId: chat.chatId,
-        accountId: chat.accountId,
-        userId: chat.userId,
-        clientId: chat.clientId,
-        llmName: chat.llmName,
-        agents: chat.agents,
-      },
-    })
-  }
-
-  async getChatsForUser(
+  getChatsForUser(
     userId: string
-  ): Promise<(Chat & { history: ChatHistory[] })[]> {
-    return this.prismaClient.chat.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        history: true,
-      },
-    })
-  }
+  ): Promise<(Chat & { history: ChatHistory[] })[]>
 
-  async upsertToChatHistory(
+  upsertToChatHistory(
     chatHistory: Omit<ChatHistory, 'id' | 'createdAt' | 'updatedAt'>
-  ) {
-    return this.prismaClient.chatHistory.upsert({
-      where: {
-        uuid: chatHistory.uuid,
-      },
-      create: chatHistory,
-      update: chatHistory,
-    })
-  }
+  ): Promise<ChatHistory>
+  getChat(chatId: string): Promise<(Chat & { history: ChatHistory[] }) | null>
 
-  async getChat(
-    chatId: string
-  ): Promise<(Chat & { history: ChatHistory[] }) | null> {
-    return this.prismaClient.chat.findUnique({
-      where: {
-        chatId,
-      },
-      include: {
-        history: true,
-      },
-    })
-  }
+  getChatHistory(uuid: string): Promise<ChatHistory | null>
+
+  updateChatHistory(
+    uuid: string,
+    data: Partial<Omit<ChatHistory, 'uuid' | 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<ChatHistory | null>
 }

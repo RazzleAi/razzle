@@ -12,7 +12,12 @@ import { ChatRepo } from './chat.repo'
 import { AppsService } from '../../../apps'
 import { ChatHistoryItem } from './chathistoryitem'
 import { RazzleResponse } from '@razzle/sdk'
-import { ChatHistory, ChatHistoryRole, Chat as ChatModel } from './types'
+import {
+  ChatHistory,
+  ChatHistoryRole,
+  Chat as ChatModel,
+  ReactionType,
+} from './types'
 
 export class ChatService {
   constructor(
@@ -68,6 +73,7 @@ export class ChatService {
 
   async getChatsForUser(userId: string): Promise<Chat[]> {
     const chats = await this.chatRepo.getChatsForUser(userId)
+
     const desirializedChats = await Promise.all(
       chats.map((c) => this.desirializedChat(c))
     )
@@ -121,6 +127,7 @@ export class ChatService {
             }
           : undefined,
       rawLmResponse: h.rawLmResponse ?? undefined,
+      userReaction: h.userReaction,
     }))
 
     return desirializedChat
@@ -161,6 +168,7 @@ export class ChatService {
       agentName: history.agent?.agentName ?? null,
       agentPrompt: history.agent?.agentPrompt ?? null,
       agentResponse: (history.agent?.agentResponse as Prisma.JsonValue) ?? null,
+      userReaction: history.userReaction ?? null,
     }
 
     console.log(`Saving history ${history.id} to chat ${chatId}`)
@@ -177,4 +185,22 @@ export class ChatService {
 
     return this.desirializedChat(chat)
   }
+
+  async reactToChat(id: string, userReaction: ReactionType): Promise<void> {
+    const chatHistory = await this.chatRepo.getChatHistory(id);
+
+    if (!chatHistory) {
+      console.log(`Chat history ${id} not found`)
+      throw new Error('Chat not found')
+    }
+
+    if(chatHistory.role !== ChatHistoryRole.LLM) {
+      console.log(`Chat history ${id} is not LLM message`)
+      throw new Error('Reaction can be applied only to LLM messages')
+    }
+
+    await this.chatRepo.updateChatHistory(id, { userReaction })
+  }
+
+
 }
