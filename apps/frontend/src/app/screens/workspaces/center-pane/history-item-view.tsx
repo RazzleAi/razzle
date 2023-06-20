@@ -6,7 +6,6 @@ import { RiThumbUpLine, RiThumbDownLine } from 'react-icons/ri'
 import { useWSClientStore } from '../../../stores/ws-client-store'
 import { useFirebaseServices } from '../../../firebase'
 import { useAppStore } from '../../../stores/app-store'
-import { ReactionType } from '@razzle/dto'
 
 type ReactionType = 'THUMBS_UP' | 'THUMBS_DOWN'
 
