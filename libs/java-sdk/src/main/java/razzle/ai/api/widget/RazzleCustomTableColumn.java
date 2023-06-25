@@ -1,44 +1,54 @@
 package razzle.ai.api.widget;
 
-import lombok.Data;
-
 /**
  * created by Julian Duru on 01/03/2023
  */
-@Data
 public class RazzleCustomTableColumn extends RazzleWidget implements IRazzleCustomTableColumn {
 
-    private String id;
+  private String id;
 
-    private String header;
+  private String header;
 
-    private Number width;
-
-
-    public RazzleCustomTableColumn(RazzleCustomTableColumnProps props) {
-        this.id = props.getId();
-        this.header = props.getHeader();
-        this.width = props.getWidth();
-    }
+  private Number width;
 
 
-    @Override
-    public String getType() {
-        return RazzleWidgetType.CUSTOM_TABLE_COLUMN.getValue();
-    }
+  public RazzleCustomTableColumn(RazzleCustomTableColumnProps props) {
+    this.id = props.getId();
+    this.header = props.getHeader();
+    this.width = props.getWidth();
+  }
 
 
-    @Override
-    public IRazzleCustomTableColumn toJSON() {
-        return this;
-    }
+  @Override
+  public String getType() {
+    return RazzleWidgetType.CUSTOM_TABLE_COLUMN.getValue();
+  }
 
 
-    @Override
-    protected void validate() throws IllegalStateException {
+  @Override
+  public IRazzleCustomTableColumn toJSON() {
+    return this;
+  }
 
-    }
 
+  @Override
+  protected void validate() throws IllegalStateException {
 
+  }
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public String getHeader() {
+    return header;
+  }
+
+  @Override
+  public Number getWidth() {
+    return width;
+  }
 }
 

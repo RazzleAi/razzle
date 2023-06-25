@@ -26,7 +26,6 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-databind:2.14.1")
     api("org.java-websocket:Java-WebSocket:1.5.3")
     api("org.awaitility:awaitility:4.2.0")
-    api("org.projectlombok:lombok:1.18.24")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.2")
 }
 

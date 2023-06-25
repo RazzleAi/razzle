@@ -1,12 +1,10 @@
 package razzle.ai.api.widget;
 
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 /**
  * created by Julian Duru on 26/02/2023
  */
-@Getter
 public class RazzleTableColumn extends RazzleWidget implements IRazzleTableColumn {
 
     private final String id;
@@ -41,7 +39,20 @@ public class RazzleTableColumn extends RazzleWidget implements IRazzleTableColum
         }
     }
 
+  @Override
+  public String getId() {
+    return id;
+  }
 
+  @Override
+  public String getHeader() {
+    return header;
+  }
+
+  @Override
+  public Number getWidth() {
+    return width;
+  }
 }
 
 

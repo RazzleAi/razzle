@@ -1,17 +1,26 @@
 package razzle.ai.api;
 
 
-import lombok.Data;
-
-
-@Data
 public class ActionPlanArgsString {
 
-    private String name;
+  private String name;
 
-    private String value;
+  private String value;
 
-    private String type;
+  private String type;
+
+
+  public String getName() {
+    return name;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public String getType() {
+    return type;
+  }
 
 
 }

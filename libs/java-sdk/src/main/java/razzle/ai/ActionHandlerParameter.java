@@ -1,15 +1,9 @@
 package razzle.ai;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * created by julian on 09/02/2023
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ActionHandlerParameter {
 
 
@@ -17,6 +11,15 @@ public class ActionHandlerParameter {
 
 
     private String type;
+
+
+    public ActionHandlerParameter(String name, String type) {
+        this.name = name;
+        this.type = type;
+    }
+
+
+
 
 
 }

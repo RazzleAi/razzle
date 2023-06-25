@@ -1,24 +1,40 @@
 package razzle.ai.api.widget;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * created by Julian Duru on 26/02/2023
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class RazzleLinkProps {
 
 
-    private IActionTrigger action;
+  private IActionTrigger action;
 
 
-    private RazzleTextSize textSize;
+  private RazzleTextSize textSize;
+
+
+  public IActionTrigger getAction() {
+    return action;
+  }
+
+  public RazzleTextSize getTextSize() {
+    return textSize;
+  }
+
+  public static RazzleLinkProps with(IActionTrigger action, RazzleTextSize textSize) {
+    var props = new RazzleLinkProps();
+    props.action = action;
+    props.textSize = textSize;
+
+    return props;
+  }
+
+
+  public static RazzleLinkProps with(IActionTrigger action) {
+    var props = new RazzleLinkProps();
+    props.action = action;
+
+    return props;
+  }
 
 
 }

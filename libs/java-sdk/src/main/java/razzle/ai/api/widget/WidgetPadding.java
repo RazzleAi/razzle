@@ -1,35 +1,50 @@
 package razzle.ai.api.widget;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * created by Julian Duru on 25/02/2023
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class WidgetPadding implements IWidgetPadding {
 
 
-    private Number top;
+  private Number top;
 
-    private Number bottom;
+  private Number bottom;
 
-    private Number left;
+  private Number left;
 
-    private Number right;
+  private Number right;
 
 
-    public static WidgetPadding DEFAULT = WidgetPadding.builder()
-        .top(10)
-        .bottom(10)
-        .left(10)
-        .right(10)
-        .build();
+  @Override
+  public Number getTop() {
+    return top;
+  }
+
+  @Override
+  public Number getBottom() {
+    return bottom;
+  }
+
+  @Override
+  public Number getLeft() {
+    return left;
+  }
+
+  @Override
+  public Number getRight() {
+    return right;
+  }
+
+  public static WidgetPadding DEFAULT;
+
+
+  static {
+    DEFAULT = new WidgetPadding();
+    DEFAULT.top = 10;
+    DEFAULT.bottom = 10;
+    DEFAULT.left = 10;
+    DEFAULT.right = 10;
+  }
 
 
 }

@@ -1,40 +1,51 @@
 package razzle.ai.api.widget;
 
-import lombok.Data;
+
+import java.util.List;
 
 /**
  * created by Julian Duru on 01/03/2023
  */
-@Data
 public class RazzleCustomTableCell extends RazzleWidget implements IRazzleCustomTableCell {
 
-    private String id;
+  private String id;
 
-    private RazzleWidget widget;
-
-
-    public RazzleCustomTableCell(RazzleCustomTableCellProps props) {
-        this.id = props.getId();
-        this.widget = props.getWidget();
-    }
+  private RazzleWidget widget;
 
 
-    @Override
-    public String getType() {
-        return RazzleWidgetType.CUSTOM_TABLE_CELL.getValue();
-    }
+  public RazzleCustomTableCell(RazzleCustomTableCellProps props) {
+    this.id = props.getId();
+    this.widget = props.getWidget();
+  }
 
 
-    @Override
-    public IRazzleCustomTableCell toJSON() {
-        return this;
-    }
+  @Override
+  public String getType() {
+    return RazzleWidgetType.CUSTOM_TABLE_CELL.getValue();
+  }
 
 
-    @Override
-    protected void validate() throws IllegalStateException {
+  @Override
+  public IRazzleCustomTableCell toJSON() {
+    return this;
+  }
 
-    }
+
+  @Override
+  protected void validate() throws IllegalStateException {
+
+  }
+
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public IRazzleWidget getWidget() {
+    return widget;
+  }
 
 
 }
