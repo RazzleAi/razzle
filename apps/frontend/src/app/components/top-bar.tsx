@@ -1,5 +1,5 @@
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment, ReactNode } from 'react'
+import { Fragment } from 'react'
 import { useFirebaseServices } from '../firebase'
 import logo_black from '../../assets/images/razzle_logo_black.svg'
 import { useAppStore } from '../stores/app-store'
@@ -9,18 +9,19 @@ import { AiOutlineAppstore } from 'react-icons/ai'
 import { MdOutlineWorkspaces } from 'react-icons/md'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useGetAccountMembers } from '../screens/queries/account'
+import { PrimaryOutlineButton } from './buttons'
+import { useWSClientStore } from '../stores/ws-client-store'
 
 export function TopBar() {
   const { account } = useAppStore()
   const { auth } = useFirebaseServices()
   const { signout } = useAppStore()
   const { trackEvent } = useEventTracker()
-  const { clearAccount, clearCurrentWorkspace } = useAppStore()
+  const { clearAccount } = useAppStore()
 
   function signoutClicked() {
     trackEvent(LOGOUT_CLICKED)
     clearAccount()
-    clearCurrentWorkspace()
     auth.signOut()
     signout()
   }
@@ -107,9 +108,21 @@ export function RightPopup() {
   const { auth, currentUser } = useFirebaseServices()
   const { signout, me } = useAppStore()
   const { trackEvent } = useEventTracker()
-  const { currentWorkspace, account } = useAppStore()
-  const { clearAccount, clearCurrentWorkspace } = useAppStore()
-  console.debug('account', account)
+  const { account } = useAppStore()
+  const { clearAccount } = useAppStore()
+  const { sendMessage } = useWSClientStore()
+
+  async function restartChat() {
+    const accessToken = await currentUser.getIdToken()
+    sendMessage(accessToken, {
+      event: 'CreateNewChat',
+      data: {
+        accountId: account.id,
+        payload: {},
+      },
+    })
+  }
+
   function signoutClicked() {
     trackEvent(LOGOUT_CLICKED)
     auth.signOut()
@@ -118,7 +131,10 @@ export function RightPopup() {
 
   return (
     <Menu as="div">
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-center justify-center gap-6">
+        <div className="h-full flex">
+          <PrimaryOutlineButton text="Restart Chat" onClick={restartChat} />
+        </div>
         <Menu.Button as="div">
           <div className="flex flex-row items-center gap-1 cursor-pointer">
             {account && <AccountMembersButton />}
@@ -164,7 +180,6 @@ export function RightPopup() {
                   e.preventDefault()
 
                   clearAccount()
-                  clearCurrentWorkspace()
                   navigate('/accounts')
                 }}
               >
@@ -205,41 +220,6 @@ export function RightPopup() {
         </Menu.Items>
       </Transition>
     </Menu>
-  )
-}
-
-function abbreviateName(name: string) {
-  const names = name.split(' ')
-  if (names.length > 1) {
-    return `${names[0][0]}${names[1][0]}`
-  }
-  return names[0][0]
-}
-
-function IconButton({
-  children,
-  active,
-  onClick,
-}: {
-  children: ReactNode
-  active?: boolean
-  onClick?: () => void
-}) {
-  return (
-    <div
-      onClick={onClick}
-      className={`flex flex-row justify-center items-center w-[50px] h-[50px] rounded-[50%] ${
-        active ? 'bg-[#ABABAB]' : 'bg-[#E8EBED]'
-      } cursor-pointer shadow-sm transition-all ease-in hover:bg-[#ABABAB]`}
-    >
-      <div
-        className={`flex flex-row justify-center items-center w-[45px] h-[45px] rounded-[50%] ${
-          active ? 'bg-[#E8EBED]' : 'bg-white'
-        } cursor-pointer shadow-sm transition-all ease-in hover:bg-[#E8EBED]`}
-      >
-        {children}
-      </div>
-    </div>
   )
 }
 

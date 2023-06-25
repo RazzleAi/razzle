@@ -1,8 +1,8 @@
 ## Introduction
 
-Large language models have become have become quite popular in recent years, understandably so. Tools like GPT-3 and ChatGPT by extension have show what software driven by natural language can accomplish in terms of ease of use and power. We've seen use cases everywhere from text generation to code generation and many more to come, we've also seen commpanies introduce a chat experience to their products to make them more accessible and easy to use.
+Large language models have become have become quite popular in recent years, understandably so. Tools like GPT-3 and ChatGPT by extension have show what software driven by natural language can accomplish in terms of ease of use and power. We've seen use cases everywhere from text generation to code generation and many more to come, we've also seen companies introduce a chat experience to their products to make them more accessible and easy to use.
 
-We at Razzle however are facinated by one question: 
+We at Razzle however are fascinated by one question: 
 <br />
 
 **What if we could build LLM native software?**
@@ -26,7 +26,7 @@ Razzle is a platform that enables developers to build software that is powered b
 
     - **Human in the loop friendly**: Razzle presents you with an action plan before it executes allowing the user to VET the action plan before it is executed. This allows the user to make sure that the action plan is what they intended to execute.
 
-    - **End to end tools**: Not only does Razzle prrovide you with the tools to build software backed by LLMs, it also provides you simple UI components that allow you to build a UI for your software, becuase we recognize tha will natural language is great sometimes being able to click a button is just better.
+    - **End to end tools**: Not only does Razzle provide you with the tools to build software backed by LLMs, it also provides you simple UI components that allow you to build a UI for your software, because we recognize tha will natural language is great sometimes being able to click a button is just better.
 
 
 We are still early on this journey and if you want to be part of it, please join us on our [Discord](https://discord.gg/TzRt9wQM5u) and let us know what you think.

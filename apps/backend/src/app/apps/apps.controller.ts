@@ -8,10 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
 import {
   ActionAndArgsDto,
-  AgentSyncActionsDto,
   AppDto,
   AppSyncStatusDto,
   CreateAppDto,
@@ -19,7 +17,7 @@ import {
   UpdateAppDto,
 } from '@razzle/dto'
 import {
-  DuplicateAppException,
+  DuplicateResourceException,
   InvalidHandleException,
   User,
 } from '@razzle/services'
@@ -35,7 +33,7 @@ export class AppsController {
   @ExceptionResponse(
     {
       statusCode: HttpStatus.CONFLICT,
-      types: [DuplicateAppException],
+      types: [DuplicateResourceException],
     },
     {
       statusCode: HttpStatus.BAD_REQUEST,
@@ -60,21 +58,14 @@ export class AppsController {
     @Param('appId') appId: string,
     @Param('actionName') actionName: string
   ): Promise<ActionAndArgsDto> {
-    const app = await this.appService.getById(appId)
+    const app = await this.appService.findById(appId)
 
     if (!app) {
       throw new Error('App not found')
     }
 
-    const actionsArr = (app.data as Prisma.JsonObject)[
-      'actions'
-    ] as Prisma.JsonArray
-
-    const actions = actionsArr
-      .map((a) => a as unknown as AgentSyncActionsDto)
-      .filter((a) => a.name === actionName)
+    const actions = app.data?.actions?.map((a) => a ).filter((a) => a.name === actionName)
     if (actions.length === 0) {
-      // TODO: throw exception that acn be caught ahdnhandled
       throw new Error('No matching action found')
     }
 
@@ -91,7 +82,7 @@ export class AppsController {
 
   @Get('/:appId')
   async getAppById(@Param('appId') appId: string): Promise<AppDto> {
-    return await this.appService.getById(appId)
+    return await this.appService.findById(appId)
   }
 
   @Get('/:id/status')

@@ -9,7 +9,6 @@ export interface IChat {
     } // llm names
     agents: string[] // agent ids
     accountId: string
-    workspaceId: string
     userId: string
     clientId: string
   }

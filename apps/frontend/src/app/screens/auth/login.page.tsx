@@ -1,9 +1,9 @@
-import { SigninType, useDoThirdPartySignin } from './api'
 import logo_black from '../../../assets/images/razzle_logo_black.svg'
 import { AiOutlineGithub, AiOutlineGoogle } from 'react-icons/ai'
 import { useEventTracker } from '../../mixpanel'
 import { LOGIN_CLICKED, LOGIN_FAILED, LOGIN_SUCCESS } from '../../events'
 import { useNavigate } from 'react-router-dom'
+import { SigninType, useDoThirdPartySignin } from '../queries/auth'
 
 export function LoginPage() {
   const navigate = useNavigate()

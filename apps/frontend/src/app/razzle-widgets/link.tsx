@@ -1,16 +1,10 @@
-import {
-  ActionAndArgsDto,
-  ActionPlanWithDetailsDto,
-  AgentSyncActionParametersDto,
-  StepDto,
-} from '@razzle/dto'
+import { ActionAndArgsDto, StepDto } from '@razzle/dto'
 import { IRazzleLink } from '@razzledotai/widgets'
 import { useFirebaseServices } from '../firebase'
 import { useMessageDetails } from '../screens/workspaces/center-pane/history-item-view'
 import { useAppStore } from '../stores/app-store'
 import { useWSClientStore } from '../stores/ws-client-store'
 import { useGetActionArgs } from './api'
-import { v4 as uuidv4 } from 'uuid'
 import {
   buildPaddingStyles,
   buildTextSizeClasses,
@@ -23,14 +17,15 @@ export interface LinkProps {
 
 export function Link(props: LinkProps) {
   const messageDetails = useMessageDetails()
-  const { account, currentWorkspace } = useAppStore()
+  const { account } = useAppStore()
   const { currentUser } = useFirebaseServices()
   const { triggerActions } = useWSClientStore()
   const { mutate: getActionArgs, error: actionArgsError } = useGetActionArgs({
     onSuccess: onActionArgsLoaded,
   })
 
-  const { action, padding, textColor, textSize, textWeight, textAlignment } = props.link
+  const { action, padding, textColor, textSize, textWeight, textAlignment } =
+    props.link
 
   function onClicked() {
     const actionType = action.type
@@ -58,9 +53,14 @@ export function Link(props: LinkProps) {
       })),
     })
 
-    if (account && currentWorkspace) {
+    if (account) {
       currentUser?.getIdToken().then((accessToken) => {
-        triggerActions(accessToken, account.id, currentWorkspace.id, steps, actionAndArgs.actionDescription)
+        triggerActions(
+          accessToken,
+          account.id,
+          steps,
+          actionAndArgs.actionDescription
+        )
       })
     }
   }

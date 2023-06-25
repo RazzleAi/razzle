@@ -27,7 +27,6 @@ export class NlpProxyAgent implements IAgent {
 
     const executionFinalStep = await this.sequencer.execute({
       accountId: params.accountId,
-      workspaceId: params.workspaceId,
       userId: params.userId,
       appsInWorkspace: [this.app],
       promptSteps: {

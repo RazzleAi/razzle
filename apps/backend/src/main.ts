@@ -13,7 +13,7 @@ import * as Rollbar from 'rollbar'
 import { environment } from './environments/environment'
 
 async function bootstrap() {
-  const rollbar = new Rollbar({
+  new Rollbar({
     accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
     captureUncaught: true,
     captureUnhandledRejections: true,

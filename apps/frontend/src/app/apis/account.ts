@@ -10,7 +10,6 @@ import {
   MeResponseDto,
   OnboardingDto,
   Page,
-  WorkspaceDto,
 } from '@razzle/dto'
 import { AccountWithUser } from '@razzle/services'
 
@@ -119,13 +118,6 @@ export function getOnboardingForAccount(
       throw { message: 'A network error occurred' }
     }
   }
-}
-
-export function getWorkspaceForUserAndAccount(
-  { get }: AxiosInstance,
-  accountId: string
-): Promise<AxiosResponse<{ data: WorkspaceDto }>> {
-  return get<{ data: WorkspaceDto }>(`/account/${accountId}/workspace`)
 }
 
 export async function getAccountMembers(

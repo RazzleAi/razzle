@@ -8,7 +8,6 @@ interface ChatInitializationProps {
   llm: ChatTunedLlm
   agents: IAgent[]
   accountId: string
-  workspaceId: string
   userId: string
   clientId: string
   chatId?: string
@@ -93,7 +92,6 @@ export default class Chat {
 
       const agentResponse = await agent.accept({
         accountId: this.initializationProps.accountId,
-        workspaceId: this.initializationProps.workspaceId,
         userId: this.initializationProps.userId,
         clientId: this.initializationProps.clientId,
         prompt: parsedLlmResponse.agent.agentPrompt,
@@ -187,7 +185,6 @@ export default class Chat {
         },
         agents: this.initializationProps.agents.map((agent) => agent.id),
         accountId: this.initializationProps.accountId,
-        workspaceId: this.initializationProps.workspaceId,
         userId: this.initializationProps.userId,
         clientId: this.initializationProps.clientId,
       },

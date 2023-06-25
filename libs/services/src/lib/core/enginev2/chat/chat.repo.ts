@@ -1,4 +1,5 @@
-import { Chat, ChatHistory, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import { Chat, ChatHistory } from './types'
 
 export class ChatRepo {
   constructor(private readonly prismaClient: PrismaClient) {}

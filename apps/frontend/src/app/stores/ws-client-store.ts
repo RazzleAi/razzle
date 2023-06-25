@@ -23,18 +23,16 @@ export interface WSClientStore {
     accessToken: string,
     message: ClientToServerMessage<ClientRequest>
   ) => any
-  identify: (accessToken: string, workspaceId: string, accountId: string) => any
+  identify: (accessToken: string, accountId: string) => any
   triggerActions: (
     accessToken: string,
     accountId: string,
-    workspaceId: string,
     steps: StepDto[],
     prompt?: string
   ) => void
   triggerPaginationAction: (
     accessToken: string,
     accountId: string,
-    workspaceId: string,
     prompt: string,
     steps: StepDto[],
     pagination: any
@@ -71,13 +69,12 @@ export const useWSClientStore = create<WSClientStore>()(
     ) => {
       get().wsClient.sendMessage(accessToken, message)
     },
-    identify: (accessToken: string, workspaceId: string, accountId: string) => {
-      get().wsClient.identify(accessToken, workspaceId, accountId)
+    identify: (accessToken: string, accountId: string) => {
+      get().wsClient.identify(accessToken, accountId)
     },
     triggerActions: (
       accessToken: string,
       accountId: string,
-      workspaceId: string,
       steps: StepDto[],
       prompt?: string
     ) => {
@@ -85,7 +82,6 @@ export const useWSClientStore = create<WSClientStore>()(
         event: 'Message',
         data: {
           accountId,
-          workspaceId,
           payload: { steps, prompt },
         },
       } as ClientToServerMessage<ClientRequest>)
@@ -93,7 +89,6 @@ export const useWSClientStore = create<WSClientStore>()(
     triggerPaginationAction: (
       accessToken: string,
       accountId: string,
-      workspaceId: string,
       prompt: string,
       steps: StepDto[],
       pagination: any
@@ -102,7 +97,6 @@ export const useWSClientStore = create<WSClientStore>()(
         event: 'Message',
         data: {
           accountId,
-          workspaceId,
           payload: { steps, pagination, prompt },
         },
       } as ClientToServerMessage<ClientRequest>)

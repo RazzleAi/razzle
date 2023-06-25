@@ -46,7 +46,7 @@ export function PrimaryOutlineButton(props: OutlineButtonProps) {
       onClick={props.onClick}
       disabled={props.disabled}
       className={
-        'inline-flex w-full justify-center rounded border border-gray-300  bg-transparent text-base font-medium text-gray-600  shadow-sm focus:outline-none focus:ring-2 focus:ring-electricIndigo-500 focus:ring-offset-2 sm:text-sm transition-colors duration-300 disabled:opacity-70 disabled:hover:text-gray-600 disabled:hover:border-gray-300 disabled:hover:opacity-70 ' +
+        'inline-flex w-full justify-center rounded border border-gray-300  bg-transparent text-base font-medium text-gray-600  shadow-sm focus:outline-none focus:ring-2 focus:ring-electricIndigo-500 focus:ring-offset-2 sm:text-sm transition-colors duration-300 disabled:opacity-70 disabled:hover:text-gray-600 disabled:hover:border-gray-300 disabled:hover:opacity-70 items-center' +
         (props.fullWidth ?? false ? ' w-full' : ' sm:w-auto') +
         (props.short ?? false ? ' px-2 py-1' : ' px-4 py-2') +
         (props.tall ?? false ? ' h-[50px] items-center justify-center' : '') +

@@ -1,4 +1,3 @@
-import { WorkspaceService } from '../../../../workspace'
 import {
   AccountRepo,
   AccountService,
@@ -8,16 +7,15 @@ import {
 import { AgentCaller } from '../../../agent'
 import { ChatService } from '../chat.service'
 import { UserService } from '../../../../user'
-import { EmailDispatchGateway } from '../../../../email'
 import { AppsRepo, AppsService } from '../../../../apps'
-import { EventBus } from '../../../../event'
 import { ChatRepo } from '../chat.repo'
-import { ChatHistoryRole, Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import Chat from '../chat'
-import { Chat as ChatModel } from '@prisma/client'
+import { Chat as ChatModel, ChatHistoryRole } from '../types'
 import { ChatGpt } from '../../llm'
 import { EmbeddingService } from '../../../../ml'
-import { AnalyticsEventTracker } from '../../../../analytics'
+import { AnalyticsEventTracker, EmailDispatchGateway, EventBus } from '../../../../tools'
+
 describe('ChatService', () => {
   let chatService: ChatService
   let accountService: jest.Mocked<AccountService>
@@ -25,7 +23,6 @@ describe('ChatService', () => {
   let accountRepo: jest.Mocked<AccountRepo>
   let accountUserInviteTokenRepo: jest.Mocked<AccountUserInviteTokenRepo>
   let userService: jest.Mocked<UserService>
-  let workspaceService: jest.Mocked<WorkspaceService>
   let accountInviteTokenGenerator: jest.Mocked<AccountUserInviteTokenGenerator>
   let emailDispatchGateway: jest.Mocked<EmailDispatchGateway>
   let appsService: jest.Mocked<AppsService>
@@ -43,7 +40,6 @@ describe('ChatService', () => {
         accountRepo,
         accountUserInviteTokenRepo,
         userService,
-        workspaceService,
         accountInviteTokenGenerator,
         emailDispatchGateway,
         appsService,
@@ -103,7 +99,6 @@ describe('ChatService', () => {
       await chatService.createNewChat(
         'accountId',
         'userId',
-        'workspaceId',
         'clientId',
         'ChatGpt-3.5'
       )
@@ -140,7 +135,6 @@ describe('ChatService', () => {
       const chat = await chatService.createNewChat(
         'accountId',
         'userId',
-        'workspaceId',
         'clientId',
         'ChatGpt-3.5'
       )
@@ -177,7 +171,6 @@ describe('ChatService', () => {
       const chat = await chatService.createNewChat(
         'accountId',
         'userId',
-        'workspaceId',
         'clientId',
         'ChatGpt-3.5'
       )
@@ -212,7 +205,7 @@ describe('ChatService', () => {
         },
       ])
 
-      jest.spyOn(appsService, 'getById').mockResolvedValue({
+      jest.spyOn(appsService, 'findById').mockResolvedValue({
         id: 'test',
         apiKey: 'test',
         appId: 'test',
@@ -239,7 +232,6 @@ describe('ChatService', () => {
       await chatService.createNewChat(
         'accountId',
         'userId',
-        'workspaceId',
         'clientId',
         'ChatGpt-3.5'
       )
@@ -307,7 +299,6 @@ describe('ChatService', () => {
         llm: ChatGpt.create([]),
         accountId: 'test',
         userId: 'test',
-        workspaceId: 'test',
       })
 
       await chatService.saveChat(chatToSave)
@@ -387,7 +378,6 @@ describe('ChatService', () => {
         llm: ChatGpt.create([]),
         accountId: 'test',
         userId: 'test',
-        workspaceId: 'test',
       })
 
       await chatService.saveChat(chatToSave)
@@ -403,7 +393,6 @@ describe('ChatService', () => {
         llm: ChatGpt.create([]),
         accountId: 'test',
         userId: 'test',
-        workspaceId: 'test',
       })
 
       chatToSave.history = [
@@ -496,7 +485,6 @@ describe('ChatService', () => {
       expect(expectedChat?.initializationProps.agents.length).toBe(0)
       expect(expectedChat?.initializationProps.userId).toBe('test')
       expect(expectedChat?.initializationProps.clientId).toBe('test')
-      expect(expectedChat?.initializationProps.workspaceId).toBe('N/A')
       expect(expectedChat?.initializationProps.accountId).toBe('test')
     })
   })

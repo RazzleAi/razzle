@@ -10,15 +10,11 @@ import { UserModule } from './user/user.module'
 import configuration from './config/configuration'
 import { MlModule } from './ml/ml.module'
 import { AccountModule } from './account/account.module'
-import { WorkspaceModule } from './workspace/workspace.module'
 import { ConstantsModule } from './constants.module'
 import { ScheduleModule } from '@nestjs/schedule'
-import { RedisModule } from './redis/redis.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
-import { EventModule } from './event/event.module'
 import { CoreModule } from './core/core.module'
 import { ToolsModule } from './tools/tools.module'
-import { PubSubModule } from './pub-sub/pub-sub.module'
 import { RequestLogger } from './request-logger.middleware'
 
 @Module({
@@ -28,17 +24,13 @@ import { RequestLogger } from './request-logger.middleware'
     EventEmitterModule.forRoot({
       wildcard: true,
       delimiter: '.',
-    }),
-    EventModule,
+    }),    
     ToolsModule,
-    PubSubModule,
     ConstantsModule,
-    RedisModule,
     PrismaModule,
     AuthModule,
     UserModule,
     AppsModule,
-    WorkspaceModule,
     CoreModule,
     MlModule,
     AccountModule,

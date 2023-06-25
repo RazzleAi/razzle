@@ -1,5 +1,5 @@
 import { Combobox } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { PROMPT_ENTERED } from '../../../events'
 import { useHotKeys } from '../../../hooks'
 import { useEventTracker } from '../../../mixpanel'
@@ -8,23 +8,14 @@ import { useFirebaseServices } from '../../../firebase'
 import { useAppStore } from '../../../stores/app-store'
 
 export default function PromptField() {
-  const [query, setQuery] = useState('')
-  const [setPrompt] = useState<any>(null)
   const { trackEvent } = useEventTracker()
   const { sendMessage } = useWSClientStore()
   const { currentUser } = useFirebaseServices()
-  const { account, currentWorkspace } = useAppStore()
+  const { account } = useAppStore()
 
-  const handlePromptChange = (value: any) => {
-    if (value === '') {
-      setPrompt(query)
-    }
-
-    setQuery(value)
-  }
 
   const sendPrompt = async (value: string) => {
-    if (!currentWorkspace || !account) {
+    if (!account) {
       console.error('No workspace or account')
       return
     }
@@ -32,7 +23,6 @@ export default function PromptField() {
     sendMessage(accessToken, {
       event: 'Message',
       data: {
-        workspaceId: currentWorkspace.id,
         accountId: account.id,
         payload: { prompt: value },
       },
@@ -55,7 +45,6 @@ export default function PromptField() {
           as="textarea"
           rows={1}
           className="flex flex-grow w-full font-medium text-[#848484] text-sm border-none resize-none active:outline-none focus:outline-none focus:ring-0"
-          onChange={(event) => handlePromptChange(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               const target = event.target as HTMLTextAreaElement

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
-import { EventModule } from '../event/event.module'
 import { PrismaModule } from '../prisma/prisma.module'
 import { OnboardingRepoImpl } from './onboarding.repo-impl'
 import { OnboardingServiceImpl } from './onboarding.service-impl'
+import { ToolsModule } from '../tools/tools.module'
 
 @Module({
-  imports: [PrismaModule, EventModule],
+  imports: [PrismaModule, ToolsModule],
   providers: [OnboardingRepoImpl, OnboardingServiceImpl],
   exports: [OnboardingRepoImpl, OnboardingServiceImpl],
 })

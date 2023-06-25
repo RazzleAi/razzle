@@ -38,7 +38,7 @@ export function ServerMessageView(props: ServerMessageViewProps) {
     ? (message as RazzleResponseWithActionArgs).actionAndArgs
     : undefined
 
-  const { account, currentWorkspace } = useAppStore()
+  const { account } = useAppStore()
   const { appName, applicationId, appId } = useMessageDetails()
   const { currentUser } = useFirebaseServices()
   const { triggerPaginationAction } = useWSClientStore()
@@ -69,7 +69,7 @@ export function ServerMessageView(props: ServerMessageViewProps) {
         })) || [],
     })
 
-    if (!account || !currentWorkspace) {
+    if (!account) {
       console.debug('onPageChanged', newPage, 'no account or workspace')
       return
     }
@@ -78,7 +78,6 @@ export function ServerMessageView(props: ServerMessageViewProps) {
       triggerPaginationAction(
         token,
         account.id,
-        currentWorkspace.id,
         prompt,
         steps,
         updatedPagination

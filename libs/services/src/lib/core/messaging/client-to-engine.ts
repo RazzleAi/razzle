@@ -1,5 +1,5 @@
 import { ClientResponse, ClientToEngineRequest } from '@razzle/dto'
-import { MessagePublisher, MessageSubscriber } from '../../pubsub'
+import { MessagePublisher, MessageSubscriber } from '../../tools/pubsub'
 import { ConnectedClients } from '../client'
 
 // export interface ClientToEngineMessenger {

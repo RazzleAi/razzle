@@ -6,23 +6,16 @@ import { onAuthStateChanged } from '@firebase/auth'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { useEffect } from 'react'
-import { LoginPage, AccountUserInvitePage, WorkspacePage } from './screens'
+import { LoginPage, AccountUserInvitePage } from './screens'
 import { AccountsLayout } from './screens/teams/create-select-account.page'
-import CreateAppPage from './screens/apps/create-app.page'
 import { MainLayout } from './screens/layout/main-layout'
-import AppsLayout from './screens/apps/apps.page'
-import AppDetailPage from './screens/apps/app-detail/app-detail.page'
 import { useEventTracker } from './mixpanel'
 import { useUiStore } from './stores/ui-store'
 import { AiOutlineClose } from 'react-icons/ai'
-import { AccountListPage } from './screens/teams/account-list.page'
 import { CreateAccountPage } from './screens/teams/create-account.page'
 import { CheckAuthStatePage } from './screens/auth/check-auth-state.page'
 
 const queryClient = new QueryClient()
-
-// const authLocations = ['/login', '/signup', '/account/invite']
-
 const authIgnoreLocations = ['/account/invite']
 
 export function App() {

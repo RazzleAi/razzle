@@ -1,13 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 import { AiFillCheckCircle } from 'react-icons/ai'
-import { useGetAppById } from '../../workspaces/center-pane/queries'
 import { useParams } from 'react-router-dom'
 import { Spinner } from '../../../components/spinners'
 import { AppDto } from '@razzle/dto'
 import {
   useAddAppToAccount,
   useGenerateNewAPIKey,
+  useGetAppById,
   useGetAppSyncStatus,
   useIsAppInAccount,
   useRemoveAppFromAccount,

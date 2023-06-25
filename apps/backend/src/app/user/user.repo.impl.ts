@@ -1,6 +1,5 @@
-import { UserRepo } from '@razzle/services'
+import { User, UserRepo } from '@razzle/services'
 import { Injectable } from '@nestjs/common'
-import { User } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 
 @Injectable()

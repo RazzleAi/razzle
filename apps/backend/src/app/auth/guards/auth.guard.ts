@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { UserServiceImpl } from '../../user/user.service.impl'
-import { AuthServiceImpl } from '../auth.service-impl'
+import { AuthServiceImpl } from '../auth.service.impl'
 import { AuthenticatedRequest } from '../authenticated-request'
 import { SKIP_AUTH_KEY } from '../decorators/no-auth.decorator'
 
