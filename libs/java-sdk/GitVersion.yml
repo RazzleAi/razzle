@@ -1,0 +1,9 @@
+mode: Mainline
+branches:
+  main:
+    regex: ^main$
+    is-mainline: true
+    source-branches: [ 'main' ]
+ignore:
+  sha: []
+merge-message-formats: {}
