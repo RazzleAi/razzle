@@ -10,6 +10,7 @@ export interface CallDetails {
   context?: {
     [key: string]: any
   }
+  headers: Record<string, any>
   /**
    * The ID of the account that the user is making the function call on.
    */

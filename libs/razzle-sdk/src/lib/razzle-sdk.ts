@@ -40,7 +40,7 @@ export interface RazzleAppProps {
   /**
    * Whether or not the app requires authentication. If true, the authenticate function must be provided.
    */
-  requiresAuth?: boolean  
+  requiresAuth?: boolean
   authenticate?: AuthFunction
 }
 
@@ -152,17 +152,20 @@ export class Razzle {
             methodName
           ) || []
 
-        // we can get the parameter types here
-        const methodDesignType = MetadataInspector.getDesignTypeForMethod(
-          app.prototype,
+        const paramTypes = Reflect.getMetadata(
+          'design:paramtypes',
+          appInstance,
           methodName
         )
 
+        const method = appInstance[methodName]
+        const isPromise = method.toString().includes('return __awaiter(')
+        // we can get the parameter types here
+
         if (
           paramMetadata.length === 0 &&
-          methodDesignType &&
-          methodDesignType.parameterTypes &&
-          methodDesignType.parameterTypes.length === 1
+          paramTypes &&
+          paramTypes.length === 1
         ) {
           paramMetadata.push(undefined)
         }
@@ -188,13 +191,12 @@ export class Razzle {
           paramNames.add(paramName)
 
           const paramIndex = i
-          if (!methodDesignType || !methodDesignType.parameterTypes) {
+          if (!paramTypes || !paramTypes.length) {
             continue
           }
 
-          const paramTypeStr =
-            methodDesignType.parameterTypes[i].name.toLowerCase()
-          const paramTypeCtor = methodDesignType.parameterTypes[i]
+          const paramTypeStr = paramTypes[i].name.toLowerCase()
+          const paramTypeCtor = paramTypes[i]
           methodParams.push({
             paramIndex,
             paramTypeCtor,
@@ -203,10 +205,6 @@ export class Razzle {
           })
         }
 
-        const isPromise = !methodDesignType
-          ? false
-          : methodDesignType.returnType !== undefined &&
-            methodDesignType.returnType.name === 'Promise'
         const handler: Handler = {
           appInstance: appInstance,
           methodToCall: methodName,

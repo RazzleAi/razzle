@@ -25,7 +25,8 @@ export class ChatGpt implements ChatTunedLlm {
     history: ChatLlmHistoryItem[]
   ): Promise<LlmResponse> {
     const agentListPrompt = this.contructAgentListPrompt(this.agents)
-
+    console.debug(`agentListPrompt: ${agentListPrompt}`)
+    
     const systemPrompt = new Prompt(
       SYSTEM_PROMPT,
       new Map([['agents', agentListPrompt]])

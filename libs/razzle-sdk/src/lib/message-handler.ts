@@ -104,26 +104,26 @@ export class MessageHandler {
   ): Promise<ServerRequest> {
     const callDetails = { ...headers }
 
-    if (this.authFunction) {
-      const url = this.authFunction(this.appId, callDetails)
-      if (!Constants.RegEx['URL'].test(url)) {
-        throw new Error(`Invalid URL returned by AuthFunction. ${url}`)
-      }
+    // if (this.authFunction) {
+    //   const url = this.authFunction(this.appId, callDetails)
+    //   if (!Constants.RegEx['URL'].test(url)) {
+    //     throw new Error(`Invalid URL returned by AuthFunction. ${url}`)
+    //   }
 
-      const response: ServerRequest = {
-        event: 'AuthenticateResponse',
-        data: {
-          payload: {
-            clientId: callDetails.clientId,
-            appId: callDetails.applicationId,
-            userId: callDetails.userId,
-            url,
-          },
-        },
-      }
+    //   const response: ServerRequest = {
+    //     event: 'AuthenticateResponse',
+    //     data: {
+    //       payload: {
+    //         clientId: callDetails.clientId,
+    //         appId: callDetails.applicationId,
+    //         userId: callDetails.userId,
+    //         url,
+    //       },
+    //     },
+    //   }
 
-      return response
-    }
+    //   return response
+    // }
 
     throw new Error('Unable to Handle Authentication, no Auth Function defined')
   }
@@ -178,6 +178,7 @@ export class MessageHandler {
       workspaceId: headers.workspaceId,
       accountId: headers.accountId,
       context: headers.context,
+      headers: headers || {},
       pagination: handler.paged
         ? {
             pageNumber: headers.pageNumber || 1,

@@ -24,7 +24,7 @@ export class ExpenseManagerModule {
       'Gets all companies in our database and returns their company IDs and name',
     paged: true,
   })
-  getCompanies(callDetails: CallDetails) {
+  getCompanies(callDetails: CallDetails) {    
     const pagination = callDetails.pagination
     let companies = this.expenseManagerService.listCompanies()
     const totalCount = companies.length

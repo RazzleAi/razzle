@@ -136,6 +136,7 @@ Action Input: "The book's ISBN is {2} and publisher is {3}"
     }
 
     addToStep()
+    console.debug('PARSE MRKL RESPONSE', steps)
     return steps
   }
 

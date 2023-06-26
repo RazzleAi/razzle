@@ -108,7 +108,9 @@ export default class Chat {
 
       yield this.history[this.history.length - 1]
 
+      console.debug(`Agent response: ${JSON.stringify(agentResponse)}`)
       if (!agentResponse.data) {
+
         const historyObj: ChatHistoryItem = {
           id: uuidV1().toString(),
           text: `Agent ${parsedLlmResponse.agent.agentName} did not return data`,

@@ -34,7 +34,7 @@ export class PromptResolverService {
 
   async handleMessage(prompt: string, apps: App[]): Promise<StepDto[]> {
     const actionTable = await this.generateActionTable(apps)
-
+    console.debug('actionTable', actionTable)
     const extractionResult = await this.resolve(prompt, actionTable)
 
     const mrklResponse =

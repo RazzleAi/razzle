@@ -4,6 +4,7 @@ import { ActionPlanWithDetails } from '../action-plan-with-details'
 export interface props {
   ui?: RazzleWidget
   data?: any
+  input?: RazzleInput
   error?: RazzleError
   agentError?: RazzleError
   pagination?: {
@@ -26,6 +27,7 @@ export class RazzleResponse {
    * The UI to render in the Razzle app.
    */
   ui?: RazzleWidget
+  input?: RazzleInput
   data?: any
   error?: RazzleError
   agentError?: RazzleError
@@ -41,11 +43,24 @@ export class RazzleResponse {
 
   constructor(props: props) {
     this.ui = props.ui
+    this.input = props.input
     this.pagination = props.pagination
     this.data = props.data
     this.error = props.error
     this.agentError = props.agentError
   }
+}
+
+export interface RazzleInput {
+  action: string
+  dataToCollect: RazzleInputDefinition[]  
+}
+
+export interface RazzleInputDefinition {
+  title: string
+  type: string
+  name: string
+  error?: string
 }
 
 export interface ActionAndArgs {
