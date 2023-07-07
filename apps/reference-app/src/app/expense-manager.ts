@@ -11,7 +11,7 @@ import {
   RazzleTable,
   RazzleText,
   WidgetPadding,
-} from '@razzledotai/widgets'
+} from '@razzledotai/sdk'
 import { RazzleResponse } from '@razzledotai/sdk'
 import { ExpenseManagerService } from './expense-manager.service'
 
